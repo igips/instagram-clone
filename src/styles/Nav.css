@@ -1,0 +1,80 @@
+nav {
+    height: 60px;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    align-items: center;
+    border-bottom: 1px solid rgba(219,219,219);
+    position: fixed;
+    top: 0;
+    z-index: 3;
+}
+
+#nav-container {
+    display: flex;
+    align-items: center;
+    flex-direction: row;
+    height: 60px;
+    justify-content: center;
+    max-width: 975px;
+    padding: 0 20px;
+    width: 100%;
+    z-index: 10;
+}
+
+#logo {
+    flex: 1 0 127px;
+    font-family: 'Dancing Script', cursive;
+    font-size: 2em;
+    height: 36px;
+    display: flex;
+    align-items: center;
+}
+
+#search-div {
+    border-radius: 8px;
+    align-items: center;
+    display: flex;
+    flex: 0 1 auto;
+    height: 36px;
+    min-width: 125px;
+    width: 268px;
+    position: relative;
+}
+
+#search-input {
+    background: rgba(239, 239, 239);
+    font-size: 16px;
+    padding: 3px 16px;
+    color: rgba(38,38,38);
+    z-index: 2;
+    border-radius: 8px;
+    height: 100%;
+    width: 100%;
+    line-height: 18px;
+    font-family: helvetica, "Font Awesome 5 Free";
+    font-weight: 100;
+    outline: none;
+}
+
+#icon-div {
+    flex: 1 0 127px;
+    align-content: center;
+    align-items: center;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    position: relative;
+    padding-left: 24px;
+    white-space: nowrap;
+}
+
+.icon-inner-div {
+    display: flex;
+    align-items: center;
+}
+
+
+
+
