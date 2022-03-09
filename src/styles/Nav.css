@@ -10,7 +10,17 @@ nav {
     z-index: 3;
 }
 
-#nav-container {
+#bottom-nav {
+    left: 0;
+    right: 0;
+    top: auto;
+    bottom: 0;
+    border-bottom: none;
+    border-top: 1px solid rgba(219,219,219);
+    display: none;
+}
+
+.nav-container {
     display: flex;
     align-items: center;
     flex-direction: row;
@@ -63,18 +73,67 @@ nav {
     align-items: center;
     display: flex;
     flex-direction: row;
-    flex-wrap: wrap;
     justify-content: flex-end;
     position: relative;
     padding-left: 24px;
     white-space: nowrap;
+    
 }
 
 .icon-inner-div {
     display: flex;
     align-items: center;
+    cursor: pointer;
 }
 
+.inner-bottom {
+    flex: 1 1 auto;
+    justify-content: center;
+    min-height: 0;
+    min-width: 0;
+    height: 100%;
+}
 
+#ava {
+    height: 100%;
+    width: 100%;
+    /* border: 1px solid rgba(38, 38, 38);
+    border-radius: 50%; */
+}
+
+.icon-inner-div:not(:first-child) {
+    margin-left: 22px;
+}
+
+@media (max-width: 650px) {
+	#search-div {
+        display: none;
+    }
+
+    .icon-to-hide {
+        display: none;
+    }
+
+    nav {
+        height: 45px;
+    }
+
+    #bottom-nav {
+        display: flex;
+        z-index: 10;
+    }
+    
+    #nav-container {
+        height: 45px;
+    }
+
+    .icon-inner-div:not(:first-child) {
+        margin-left: 0px;
+    }
+
+    .nav-container-bottom {
+        padding: 0px;
+    }
+}
 
 
