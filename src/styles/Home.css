@@ -17,3 +17,48 @@ main {
     flex-shrink: 0;
     
 }
+
+#home-left-div {
+    float: left;
+    margin-right: 28px;
+    max-width: 614px;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    flex-shrink: 0;
+    position: relative;
+}
+
+#home-left-inner {
+    flex: 0 0 auto;
+    justify-content: flex-start;
+    align-items: stretch;
+    align-content: stretch;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    color: rgba(38,38,38);
+}
+
+
+
+#home-right-div {
+    left: 674.5px;
+    top: calc(34px + 60px);
+    position: fixed;
+    max-width: 293px;
+    width: 100%;
+    right: 0;
+    display: flex;
+    flex-direction: column;
+    flex-shrink: 0;
+    height: 100vh;
+}
+
+
+
+@media (max-width: 650px) {
+    #home-section {
+        padding-top: 0px;
+    }
+}
