@@ -1,4 +1,5 @@
 import "../styles/Home.css";
+import PictureCard from "./PictureCard.js";
 
 function Home() {
   return (
@@ -6,7 +7,7 @@ function Home() {
         <section id="home-section">
             <div id="home-left-div">
                 <div id="home-left-inner">
-                   
+                   <PictureCard></PictureCard>
 
                 </div>
                 
