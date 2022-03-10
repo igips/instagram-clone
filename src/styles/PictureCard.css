@@ -283,10 +283,107 @@ canvas {
     opacity: 0.5;
 }
 
+.added-div {
+    padding-left: 16px;
+    margin-bottom: 16px;
+    display: flex;
+    flex-direction: column;
+    color: #8e8e8e;
+    font-size: 11px;
+    line-height: 12px;
+    letter-spacing: .2px;
+    font-weight: 500;
+    height: 18px;
+    margin-top: 16px;
+}
+
+.add-comment-section {
+    padding-left: 16px;
+    padding-right: 16px;
+    padding-bottom: 6px;
+    padding-top: 6px;
+    border-top: 1px solid rgba(239,239,239);
+    color: rgba(142,142,142);
+    flex-shrink: 0;
+    font-size: 14px;
+    display: flex;
+    justify-content: center;
+    line-height: 18px;
+    flex-direction: column;
+    align-items: stretch;
+    vertical-align: baseline;
+    pointer-events: auto;
+
+    
+}
+
+.comment-form {
+    display: flex;
+    align-items: center;
+    flex-grow: 1;
+    flex-shrink: 1;
+    position: relative;
+    vertical-align: baseline;
+
+
+}
+
+.emoji-div {
+    padding: 8px 16px 8px 0;
+    display: flex;
+    flex-direction: column;
+    flex-shrink: 0;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+
+}
+
+.add-comment-section-inner {
+    display: flex;
+    align-items: stretch;
+    flex-direction: column;
+    flex-shrink: 0;
+    position: relative;
+    vertical-align: baseline;
+    pointer-events: auto;
+    flex-grow: 1;
+
+}
+
+.add-comment-text-area {
+    height: 18px !important;
+    display: flex;
+    flex-grow: 1;
+    max-height: 80px;
+    width: 0;
+    outline: 0;
+    font-family: Helvetica;
+    resize: none;
+    overflow:hidden;
+}
+
+.post-div {
+    color: #0095f6;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 600;
+    text-align: center;
+    width: auto;
+    opacity: .3;
+    font-family: Helvetica;
+    line-height: 18px;
+}
+
 
 
 @media (max-width: 650px) {
 	.picture-card-article {
-		margin-bottom: 0px;
+		margin-bottom: 15px;
+        border: none;
 	}
+    
+    .add-comment-section {
+        display: none;
+    }
 }
