@@ -2,28 +2,21 @@ import "../styles/Home.css";
 import PictureCard from "./PictureCard.js";
 
 function Home() {
-  return (
-    <main>
-        <section id="home-section">
-            <div id="home-left-div">
-                <div id="home-left-inner">
-                   <PictureCard></PictureCard>
+	return (
+		<main>
+			<section id="home-section">
+				<div id="home-left-div">
+					<div id="home-left-inner">
+						<PictureCard></PictureCard>
+						<PictureCard></PictureCard>
+						<PictureCard></PictureCard>
+					</div>
+				</div>
 
-                </div>
-                
-            </div>    
-
-            <div id="home-right-div">
-
-                
-            </div>
-            
-            
-            
-        </section>
-    </main>
-
-  );
+				<div id="home-right-div"></div>
+			</section>
+		</main>
+	);
 }
 
 export default Home;
