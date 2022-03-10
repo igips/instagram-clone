@@ -147,6 +147,144 @@ canvas {
     width: 100%;
 }
 
+.comments-div {
+    flex: 0 0 auto;
+    display: flex;
+    justify-content: flex-start;
+    align-items: stretch;
+    flex-direction: column;
+}
+
+.comments-inner-div {
+    min-width: 335px;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    flex-shrink: 0;
+}
+
+.icons-in-comments-section {
+    padding-left: 16px;
+    padding-right: 16px;
+    margin-top: 4px;
+    padding-top: 6px;
+    padding-bottom: 8px;
+    display: flex;
+    align-items: stretch;
+    flex-shrink: 0;
+}
+
+.comms-icon-span {
+    margin-left: -8px;
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    padding: 8px;
+}
+
+.comms-icon-span:hover {
+    opacity: 0.5;
+}
+
+.comms-icon-span:not(:first-child) {
+    margin-left: 0px;
+}
+
+.comms-icon-span:last-child {
+    margin-left: auto;
+    margin-right: -10px;
+}
+
+.number-of-likes-section {
+    padding-left: 16px;
+    padding-right: 16px;
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 8px;
+    align-items: stretch;
+    flex-shrink: 0;
+
+}
+
+.number-of-likes-div {
+    flex: 1 1 auto;
+    display: flex;
+    justify-content: flex-start;
+    align-items: stretch;
+    align-content: stretch;
+    font-weight: 600;
+    font-size: 14px;
+    line-height: 18px;
+    font-family: Helvetica;
+}
+
+.likes-span {
+    cursor: pointer;
+}
+
+.pic-comments-div {
+    margin: 0 0 auto;
+    padding: 0 16px;
+    flex-grow: 1;
+    flex-shrink: 1;
+    min-height: 0;
+    overflow: auto;
+    display: flex;
+    flex-direction: column;   
+}
+
+.pic-comments-inner-div {
+    flex: 0 0 auto;
+    display: flex;
+    justify-content: flex-start;
+    align-items: stretch;
+    flex-direction: column;
+    font-family: Helvetica;
+}
+
+.comment-line-div {
+    margin-bottom: 4px;
+    flex: 1 1 auto;
+    display: flex;
+    justify-content: flex-start;
+    align-items: stretch;
+}
+
+.comment-span {
+    font-family: Helvetica;
+    margin-left: 5px;
+}
+
+.view-all-coms-span {
+    color: #8e8e8e;
+    cursor: pointer;
+}
+
+.in-coms {
+    cursor: pointer;
+}
+
+.in-coms:hover {
+    text-decoration: underline;
+}
+
+.comment-line-inner-div {
+    flex: 1 1 auto;
+}
+
+.like-comment-div {
+    cursor: pointer;
+}
+
+.like-comment-div:hover {
+    opacity: 0.5;
+}
+
+
+
 @media (max-width: 650px) {
 	.picture-card-article {
 		margin-bottom: 0px;
