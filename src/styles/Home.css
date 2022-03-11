@@ -331,7 +331,7 @@ main {
 }
 
 .modal {
-    display: flex; /* Hidden by default */
+    display: none; /* Hidden by default */
     position: fixed; /* Stay in place */
     z-index: 100; /* Sit on top */
     left: 0;
@@ -383,7 +383,7 @@ main {
     color: #686868;
 }
 
-#reg-form {
+#reg-form, #login-form {
     padding-top: 20px;
     display: flex;
     flex-direction: column;
@@ -421,12 +421,12 @@ main {
     outline: none;
 }
 
-#already-sign-ip {
+#already-sign-ip, #already-login-ip {
     font-size: 10px;
     cursor: pointer;
 }
 
-#already-sign-ip:hover {
+#already-sign-ip:hover, #already-login-ip:hover {
     color: #0095f6;
 }
 
