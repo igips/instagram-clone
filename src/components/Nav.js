@@ -9,7 +9,7 @@ function Nav() {
 					<div className="nav-inner-container">
 						<div id="logo">Fakegram</div>
 						<div id="search-div">
-							<input id="search-input" type="text" placeholder="Search" />
+							<input id="search-input" className="search-input" type="text" placeholder="Search" />
 						</div>
 						<div id="icon-div">
 							<div className="icon-inner-div icon-to-hide">
