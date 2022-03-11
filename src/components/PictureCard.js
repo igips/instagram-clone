@@ -178,7 +178,7 @@ function PictureCard() {
 						</div>
 					</div>
 					<div className="added-div">6 DAYS AGO</div>
-					<section className="add-comment-section">
+					{/* <section className="add-comment-section">
 						<div className="add-comment-section-inner">
 							<form className="comment-form">
 								<div className="emoji-div">
@@ -199,7 +199,7 @@ function PictureCard() {
 								<div className="post-div">Post</div>
 							</form>
 						</div>
-					</section>
+					</section> */}
 				</div>
 			</div>
 		</article>
