@@ -8,13 +8,12 @@ function Home() {
 		<main>
             <Modal></Modal>
            
-
 			<section id="home-section">
 				<div id="home-left-div">
 					<div id="home-left-inner">
 						<div id="home-left-button-div">
-							<button className="sign-login-butt">Sign Up</button>
-							<button className="sign-login-butt">Login</button>
+							<button onClick={() => document.getElementById("registerModal").style.display = "flex"} className="sign-login-butt">Sign Up</button>
+							<button onClick={() => document.getElementById("loginModal").style.display = "flex"} className="sign-login-butt">Sign In</button>
 						</div>
 						{/* <div id="suggestions-left-div">
 							<span id="for-you-sug-span-left">Suggestions For You</span>
@@ -54,8 +53,8 @@ function Home() {
 								<span id="right-login-div-bottom-span">Marian Maria</span>
 							</div>
 						</div> */}
-						<button className="sign-login-butt">Sign Up</button>
-                        <button className="sign-login-butt">Login</button>
+						<button onClick={() => document.getElementById("registerModal").style.display = "flex"} className="sign-login-butt">Sign Up</button>
+                        <button onClick={() => document.getElementById("loginModal").style.display = "flex"} className="sign-login-butt">Sign In</button>
 					</div>
 					{/* <div id="suggestions-div-right">
 						<span id="for-you-sug-span">Suggestions For You</span>
