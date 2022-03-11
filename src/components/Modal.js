@@ -23,6 +23,13 @@ function Modal() {
 					<p>Sign Up</p>
 					<form onSubmit={(e) => e.preventDefault()} id="reg-form">
 						<input
+							required
+							id="email-input"
+							className="input-modal"
+							type="email"
+							placeholder="Email"
+						/>
+                        <input
 							maxLength="15"
 							required
 							id="username-input"
@@ -41,7 +48,7 @@ function Modal() {
 						<input
 							id="password-input-rep"
 							className="input-modal"
-							placeholder="Repeat password"
+							placeholder="Repeat Password"
 							required
 							type="password"
 							onInput={() => checkIfPasswordMatch()}
@@ -76,7 +83,7 @@ function Modal() {
 							id="login-username-input"
 							className="input-modal"
 							type="text"
-							placeholder="Username"
+							placeholder="Email"
 						/>
 						<input
 							id="login-password-input"
