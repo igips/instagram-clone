@@ -71,7 +71,7 @@ main {
 
 }
 
-#home-right-profile button {
+.sign-login-butt {
     width: 200px;
     height: 30px;
     font-weight: 600;
@@ -80,12 +80,12 @@ main {
     border-radius: 3px;
 }
 
-#home-right-profile button:last-child {
+.sign-login-butt:last-child {
     background-color: black;
     color: white;
 }
 
-#home-right-profile button:hover {
+.sign-login-butt:hover {
     box-shadow: 0px 5px 20px 1px rgba(0, 0, 0, 0.2);
 }
 
@@ -239,6 +239,99 @@ main {
     color: #0095f6;
 }
 
+#home-left-button-div {
+    display: flex;
+    margin-bottom: 30px;
+    gap: 10px;
+    width: 100%;
+    justify-content: center;
+}
+
+#home-left-button-div button {
+    width: 48%;
+}
+
+#suggestions-left-div {
+    padding: 20px 0;
+    background-color: rgba(255, 255, 255);
+	border: 1px solid rgba(219, 219, 219);
+    border-radius: 3px;
+    margin-bottom: 24px;
+    margin-left: -1px;
+	margin-right: -1px;
+    display: none;
+	flex-direction: column;
+	align-items: stretch;
+
+}
+
+#for-you-sug-span-left {
+    margin: 0 24px 12px 24px;
+    color: #8e8e8e;
+    font-weight: 550;
+    font-size: 14px;
+    line-height: 18px;
+}
+
+#suggestions-left-inner-div {
+    height: 216px;
+    flex: 0 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: stretch;
+    height: 100%;
+    width: 100%;
+    overflow-x: auto;
+    overflow-y: hidden;
+    padding-left: 24px;
+    padding-right: 24px;
+    -ms-overflow-style: none;  
+    scrollbar-width: none;
+    
+}
+
+#suggestions-left-inner-div::-webkit-scrollbar {
+    display: none;
+}
+
+.sug-box-left {
+    height: 207px;
+    width: 176px;
+    flex: 0 0 auto;
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    flex-direction: column;
+    border: 1px solid rgba(219, 219, 219);
+    border-radius: 3px;
+    cursor: pointer;
+    padding: 20px;
+    background-color: rgba(255, 255, 255);
+
+}
+
+.sug-box-left-ava {
+    margin-bottom: 20px;
+    border-radius: 50px;
+    height: 54px;
+    width: 54px;
+}
+
+.sug-box-left-follow {
+    margin-top: 30px;
+    border-radius: 3px;
+    width: 63.5px;
+    height: 30px;
+    background-color: #0095f6;
+    color: white;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+
+
 @media (max-width: 999px) {
     #home-right-div {
         display: none;
@@ -250,6 +343,10 @@ main {
     #home-left-div {
         margin-right: 0px
     }
+
+    #suggestions-left-div {
+        display: flex;
+    }
 }
 
 @media (max-width: 650px) {
@@ -257,9 +354,40 @@ main {
         padding-top: 0px;
     }
 
-    
+    #home-left-button-div  {
+        margin-top: 15px;
+        flex-direction: column;
+        align-items: center;
+        margin-bottom: 15px;
+    }
+
+    #home-left-button-div button {
+        width: 99%;
+    }
+
+    .sug-box-left-ava {
+        margin-top: 10px;
+    }
+
+    .sug-box-left  {
+        width: 156px;
+        height: 170px;
+        padding: 0px;
+    }
+
+    .sug-box-left-follow  {
+        margin-top: 15px;
+    }
 
     #home-left-inner {
         padding-bottom: 30px;
+    }
+
+    #suggestions-left-div {
+        background-color: rgba(250, 250, 250);
+    }
+
+    #suggestions-left-inner-div {
+        gap: 10px;
     }
 }
