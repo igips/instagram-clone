@@ -1,9 +1,22 @@
 import "../styles/Home.css";
 import PictureCard from "./PictureCard.js";
-import ava from "../img/ava.jpeg";
 import Modal from "./Modal.js";
+import { getAuth, signOut } from "firebase/auth";
+
+
 
 function Home() {
+
+    function signOutFromAccount() {
+        signOut(getAuth()).then(() => {
+            console.log("YES");
+           
+        }).catch((error) => {
+            
+        });
+
+    }
+
 	return (
 		<main>
             <Modal></Modal>
@@ -14,6 +27,7 @@ function Home() {
 						<div id="home-left-button-div">
 							<button onClick={() => document.getElementById("registerModal").style.display = "flex"} className="sign-login-butt">Sign Up</button>
 							<button onClick={() => document.getElementById("loginModal").style.display = "flex"} className="sign-login-butt">Sign In</button>
+                            <button onClick={() => signOutFromAccount()} className="sign-login-butt">Sign Out</button>
 						</div>
 						{/* <div id="suggestions-left-div">
 							<span id="for-you-sug-span-left">Suggestions For You</span>
@@ -55,6 +69,7 @@ function Home() {
 						</div> */}
 						<button onClick={() => document.getElementById("registerModal").style.display = "flex"} className="sign-login-butt">Sign Up</button>
                         <button onClick={() => document.getElementById("loginModal").style.display = "flex"} className="sign-login-butt">Sign In</button>
+                        <button onClick={() => signOutFromAccount()} className="sign-login-butt">Sign Out</button>
 					</div>
 					{/* <div id="suggestions-div-right">
 						<span id="for-you-sug-span">Suggestions For You</span>
