@@ -1,5 +1,5 @@
 import favi from "../img/favicon.jpg";
-import { getAuth, createUserWithEmailAndPassword } from "firebase/auth";
+import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword } from "firebase/auth";
 import { getFirestore, addDoc, collection, getDocs } from "firebase/firestore";
 
 function Modal() {
@@ -40,6 +40,35 @@ function Modal() {
 		return Boolean(check);
 	}
 
+	function signIn(e) {
+		e.preventDefault();
+
+        const email = document.getElementById("login-username-input");
+        const pass = document.getElementById("login-password-input");
+        const signInButton = document.getElementById("sign-in-submit-button");
+        const loginModal = document.getElementById("loginModal");
+
+		signInWithEmailAndPassword(getAuth(), email.value, pass.value)
+			.then((userCredential) => {
+				const user = userCredential.user;
+                loginModal.style.display = "none";
+                clearSigInInputs();
+
+			})
+			.catch((error) => {
+
+                if(error.code === "auth/user-not-found") {
+                    email.setCustomValidity("User not found!");
+                    signInButton.click();
+
+                } else if (error.code === "auth/wrong-password") {
+                    pass.setCustomValidity("Wrong password!");
+                    signInButton.click();
+                }
+
+			});
+	}
+
 	function signUp(e) {
 		e.preventDefault();
 
@@ -47,7 +76,7 @@ function Modal() {
 		const pass = document.getElementById("password-input-rep");
 		const userName = document.getElementById("username-input");
 		const formSubmitButton = document.getElementById("submit-sign-up-form-button");
-        const signUpModal = document.getElementById("registerModal");
+		const signUpModal = document.getElementById("registerModal");
 
 		usernameAvailable().then((avail) => {
 			if (avail) {
@@ -60,9 +89,8 @@ function Modal() {
 							username: userName.value,
 						});
 
-                        signUpModal.style.display = "none";
+						signUpModal.style.display = "none";
 						clearSignUpInputs();
-
 					})
 					.catch((error) => {
 						if (error.code === "auth/email-already-in-use") {
@@ -157,7 +185,7 @@ function Modal() {
 					</span>
 					<img className="img-modal" src={favi} alt="" />
 					<p>Sign In</p>
-					<form onSubmit={(e) => e.preventDefault()} id="login-form">
+					<form onSubmit={(e) => signIn(e)} id="login-form">
 						<input
 							maxLength="15"
 							required
@@ -165,15 +193,18 @@ function Modal() {
 							className="input-modal"
 							type="email"
 							placeholder="Email"
+                            onInput={() => document.getElementById("login-username-input").setCustomValidity("")}
 						/>
 						<input
+							minLength="6"
 							id="login-password-input"
 							className="input-modal"
 							placeholder="Password"
 							required
 							type="password"
+                            onInput={() => document.getElementById("login-password-input").setCustomValidity("")}
 						/>
-						<button className="modal-button">Sign In</button>
+						<button id="sign-in-submit-button" className="modal-button">Sign In</button>
 					</form>
 					<p
 						onClick={() => {
