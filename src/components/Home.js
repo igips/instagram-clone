@@ -86,8 +86,7 @@ function Home() {
 								<img className="right-ava" src={ava} alt="" />
 							</div>
 							<div id="right-login-div">
-								<span id="right-login-div-top-span">5566555hh</span>
-								<span id="right-login-div-bottom-span">Marian Maria</span>
+								<span id="right-login-div-top-span"></span>
 							</div>
 						</div>
 					</div>
