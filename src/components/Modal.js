@@ -51,6 +51,7 @@ function Modal() {
 		signInWithEmailAndPassword(getAuth(), email.value, pass.value)
 			.then((userCredential) => {
 				const user = userCredential.user;
+                
                 loginModal.style.display = "none";
                 clearSigInInputs();
 
