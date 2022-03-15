@@ -147,22 +147,7 @@ main {
     letter-spacing: 1px;
 }
 
-#right-login-div-bottom-span {
-    margin-top: 1px;
-    margin-left: 6px;
-    flex: 1 1 auto;
-    display: flex;
-    justify-content: flex-start;
-    align-items: stretch;
-    flex-direction: column;
-    color: #8e8e8e;
-    font-weight: 400;
-    font-size: 14px;
-    line-height: 18px;
-    font-family: Helvetica;
-    letter-spacing: 0.5px;
 
-}
 
 #suggestions-div-right {
     margin: 0 0 12px -16px;
