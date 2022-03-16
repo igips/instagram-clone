@@ -3,12 +3,14 @@ import PictureCard from "./PictureCard.js";
 import Modal from "./Modal.js";
 import { getAuth, signOut } from "firebase/auth";
 import ava from "../img/ava.jpeg";
+import { homeIcon } from "./Nav";
 
 function Home() {
 	function signOutFromAccount() {
 		signOut(getAuth())
 			.then(() => {
-				
+                homeIcon();
+                	
 			})
 			.catch((error) => {});
 	}
@@ -33,8 +35,8 @@ function Home() {
 							>
 								Sign In
 							</button>
+                            
 						</div>
-						
 						<div className="not-visible" id="suggestions-left-div">
 							<span id="for-you-sug-span-left">Suggestions For You</span>
 							<div id="suggestions-left-inner-div">
