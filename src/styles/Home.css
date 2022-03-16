@@ -145,6 +145,8 @@ main {
     line-height: 18px;
     font-family: Helvetica;
     letter-spacing: 1px;
+    cursor: pointer;
+    max-width: fit-content;
 }
 
 
