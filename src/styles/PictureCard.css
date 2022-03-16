@@ -126,6 +126,7 @@ canvas {
 .name-span {
     font-weight: 600;
     font-family: Helvetica;
+    cursor: pointer;
 }
 
 .picture-div {
