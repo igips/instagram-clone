@@ -51,7 +51,7 @@ function Modal() {
 		signInWithEmailAndPassword(getAuth(), email.value, pass.value)
 			.then((userCredential) => {
 				const user = userCredential.user;
-                
+
                 loginModal.style.display = "none";
                 clearSigInInputs();
 
@@ -215,7 +215,7 @@ function Modal() {
 						}}
 						id="already-login-ip"
 					>
-						Already have an account? Sign In
+						Already have an account? Sign Up
 					</p>
 				</div>
 			</div>
