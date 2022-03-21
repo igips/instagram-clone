@@ -15,6 +15,28 @@ function Home() {
 			.catch((error) => {});
 	}
 
+    function followDesktop(e) {
+        if(e.currentTarget.textContent === "Follow") {
+            e.currentTarget.style.color = "rgb(38,38,38)";
+            e.currentTarget.textContent = "Following";
+
+        } else if(e.currentTarget.textContent === "Following") {
+            e.currentTarget.style.color = "#0095f6";
+            e.currentTarget.textContent = "Follow";
+        }
+    }
+
+    function followMobile(e) {
+        if(e.currentTarget.textContent === "Follow") {
+            e.currentTarget.classList.add("sug-box-left-follow-active");
+            e.currentTarget.textContent = "Following";
+
+        } else if(e.currentTarget.textContent === "Following") {
+            e.currentTarget.classList.remove("sug-box-left-follow-active");
+            e.currentTarget.textContent = "Follow";
+        }
+    }
+
 	return (
 		<main>
 			<Modal></Modal>
@@ -43,17 +65,17 @@ function Home() {
 								<div className="sug-box-left">
 									<img className="sug-box-left-ava" src={ava} alt="" />
 									<span style={{ marginBottom: "10px" }}>Siabadab Abrakap</span>
-									<div className="sug-box-left-follow">Follow</div>
+									<button onClick={(e) => followMobile(e)} className="sug-box-left-follow">Follow</button>
 								</div>
                                 <div className="sug-box-left">
 									<img className="sug-box-left-ava" src={ava} alt="" />
 									<span style={{ marginBottom: "10px" }}>Siabadab Abrakap</span>
-									<div className="sug-box-left-follow">Follow</div>
+									<button onClick={(e) => followMobile(e)} className="sug-box-left-follow">Follow</button>
 								</div>
                                 <div className="sug-box-left">
 									<img className="sug-box-left-ava" src={ava} alt="" />
 									<span style={{ marginBottom: "10px" }}>Siabadab Abrakap</span>
-									<div className="sug-box-left-follow">Follow</div>
+									<button onClick={(e) => followMobile(e)} className="sug-box-left-follow">Follow</button>
 								</div>
 							</div>
 						</div>
@@ -100,35 +122,35 @@ function Home() {
 									<img className="ava-img-sug" src={ava} alt="" />
 								</div>
 								<span className="sug-login-right">sialabala</span>
-								<span className="sug-right-follow">Follow</span>
+								<button onClick={(e) => followDesktop(e)} className="sug-right-follow">Follow</button>
 							</div>
 							<div className="right-sug-div-list">
 								<div className="right-sug-ava-div">
 									<img className="ava-img-sug" src={ava} alt="" />
 								</div>
 								<span className="sug-login-right">sialabala</span>
-								<span className="sug-right-follow">Follow</span>
+								<button onClick={(e) => followDesktop(e)} className="sug-right-follow">Follow</button>
 							</div>
 							<div className="right-sug-div-list">
 								<div className="right-sug-ava-div">
 									<img className="ava-img-sug" src={ava} alt="" />
 								</div>
 								<span className="sug-login-right">sialabala</span>
-								<span className="sug-right-follow">Follow</span>
+								<button onClick={(e) => followDesktop(e)} className="sug-right-follow">Follow</button>
 							</div>
 							<div className="right-sug-div-list">
 								<div className="right-sug-ava-div">
 									<img className="ava-img-sug" src={ava} alt="" />
 								</div>
 								<span className="sug-login-right">sialabala</span>
-								<span className="sug-right-follow">Follow</span>
+								<button onClick={(e) => followDesktop(e)} className="sug-right-follow">Follow</button>
 							</div>
 							<div className="right-sug-div-list">
 								<div className="right-sug-ava-div">
 									<img className="ava-img-sug" src={ava} alt="" />
 								</div>
 								<span className="sug-login-right">sialabala</span>
-								<span className="sug-right-follow">Follow</span>
+								<button onClick={(e) => followDesktop(e)} className="sug-right-follow">Follow</button>
 							</div>
 						</div>
 					</div>

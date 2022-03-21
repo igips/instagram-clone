@@ -1,3 +1,5 @@
+
+
 main {
     background-color: rgba(250,250,250);
     flex-grow: 1;
@@ -230,6 +232,7 @@ main {
     font-size: 12px;
     line-height: 16px;
     color: #0095f6;
+    background-color: rgba(250,250,250);
 }
 
 #home-left-button-div {
@@ -311,7 +314,7 @@ main {
 .sug-box-left-follow {
     margin-top: 30px;
     border-radius: 3px;
-    width: 63.5px;
+    width: 80px;
     height: 30px;
     background-color: #0095f6;
     color: white;
@@ -319,6 +322,13 @@ main {
     display: flex;
     align-items: center;
     justify-content: center;
+    cursor: pointer;
+}
+
+.sug-box-left-follow-active {
+    background-color: transparent;
+    color: rgb(38,38,38);
+    border: 1px solid rgb(219,219,219);
 }
 
 .modal {
