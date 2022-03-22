@@ -11,13 +11,16 @@
 	box-sizing: inherit;
 }
 
-html, body, #root {
+html {
+    display: block;
+    min-height: 100%;
+}
+
+body, #root {
     height: 100%;
 }
 
-html {
-    display: block;
-}
+
 
 body {
     font-size: 14px;
