@@ -1,5 +1,5 @@
 import "../styles/Home.css";
-import PictureCard from "./PictureCard.js";
+import PictureCard, { keepDropDown, hideDropDown, dropDown } from "./PictureCard.js";
 import Modal from "./Modal.js";
 import { getAuth, signOut } from "firebase/auth";
 import ava from "../img/ava.jpeg";
@@ -9,38 +9,42 @@ function Home() {
 	function signOutFromAccount() {
 		signOut(getAuth())
 			.then(() => {
-                homeIcon();
-                	
+				homeIcon();
 			})
 			.catch((error) => {});
 	}
 
-    function followDesktop(e) {
-        if(e.currentTarget.textContent === "Follow") {
-            e.currentTarget.style.color = "rgb(38,38,38)";
-            e.currentTarget.textContent = "Following";
+	function followDesktop(e) {
+		if (e.currentTarget.textContent === "Follow") {
+			e.currentTarget.style.color = "rgb(38,38,38)";
+			e.currentTarget.textContent = "Following";
+		} else if (e.currentTarget.textContent === "Following") {
+			e.currentTarget.style.color = "#0095f6";
+			e.currentTarget.textContent = "Follow";
+		}
+	}
 
-        } else if(e.currentTarget.textContent === "Following") {
-            e.currentTarget.style.color = "#0095f6";
-            e.currentTarget.textContent = "Follow";
-        }
-    }
-
-    function followMobile(e) {
-        if(e.currentTarget.textContent === "Follow") {
-            e.currentTarget.classList.add("sug-box-left-follow-active");
-            e.currentTarget.textContent = "Following";
-
-        } else if(e.currentTarget.textContent === "Following") {
-            e.currentTarget.classList.remove("sug-box-left-follow-active");
-            e.currentTarget.textContent = "Follow";
-        }
-    }
+	function followMobile(e) {
+		if (e.currentTarget.textContent === "Follow") {
+			e.currentTarget.classList.add("sug-box-left-follow-active");
+			e.currentTarget.textContent = "Following";
+		} else if (e.currentTarget.textContent === "Following") {
+			e.currentTarget.classList.remove("sug-box-left-follow-active");
+			e.currentTarget.textContent = "Follow";
+		}
+	}
 
 	return (
 		<main>
 			<Modal></Modal>
-
+			<div
+				onMouseOver={() => keepDropDown()}
+				onMouseLeave={() => hideDropDown()}
+				className="drop-down"
+				id="drop-down"
+			>
+				<div className="drop-down-inner">LABRADOR</div>
+			</div>
 			<section id="home-section">
 				<div id="home-left-div">
 					<div id="home-left-inner">
@@ -57,7 +61,6 @@ function Home() {
 							>
 								Sign In
 							</button>
-                            
 						</div>
 						<div className="not-visible" id="suggestions-left-div">
 							<span id="for-you-sug-span-left">Suggestions For You</span>
@@ -65,17 +68,23 @@ function Home() {
 								<div className="sug-box-left">
 									<img className="sug-box-left-ava" src={ava} alt="" />
 									<span style={{ marginBottom: "10px" }}>Siabadab Abrakap</span>
-									<button onClick={(e) => followMobile(e)} className="sug-box-left-follow">Follow</button>
+									<button onClick={(e) => followMobile(e)} className="sug-box-left-follow">
+										Follow
+									</button>
 								</div>
-                                <div className="sug-box-left">
+								<div className="sug-box-left">
 									<img className="sug-box-left-ava" src={ava} alt="" />
 									<span style={{ marginBottom: "10px" }}>Siabadab Abrakap</span>
-									<button onClick={(e) => followMobile(e)} className="sug-box-left-follow">Follow</button>
+									<button onClick={(e) => followMobile(e)} className="sug-box-left-follow">
+										Follow
+									</button>
 								</div>
-                                <div className="sug-box-left">
+								<div className="sug-box-left">
 									<img className="sug-box-left-ava" src={ava} alt="" />
 									<span style={{ marginBottom: "10px" }}>Siabadab Abrakap</span>
-									<button onClick={(e) => followMobile(e)} className="sug-box-left-follow">Follow</button>
+									<button onClick={(e) => followMobile(e)} className="sug-box-left-follow">
+										Follow
+									</button>
 								</div>
 							</div>
 						</div>
@@ -118,39 +127,99 @@ function Home() {
 						<span id="for-you-sug-span">Suggestions For You</span>
 						<div id="list-of-sug-div">
 							<div className="right-sug-div-list">
-								<div className="right-sug-ava-div">
+								<div
+									onMouseEnter={(e) => dropDown(e, "avaPic", "right")}
+									onMouseLeave={() => hideDropDown()}
+									className="right-sug-ava-div"
+								>
 									<img className="ava-img-sug" src={ava} alt="" />
 								</div>
-								<span className="sug-login-right">sialabala</span>
-								<button onClick={(e) => followDesktop(e)} className="sug-right-follow">Follow</button>
+								<span
+									onMouseEnter={(e) => dropDown(e, "no", "right")}
+									onMouseLeave={() => hideDropDown()}
+									className="sug-login-right"
+								>
+									sialabala
+								</span>
+								<button onClick={(e) => followDesktop(e)} className="sug-right-follow">
+									Follow
+								</button>
 							</div>
 							<div className="right-sug-div-list">
-								<div className="right-sug-ava-div">
+								<div
+									onMouseEnter={(e) => dropDown(e, "avaPic", "right")}
+									onMouseLeave={() => hideDropDown()}
+									className="right-sug-ava-div"
+								>
 									<img className="ava-img-sug" src={ava} alt="" />
 								</div>
-								<span className="sug-login-right">sialabala</span>
-								<button onClick={(e) => followDesktop(e)} className="sug-right-follow">Follow</button>
+								<span
+									onMouseEnter={(e) => dropDown(e, "no", "right")}
+									onMouseLeave={() => hideDropDown()}
+									className="sug-login-right"
+								>
+									sialabala
+								</span>
+								<button onClick={(e) => followDesktop(e)} className="sug-right-follow">
+									Follow
+								</button>
 							</div>
 							<div className="right-sug-div-list">
-								<div className="right-sug-ava-div">
+								<div
+									onMouseEnter={(e) => dropDown(e, "avaPic", "right")}
+									onMouseLeave={() => hideDropDown()}
+									className="right-sug-ava-div"
+								>
 									<img className="ava-img-sug" src={ava} alt="" />
 								</div>
-								<span className="sug-login-right">sialabala</span>
-								<button onClick={(e) => followDesktop(e)} className="sug-right-follow">Follow</button>
+								<span
+									onMouseEnter={(e) => dropDown(e, "no", "right")}
+									onMouseLeave={() => hideDropDown()}
+									className="sug-login-right"
+								>
+									sialabala
+								</span>
+								<button onClick={(e) => followDesktop(e)} className="sug-right-follow">
+									Follow
+								</button>
 							</div>
 							<div className="right-sug-div-list">
-								<div className="right-sug-ava-div">
+								<div
+									onMouseEnter={(e) => dropDown(e, "avaPic", "right")}
+									onMouseLeave={() => hideDropDown()}
+									className="right-sug-ava-div"
+								>
 									<img className="ava-img-sug" src={ava} alt="" />
 								</div>
-								<span className="sug-login-right">sialabala</span>
-								<button onClick={(e) => followDesktop(e)} className="sug-right-follow">Follow</button>
+								<span
+									onMouseEnter={(e) => dropDown(e, "no", "right")}
+									onMouseLeave={() => hideDropDown()}
+									className="sug-login-right"
+								>
+									sialabala
+								</span>
+								<button onClick={(e) => followDesktop(e)} className="sug-right-follow">
+									Follow
+								</button>
 							</div>
 							<div className="right-sug-div-list">
-								<div className="right-sug-ava-div">
+								<div
+									onMouseEnter={(e) => dropDown(e, "avaPic", "right")}
+									onMouseLeave={() => hideDropDown()}
+									className="right-sug-ava-div"
+								>
 									<img className="ava-img-sug" src={ava} alt="" />
 								</div>
-								<span className="sug-login-right">sialabala</span>
-								<button onClick={(e) => followDesktop(e)} className="sug-right-follow">Follow</button>
+								<span
+									onMouseEnter={(e) => dropDown(e, "no", "right")}
+									onMouseLeave={() => hideDropDown()}
+									className="sug-login-right"
+								>
+									sialabala
+								</span>
+								<button onClick={(e) => followDesktop(e)} className="sug-right-follow">
+									Follow
+								</button>
 							</div>
 						</div>
 					</div>
