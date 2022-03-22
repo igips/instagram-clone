@@ -120,7 +120,6 @@ function homeIcon() {
 	messageIconNotClicked();
 	notificationIconNotClicked();
 	avatarIconNotClicked();
-
 }
 
 function messageIcon() {
@@ -149,12 +148,9 @@ function addPostIcon() {
 	const user = getAuth().currentUser;
 
 	if (user) {
-
-
 	} else {
 		showSignInModal();
 	}
-
 }
 
 function Nav() {
@@ -217,6 +213,7 @@ function Nav() {
 
 	return (
 		<>
+			
 			<nav id="top-nav">
 				<div className="nav-container">
 					<div className="nav-inner-container">
@@ -457,4 +454,4 @@ function Nav() {
 }
 
 export default Nav;
-export {homeIcon, showSignInModal};
+export { homeIcon, showSignInModal };
