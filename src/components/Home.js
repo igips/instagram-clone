@@ -1,9 +1,41 @@
 import "../styles/Home.css";
-import PictureCard, { keepDropDown, hideDropDown, dropDown } from "./PictureCard.js";
+import PictureCard from "./PictureCard.js";
 import Modal from "./Modal.js";
 import { getAuth, signOut } from "firebase/auth";
 import ava from "../img/ava.jpeg";
 import { homeIcon } from "./Nav";
+import testPic from "../img/test-img.jpg";
+
+function dropDown(e, ele, right) {
+	const dropDown = document.getElementById("drop-down");
+	const rect = e.target.getBoundingClientRect();
+
+	dropDown.style.display = "flex";
+	dropDown.style.left = rect.left + "px";
+	dropDown.style.top = (right ? rect.top : window.scrollY + rect.top) + (ele === "avaPic" ? 25 : 18) + "px";
+	dropDown.style.position = right ? "fixed" : "absolute";
+
+	if (window.innerHeight - dropDown.getBoundingClientRect().bottom < 0) {
+		dropDown.style.top = window.scrollY + rect.top - 88 + "px";
+	}
+
+	if (window.innerWidth - dropDown.getBoundingClientRect().left <= 390) {
+		dropDown.style.left = rect.left - (410 - (window.innerWidth - dropDown.getBoundingClientRect().left)) + "px";
+	}
+}
+
+function hideDropDown() {
+	const dropDown = document.getElementById("drop-down");
+
+	if (dropDown) {
+		dropDown.style.display = "none";
+	}
+}
+
+function keepDropDown() {
+	const dropDown = document.getElementById("drop-down");
+	dropDown.style.display = "flex";
+}
 
 function Home() {
 	function signOutFromAccount() {
@@ -34,6 +66,33 @@ function Home() {
 		}
 	}
 
+	function followDropDown(e) {
+		const container = document.getElementById("drop-down-inner-fourth");
+
+		if (e.currentTarget.textContent === "Follow") {
+			const secondButton = document.getElementById("drop-down-button");
+
+			if (secondButton) {
+				secondButton.removeEventListener("click", followDropDown);
+			}
+
+			container.innerHTML =
+				"<button class='drop-down-button'>Message</button> <button id='drop-down-following-button' class='drop-down-button'>Following</button>";
+
+			const button = document.getElementById("drop-down-following-button");
+			button.addEventListener("click", (e) => followDropDown(e));
+
+		} else if (e.currentTarget.textContent === "Following") {
+			const button = document.getElementById("drop-down-following-button");
+			button.removeEventListener("click", followDropDown);
+
+			container.innerHTML = "<button id='drop-down-button'>Follow</button>";
+
+			const secondButton = document.getElementById("drop-down-button");
+			secondButton.addEventListener("click", (e) => followDropDown(e));
+		}
+	}
+
 	return (
 		<main>
 			<Modal></Modal>
@@ -43,7 +102,34 @@ function Home() {
 				className="drop-down"
 				id="drop-down"
 			>
-				<div className="drop-down-inner">LABRADOR</div>
+				<div className="drop-down-inner-first">
+					<img id="drop-down-ava" src={ava} alt="" />
+					<span>sialabala</span>
+				</div>
+				<div className="drop-down-inner-second">
+					<div className="drop-down-inner-second-inner">
+						<span>23</span>
+						<span>posts</span>
+					</div>
+					<div className="drop-down-inner-second-inner">
+						<span>173</span>
+						<span>followers</span>
+					</div>
+					<div className="drop-down-inner-second-inner">
+						<span>233</span>
+						<span>following</span>
+					</div>
+				</div>
+				<div className="drop-down-inner-third">
+					<img src={testPic} alt="" />
+					<img src={testPic} alt="" />
+					<img src={testPic} alt="" />
+				</div>
+				<div id="drop-down-inner-fourth">
+					<button onClick={(e) => followDropDown(e)} id="drop-down-button">
+						Follow
+					</button>
+				</div>
 			</div>
 			<section id="home-section">
 				<div id="home-left-div">
@@ -230,3 +316,4 @@ function Home() {
 }
 
 export default Home;
+export { dropDown, hideDropDown, keepDropDown };
