@@ -1,8 +1,28 @@
 import favi from "../img/favicon.jpg";
 import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword } from "firebase/auth";
 import { getFirestore, addDoc, collection, getDocs } from "firebase/firestore";
+import { useEffect } from "react";
 
 function Modal() {
+
+	useEffect(() => {
+		const signInModal = document.getElementById("loginModal");
+		const registerModal = document.getElementById("registerModal");
+        const unfollowModal = document.getElementById("unfollowModal");
+
+		window.onclick = (e) => {
+			if (e.target === signInModal) {
+				signInModal.style.display = "none";
+
+			} else if (e.target === registerModal) {
+				registerModal.style.display = "none";
+
+			} else if(e.target === unfollowModal) {
+                unfollowModal.style.display = "none";
+            }
+		};
+	});
+
 	function checkIfPasswordMatch() {
 		const passwordInput = document.getElementById("password-input-rep");
 		const passwordInput2 = document.getElementById("password-input");
@@ -43,30 +63,26 @@ function Modal() {
 	function signIn(e) {
 		e.preventDefault();
 
-        const email = document.getElementById("login-username-input");
-        const pass = document.getElementById("login-password-input");
-        const signInButton = document.getElementById("sign-in-submit-button");
-        const loginModal = document.getElementById("loginModal");
+		const email = document.getElementById("login-username-input");
+		const pass = document.getElementById("login-password-input");
+		const signInButton = document.getElementById("sign-in-submit-button");
+		const loginModal = document.getElementById("loginModal");
 
 		signInWithEmailAndPassword(getAuth(), email.value, pass.value)
 			.then((userCredential) => {
 				const user = userCredential.user;
 
-                loginModal.style.display = "none";
-                clearSigInInputs();
-
+				loginModal.style.display = "none";
+				clearSigInInputs();
 			})
 			.catch((error) => {
-
-                if(error.code === "auth/user-not-found") {
-                    email.setCustomValidity("User not found!");
-                    signInButton.click();
-
-                } else if (error.code === "auth/wrong-password") {
-                    pass.setCustomValidity("Wrong password!");
-                    signInButton.click();
-                }
-
+				if (error.code === "auth/user-not-found") {
+					email.setCustomValidity("User not found!");
+					signInButton.click();
+				} else if (error.code === "auth/wrong-password") {
+					pass.setCustomValidity("Wrong password!");
+					signInButton.click();
+				}
 			});
 	}
 
@@ -104,6 +120,11 @@ function Modal() {
 				formSubmitButton.click();
 			}
 		});
+	}
+
+	function hideFollowModal() {
+		const modal = document.getElementById("unfollowModal");
+		modal.style.display = "none";
 	}
 
 	return (
@@ -194,7 +215,7 @@ function Modal() {
 							className="input-modal"
 							type="email"
 							placeholder="Email"
-                            onInput={() => document.getElementById("login-username-input").setCustomValidity("")}
+							onInput={() => document.getElementById("login-username-input").setCustomValidity("")}
 						/>
 						<input
 							minLength="6"
@@ -203,9 +224,11 @@ function Modal() {
 							placeholder="Password"
 							required
 							type="password"
-                            onInput={() => document.getElementById("login-password-input").setCustomValidity("")}
+							onInput={() => document.getElementById("login-password-input").setCustomValidity("")}
 						/>
-						<button id="sign-in-submit-button" className="modal-button">Sign In</button>
+						<button id="sign-in-submit-button" className="modal-button">
+							Sign In
+						</button>
 					</form>
 					<p
 						onClick={() => {
@@ -219,9 +242,20 @@ function Modal() {
 					</p>
 				</div>
 			</div>
+			<div id="unfollowModal" className="modal">
+				<div className="unfollowModalContent">
+					<span>Unfollow</span>
+					<span onClick={() => hideFollowModal()}>Cancel</span>
+				</div>
+			</div>
+            <div id="likesModal" className="modal">
+				<div className="likesModalContent">
+					
+				</div>
+			</div>
+
 		</>
 	);
 }
 
 export default Modal;
-
