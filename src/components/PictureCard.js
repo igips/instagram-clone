@@ -4,40 +4,9 @@ import testPic from "../img/test-img.jpg";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 import { useState } from "react";
 import { showSignInModal } from "./Nav";
+import { hideDropDown, dropDown } from "./Home.js";
 import uniqid from "uniqid";
 
-function dropDown(e, ele, right) {
-	const dropDown = document.getElementById("drop-down");
-	const rect = e.target.getBoundingClientRect();
-
-	dropDown.style.display = "block";
-	dropDown.style.left = rect.left + "px";
-    dropDown.style.top =  (right ? rect.top : window.scrollY + rect.top) + (ele === "avaPic" ? 20 : 10) + "px";
-    dropDown.style.position = right ? "fixed" : "absolute";
-
-	if (window.innerHeight - dropDown.getBoundingClientRect().bottom < 0) {
-		dropDown.style.top = window.scrollY + rect.top - 110 + "px";
-	}
-
-    if(window.innerWidth - dropDown.getBoundingClientRect().left <= 390) {
-        dropDown.style.left = rect.left - (410 - (window.innerWidth - dropDown.getBoundingClientRect().left)) + "px"; 
-    }
-
-   
-}
-
-function hideDropDown() {
-	const dropDown = document.getElementById("drop-down");
-    
-	if (dropDown) {
-		dropDown.style.display = "none";
-	}
-}
-
-function keepDropDown() {
-	const dropDown = document.getElementById("drop-down");
-	dropDown.style.display = "block";
-}
 
 function PictureCard() {
 	const [signedIn, setSignedIn] = useState(false);
@@ -380,4 +349,4 @@ function PictureCard() {
 }
 
 export default PictureCard;
-export { dropDown, hideDropDown, keepDropDown };
+
