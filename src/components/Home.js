@@ -1,10 +1,11 @@
 import "../styles/Home.css";
 import PictureCard from "./PictureCard.js";
 import Modal from "./Modal.js";
-import { getAuth, signOut } from "firebase/auth";
+import { getAuth, signOut, onAuthStateChanged } from "firebase/auth";
 import ava from "../img/ava.jpeg";
 import { homeIcon } from "./Nav";
 import testPic from "../img/test-img.jpg";
+import { useState } from "react";
 
 function dropDown(e, ele, right) {
 	const dropDown = document.getElementById("drop-down");
@@ -16,7 +17,7 @@ function dropDown(e, ele, right) {
 	dropDown.style.position = right ? "fixed" : "absolute";
 
 	if (window.innerHeight - dropDown.getBoundingClientRect().bottom < 0) {
-		dropDown.style.top = (right ? rect.top : window.scrollY + rect.top)  - 350 + "px";
+		dropDown.style.top = (right ? rect.top : window.scrollY + rect.top) - 350 + "px";
 	}
 
 	if (window.innerWidth - dropDown.getBoundingClientRect().left <= 390) {
@@ -38,6 +39,18 @@ function keepDropDown() {
 }
 
 function Home() {
+    const [signedIn, setSignedIn] = useState(false);
+
+    onAuthStateChanged(getAuth(), (user) => {
+		if (user) {
+			setSignedIn(true);
+		} else {
+			setSignedIn(false);
+		}
+	});
+
+
+
 	function signOutFromAccount() {
 		signOut(getAuth())
 			.then(() => {
@@ -81,7 +94,6 @@ function Home() {
 
 			const button = document.getElementById("drop-down-following-button");
 			button.addEventListener("click", (e) => followDropDown(e));
-
 		} else if (e.currentTarget.textContent === "Following") {
 			const button = document.getElementById("drop-down-following-button");
 			button.removeEventListener("click", followDropDown);
@@ -90,6 +102,19 @@ function Home() {
 
 			const secondButton = document.getElementById("drop-down-button");
 			secondButton.addEventListener("click", (e) => followDropDown(e));
+		}
+	}
+
+	function dropDownBottomSection() {
+
+		if (signedIn) {
+			return (
+				<div id="drop-down-inner-fourth">
+					<button onClick={(e) => followDropDown(e)} id="drop-down-button">
+						Follow
+					</button>
+				</div>
+			);
 		}
 	}
 
@@ -125,11 +150,7 @@ function Home() {
 					<img src={testPic} alt="" />
 					<img src={testPic} alt="" />
 				</div>
-				<div id="drop-down-inner-fourth">
-					<button onClick={(e) => followDropDown(e)} id="drop-down-button">
-						Follow
-					</button>
-				</div>
+				{dropDownBottomSection()}
 			</div>
 			<section id="home-section">
 				<div id="home-left-div">
