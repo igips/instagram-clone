@@ -16,7 +16,7 @@ function dropDown(e, ele, right) {
 	dropDown.style.position = right ? "fixed" : "absolute";
 
 	if (window.innerHeight - dropDown.getBoundingClientRect().bottom < 0) {
-		dropDown.style.top = window.scrollY + rect.top - 88 + "px";
+		dropDown.style.top = (right ? rect.top : window.scrollY + rect.top)  - 350 + "px";
 	}
 
 	if (window.innerWidth - dropDown.getBoundingClientRect().left <= 390) {
