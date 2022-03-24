@@ -311,7 +311,7 @@ main {
     width: 54px;
 }
 
-.sug-box-left-follow {
+.sug-box-left-follow, .likes-modal-follow {
     margin-top: 30px;
     border-radius: 3px;
     width: 80px;
@@ -323,6 +323,11 @@ main {
     align-items: center;
     justify-content: center;
     cursor: pointer;
+}
+
+.likes-modal-follow {
+    margin-top: 0px;
+    margin-left: auto;
 }
 
 .sug-box-left-follow-active {
@@ -371,7 +376,7 @@ main {
   cursor: pointer;
 }
 
-.unfollowModalContent {
+.unfollow-modal-content {
     width: 400px;
     border-radius: 5px;
     border: 1px solid rgba(219, 219, 219);
@@ -384,31 +389,18 @@ main {
     background-color: rgba(255, 255, 255);
 }
 
-.unfollowModalContent span {
+.unfollow-modal-content span {
     height: 48px;
     display: flex;
     align-items: center;
     justify-content: center;
 }
 
-.unfollowModalContent span:last-child {
+.unfollow-modal-content span:last-child {
     border-top: 1px solid rgba(219, 219, 219);
     color: #222;
     font-weight: 500;
 }
-
-.likesModalContent {
-    width: 400px;
-    height: 399px;
-    border-radius: 10px;
-    border: 1px solid rgba(219, 219, 219);
-    margin: auto;
-    background-color: rgba(255, 255, 255);
-
-}
-
-
-
 
 
 .img-modal {
@@ -590,6 +582,48 @@ main {
     border: 1px solid rgb(219,219,219);
 }
 
+.likes-modal-content {
+    width: 400px;
+    height: 399px;
+    border-radius: 10px;
+    border: 1px solid rgba(219, 219, 219);
+    margin: auto;
+    background-color: rgba(255, 255, 255);
+    display: flex;
+    flex-direction: column;
+}
+
+#likes-modal-header {
+    min-height: 42px;
+    color: rgba(38,38,38);
+    font-size: 16px;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    border-bottom: 1px solid rgba(219, 219, 219);
+    padding-left: 34px;
+    padding-right: 16px;
+}
+
+#likes-modal-header span {
+    margin-left: auto;
+    margin-right: auto;
+    
+}
+
+#close-likes-modal {
+    cursor: pointer;
+}
+
+.ava-img-likes {
+    height: 44px;
+    width: 44px;
+}
+
+#list-of-likes-div {
+    overflow-y: scroll;
+}
+
 
 
 @media (max-width: 999px) {
@@ -656,11 +690,11 @@ main {
         gap: 10px;
     }
 
-    .unfollowModalContent {
+    .unfollow-modal-content {
         width: 270px;
     }
 
-    .likesModalContent {
+    .likes-modal-content {
         width: 100%;
         height: 100%;
         border-radius: 0px;
