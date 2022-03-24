@@ -46,7 +46,7 @@ function PictureCard() {
 
 	function options() {
 		if (signedIn) {
-            const modal = document.getElementById("unfollowModal");
+            const modal = document.getElementById("unfollow-modal");
             modal.style.display = "flex";
 
 		} else {
@@ -109,7 +109,7 @@ function PictureCard() {
 	}
 
     function showLikesModal() {
-        const modal = document.getElementById("likesModal");
+        const modal = document.getElementById("likes-modal");
         modal.style.display = "flex";
     }
 
