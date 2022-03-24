@@ -4,6 +4,7 @@ import { getFirestore, addDoc, collection, getDocs } from "firebase/firestore";
 import { useEffect, useState } from "react";
 import ava from "../img/ava.jpeg";
 import { dropDown, hideDropDown, followMobile } from "./Home";
+import testPic from "../img/test-img.jpg";
 
 function Modal() {
 	const [signedIn, setSignedIn] = useState(false);
@@ -21,6 +22,8 @@ function Modal() {
 		const registerModal = document.getElementById("register-modal");
 		const unfollowModal = document.getElementById("unfollow-modal");
 		const likesModal = document.getElementById("likes-modal");
+		const commentsModal = document.getElementById("comments-modal");
+		
 
 		window.onclick = (e) => {
 			if (e.target === signInModal) {
@@ -31,6 +34,8 @@ function Modal() {
 				unfollowModal.style.display = "none";
 			} else if (e.target === likesModal) {
 				likesModal.style.display = "none";
+			} else if (e.target === commentsModal) {
+				commentsModal.style.display = "none";
 			}
 		};
 	});
@@ -141,6 +146,11 @@ function Modal() {
 
 	function hideLikesModal() {
 		const modal = document.getElementById("likes-modal");
+		modal.style.display = "none";
+	}
+
+	function hideCommentsModal() {
+		const modal = document.getElementById("comments-modal");
 		modal.style.display = "none";
 	}
 
@@ -364,6 +374,45 @@ function Modal() {
 							{followButtonForLikes()}
 						</div>
 					</div>
+				</div>
+			</div>
+			<div id="comments-modal" className="modal">
+				<div onClick={() => hideCommentsModal()} id="comments-modal-close">
+					<svg
+						aria-label="Close"
+						color="#ffffff"
+						fill="#ffffff"
+						height="24"
+						role="img"
+						viewBox="0 0 24 24"
+						width="24"
+					>
+						<polyline
+							fill="none"
+							points="20.643 3.357 12 12 3.353 20.647"
+							stroke="currentColor"
+							strokeLinecap="round"
+							strokeLinejoin="round"
+							strokeWidth="3"
+						></polyline>
+						<line
+							fill="none"
+							stroke="currentColor"
+							strokeLinecap="round"
+							strokeLinejoin="round"
+							strokeWidth="3"
+							x1="20.649"
+							x2="3.354"
+							y1="20.649"
+							y2="3.354"
+						></line>
+					</svg>
+				</div>
+				<div id="comments-modal-content">
+					<div id="comments-div-img">
+						<img src={testPic} alt="" />
+					</div>
+					<div id="comments-div-modal"></div>
 				</div>
 			</div>
 		</>
