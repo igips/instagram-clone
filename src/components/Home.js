@@ -10,6 +10,7 @@ import { useState } from "react";
 function dropDown(e, ele, right) {
 	const dropDown = document.getElementById("drop-down");
 	const rect = e.target.getBoundingClientRect();
+	const user = getAuth().currentUser;
 
 	dropDown.style.display = "flex";
 	dropDown.style.left = rect.left + "px";
@@ -17,7 +18,7 @@ function dropDown(e, ele, right) {
 	dropDown.style.position = right ? "fixed" : "absolute";
 
 	if (window.innerHeight - dropDown.getBoundingClientRect().bottom < 0) {
-		dropDown.style.top = (right ? rect.top : window.scrollY + rect.top) - 350 + "px";
+		dropDown.style.top = (right ? rect.top : window.scrollY + rect.top) - (user ? 350 : 290) + "px";
 	}
 
 	if (window.innerWidth - dropDown.getBoundingClientRect().left <= 390) {
@@ -38,10 +39,30 @@ function keepDropDown() {
 	dropDown.style.display = "flex";
 }
 
-function Home() {
-    const [signedIn, setSignedIn] = useState(false);
+function followDesktop(e) {
+	if (e.currentTarget.textContent === "Follow") {
+		e.currentTarget.style.color = "rgb(38,38,38)";
+		e.currentTarget.textContent = "Following";
+	} else if (e.currentTarget.textContent === "Following") {
+		e.currentTarget.style.color = "#0095f6";
+		e.currentTarget.textContent = "Follow";
+	}
+}
 
-    onAuthStateChanged(getAuth(), (user) => {
+function followMobile(e) {
+	if (e.currentTarget.textContent === "Follow") {
+		e.currentTarget.classList.add("sug-box-left-follow-active");
+		e.currentTarget.textContent = "Following";
+	} else if (e.currentTarget.textContent === "Following") {
+		e.currentTarget.classList.remove("sug-box-left-follow-active");
+		e.currentTarget.textContent = "Follow";
+	}
+}
+
+function Home() {
+	const [signedIn, setSignedIn] = useState(false);
+
+	onAuthStateChanged(getAuth(), (user) => {
 		if (user) {
 			setSignedIn(true);
 		} else {
@@ -49,34 +70,12 @@ function Home() {
 		}
 	});
 
-
-
 	function signOutFromAccount() {
 		signOut(getAuth())
 			.then(() => {
 				homeIcon();
 			})
 			.catch((error) => {});
-	}
-
-	function followDesktop(e) {
-		if (e.currentTarget.textContent === "Follow") {
-			e.currentTarget.style.color = "rgb(38,38,38)";
-			e.currentTarget.textContent = "Following";
-		} else if (e.currentTarget.textContent === "Following") {
-			e.currentTarget.style.color = "#0095f6";
-			e.currentTarget.textContent = "Follow";
-		}
-	}
-
-	function followMobile(e) {
-		if (e.currentTarget.textContent === "Follow") {
-			e.currentTarget.classList.add("sug-box-left-follow-active");
-			e.currentTarget.textContent = "Following";
-		} else if (e.currentTarget.textContent === "Following") {
-			e.currentTarget.classList.remove("sug-box-left-follow-active");
-			e.currentTarget.textContent = "Follow";
-		}
 	}
 
 	function followDropDown(e) {
@@ -106,7 +105,6 @@ function Home() {
 	}
 
 	function dropDownBottomSection() {
-
 		if (signedIn) {
 			return (
 				<div id="drop-down-inner-fourth">
@@ -117,6 +115,7 @@ function Home() {
 			);
 		}
 	}
+
 
 	return (
 		<main>
@@ -157,13 +156,13 @@ function Home() {
 					<div id="home-left-inner">
 						<div className="mobile" id="home-left-button-div">
 							<button
-								onClick={() => (document.getElementById("registerModal").style.display = "flex")}
+								onClick={() => (document.getElementById("register-modal").style.display = "flex")}
 								className="sign-login-butt"
 							>
 								Sign Up
 							</button>
 							<button
-								onClick={() => (document.getElementById("loginModal").style.display = "flex")}
+								onClick={() => (document.getElementById("login-modal").style.display = "flex")}
 								className="sign-login-butt"
 							>
 								Sign In
@@ -206,13 +205,13 @@ function Home() {
 					<div id="home-right-profile">
 						<div className="visible" id="right-div-for-buttons">
 							<button
-								onClick={() => (document.getElementById("registerModal").style.display = "flex")}
+								onClick={() => (document.getElementById("register-modal").style.display = "flex")}
 								className="sign-login-butt"
 							>
 								Sign Up
 							</button>
 							<button
-								onClick={() => (document.getElementById("loginModal").style.display = "flex")}
+								onClick={() => (document.getElementById("login-modal").style.display = "flex")}
 								className="sign-login-butt"
 							>
 								Sign In
@@ -337,4 +336,4 @@ function Home() {
 }
 
 export default Home;
-export { dropDown, hideDropDown, keepDropDown };
+export { dropDown, hideDropDown, keepDropDown, followMobile };
