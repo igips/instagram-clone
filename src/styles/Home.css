@@ -624,7 +624,54 @@ main {
     overflow-y: scroll;
 }
 
+#comments-modal {
+    flex-shrink: 0;
+    align-items: center;
+    justify-content: center;
+}
 
+#comments-modal-content {
+    display: flex;
+    min-height: 450px;
+    padding: 24px 64px;
+    max-height: 100%;
+}
+
+#comments-div-img {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: black;
+    max-height: 100%;
+}
+
+#comments-div-img img {
+    object-fit: cover;
+    width: 100%;
+    height: auto;
+    max-height: 100%;
+    max-width: 500px;
+}
+
+
+
+#comments-div-modal {
+    min-width: 405px;
+    width: 500px;
+    max-width: 500px;
+    max-height: 100%;
+    background-color: white;
+    border-top-right-radius: 5px;
+    border-bottom-right-radius: 5px;
+}
+
+#comments-modal-close {
+    position: absolute;
+    right: 18px;
+    top: 18px;
+    z-index: 1;
+    cursor: pointer;
+}
 
 @media (max-width: 999px) {
     #home-right-div {
