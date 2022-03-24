@@ -4,7 +4,7 @@ import { getAuth, onAuthStateChanged } from "firebase/auth";
 import { useState } from "react";
 
 function showSignInModal() {
-	const modal = document.getElementById("loginModal");
+	const modal = document.getElementById("login-modal");
 	modal.style.display = "flex";
 }
 
