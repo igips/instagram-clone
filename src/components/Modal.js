@@ -1,25 +1,37 @@
 import favi from "../img/favicon.jpg";
-import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword } from "firebase/auth";
+import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged } from "firebase/auth";
 import { getFirestore, addDoc, collection, getDocs } from "firebase/firestore";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import ava from "../img/ava.jpeg";
+import { dropDown, hideDropDown, followMobile } from "./Home";
 
 function Modal() {
+	const [signedIn, setSignedIn] = useState(false);
+
+	onAuthStateChanged(getAuth(), (user) => {
+		if (user) {
+			setSignedIn(true);
+		} else {
+			setSignedIn(false);
+		}
+	});
 
 	useEffect(() => {
-		const signInModal = document.getElementById("loginModal");
-		const registerModal = document.getElementById("registerModal");
-        const unfollowModal = document.getElementById("unfollowModal");
+		const signInModal = document.getElementById("login-modal");
+		const registerModal = document.getElementById("register-modal");
+		const unfollowModal = document.getElementById("unfollow-modal");
+		const likesModal = document.getElementById("likes-modal");
 
 		window.onclick = (e) => {
 			if (e.target === signInModal) {
 				signInModal.style.display = "none";
-
 			} else if (e.target === registerModal) {
 				registerModal.style.display = "none";
-
-			} else if(e.target === unfollowModal) {
-                unfollowModal.style.display = "none";
-            }
+			} else if (e.target === unfollowModal) {
+				unfollowModal.style.display = "none";
+			} else if (e.target === likesModal) {
+				likesModal.style.display = "none";
+			}
 		};
 	});
 
@@ -66,7 +78,7 @@ function Modal() {
 		const email = document.getElementById("login-username-input");
 		const pass = document.getElementById("login-password-input");
 		const signInButton = document.getElementById("sign-in-submit-button");
-		const loginModal = document.getElementById("loginModal");
+		const loginModal = document.getElementById("login-modal");
 
 		signInWithEmailAndPassword(getAuth(), email.value, pass.value)
 			.then((userCredential) => {
@@ -93,7 +105,7 @@ function Modal() {
 		const pass = document.getElementById("password-input-rep");
 		const userName = document.getElementById("username-input");
 		const formSubmitButton = document.getElementById("submit-sign-up-form-button");
-		const signUpModal = document.getElementById("registerModal");
+		const signUpModal = document.getElementById("register-modal");
 
 		usernameAvailable().then((avail) => {
 			if (avail) {
@@ -123,17 +135,32 @@ function Modal() {
 	}
 
 	function hideFollowModal() {
-		const modal = document.getElementById("unfollowModal");
+		const modal = document.getElementById("unfollow-modal");
 		modal.style.display = "none";
+	}
+
+	function hideLikesModal() {
+		const modal = document.getElementById("likes-modal");
+		modal.style.display = "none";
+	}
+
+	function followButtonForLikes() {
+		if (signedIn) {
+			return (
+				<button onClick={(e) => followMobile(e)} className="likes-modal-follow">
+					Follow
+				</button>
+			);
+		}
 	}
 
 	return (
 		<>
-			<div id="registerModal" className="modal">
+			<div id="register-modal" className="modal">
 				<div className="modal-content">
 					<span
 						onClick={() => {
-							document.getElementById("registerModal").style.display = "none";
+							document.getElementById("register-modal").style.display = "none";
 							clearSignUpInputs();
 						}}
 						className="close-modal"
@@ -184,8 +211,8 @@ function Modal() {
 					</form>
 					<p
 						onClick={() => {
-							document.getElementById("registerModal").style.display = "none";
-							document.getElementById("loginModal").style.display = "flex";
+							document.getElementById("register-modal").style.display = "none";
+							document.getElementById("login-modal").style.display = "flex";
 							clearSignUpInputs();
 						}}
 						id="already-sign-ip"
@@ -194,11 +221,11 @@ function Modal() {
 					</p>
 				</div>
 			</div>
-			<div id="loginModal" className="modal">
+			<div id="login-modal" className="modal">
 				<div className="modal-content">
 					<span
 						onClick={() => {
-							document.getElementById("loginModal").style.display = "none";
+							document.getElementById("login-modal").style.display = "none";
 							clearSigInInputs();
 						}}
 						className="close-modal"
@@ -232,8 +259,8 @@ function Modal() {
 					</form>
 					<p
 						onClick={() => {
-							document.getElementById("loginModal").style.display = "none";
-							document.getElementById("registerModal").style.display = "flex";
+							document.getElementById("login-modal").style.display = "none";
+							document.getElementById("register-modal").style.display = "flex";
 							clearSigInInputs();
 						}}
 						id="already-login-ip"
@@ -242,18 +269,103 @@ function Modal() {
 					</p>
 				</div>
 			</div>
-			<div id="unfollowModal" className="modal">
-				<div className="unfollowModalContent">
+			<div id="unfollow-modal" className="modal">
+				<div className="unfollow-modal-content">
 					<span>Unfollow</span>
 					<span onClick={() => hideFollowModal()}>Cancel</span>
 				</div>
 			</div>
-            <div id="likesModal" className="modal">
-				<div className="likesModalContent">
-					
+			<div id="likes-modal" className="modal">
+				<div className="likes-modal-content">
+					<div id="likes-modal-header">
+						<span>Likes</span>
+						<svg
+							onClick={() => hideLikesModal()}
+							id="close-likes-modal"
+							aria-label="Close"
+							color="#262626"
+							fill="#262626"
+							height="18"
+							role="img"
+							viewBox="0 0 24 24"
+							width="18"
+						>
+							<polyline
+								fill="none"
+								points="20.643 3.357 12 12 3.353 20.647"
+								stroke="currentColor"
+								strokeLinecap="round"
+								strokeLinejoin="round"
+								strokeWidth="3"
+							></polyline>
+							<line
+								fill="none"
+								stroke="currentColor"
+								strokeLinecap="round"
+								strokeLinejoin="round"
+								strokeWidth="3"
+								x1="20.649"
+								x2="3.354"
+								y1="20.649"
+								y2="3.354"
+							></line>
+						</svg>
+					</div>
+					<div id="list-of-likes-div">
+						<div className="right-sug-div-list">
+							<div
+								onMouseEnter={(e) => dropDown(e, "avaPic", "right")}
+								onMouseLeave={() => hideDropDown()}
+								className="right-sug-ava-div"
+							>
+								<img className="ava-img-likes" src={ava} alt="" />
+							</div>
+							<span
+								onMouseEnter={(e) => dropDown(e, "no", "right")}
+								onMouseLeave={() => hideDropDown()}
+								className="sug-login-right"
+							>
+								sialabala
+							</span>
+							{followButtonForLikes()}
+						</div>
+						<div className="right-sug-div-list">
+							<div
+								onMouseEnter={(e) => dropDown(e, "avaPic", "right")}
+								onMouseLeave={() => hideDropDown()}
+								className="right-sug-ava-div"
+							>
+								<img className="ava-img-likes" src={ava} alt="" />
+							</div>
+							<span
+								onMouseEnter={(e) => dropDown(e, "no", "right")}
+								onMouseLeave={() => hideDropDown()}
+								className="sug-login-right"
+							>
+								sialabala
+							</span>
+							{followButtonForLikes()}
+						</div>
+						<div className="right-sug-div-list">
+							<div
+								onMouseEnter={(e) => dropDown(e, "avaPic", "right")}
+								onMouseLeave={() => hideDropDown()}
+								className="right-sug-ava-div"
+							>
+								<img className="ava-img-likes" src={ava} alt="" />
+							</div>
+							<span
+								onMouseEnter={(e) => dropDown(e, "no", "right")}
+								onMouseLeave={() => hideDropDown()}
+								className="sug-login-right"
+							>
+								sialabala
+							</span>
+							{followButtonForLikes()}
+						</div>
+					</div>
 				</div>
 			</div>
-
 		</>
 	);
 }
