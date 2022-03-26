@@ -249,9 +249,11 @@ main {
 #suggestions-left-div {
     padding: 20px 0;
     background-color: rgba(255, 255, 255);
-	border: 1px solid rgba(219, 219, 219);
+	/* border: 1px solid rgba(219, 219, 219); */
+    border: none;
+    
     border-radius: 3px;
-    margin-bottom: 24px;
+    /* margin-bottom: 24px; */
     margin-left: -1px;
 	margin-right: -1px;
 	flex-direction: column;
@@ -374,6 +376,10 @@ main {
   color: #000;
   text-decoration: none;
   cursor: pointer;
+}
+
+#unfollow-modal {
+    z-index: 10000000;
 }
 
 .unfollow-modal-content {
@@ -582,6 +588,10 @@ main {
     border: 1px solid rgb(219,219,219);
 }
 
+#likes-modal {
+    z-index: 1000;
+}
+
 .likes-modal-content {
     width: 400px;
     height: 399px;
@@ -593,7 +603,7 @@ main {
     flex-direction: column;
 }
 
-#likes-modal-header {
+#likes-modal-header, #comms-modal-header-mobile {
     min-height: 42px;
     color: rgba(38,38,38);
     font-size: 16px;
@@ -605,10 +615,26 @@ main {
     padding-right: 16px;
 }
 
-#likes-modal-header span {
+#comms-modal-header-mobile {
+    padding-right: 12px;
+    padding-left: 16px;
+}
+
+#comms-modal-header-mobile .comms-icon-span {
+    padding: 0px;
+}
+
+#comms-modal-header-mobile  {
+    display: none;
+}
+
+#likes-modal-header span, #comms-modal-header-mobile span {
     margin-left: auto;
     margin-right: auto;
-    
+}
+
+#comms-modal-header-mobile .comms-icon-span {
+    margin: 0px;
 }
 
 #close-likes-modal {
@@ -618,6 +644,7 @@ main {
 .ava-img-likes {
     height: 44px;
     width: 44px;
+    cursor: pointer;
 }
 
 #list-of-likes-div {
@@ -628,12 +655,12 @@ main {
     flex-shrink: 0;
     align-items: center;
     justify-content: center;
+    padding: 24px 64px;
 }
 
 #comments-modal-content {
     display: flex;
     min-height: 450px;
-    padding: 24px 64px;
     max-height: 100%;
 }
 
@@ -663,6 +690,8 @@ main {
     background-color: white;
     border-top-right-radius: 5px;
     border-bottom-right-radius: 5px;
+    display: flex;
+    flex-direction: column;
 }
 
 #comments-modal-close {
@@ -672,6 +701,68 @@ main {
     z-index: 1;
     cursor: pointer;
 }
+
+#modal-comments-section {
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+    width: 100%;
+    height: 100%;
+    border-bottom: 1px solid rgba(219, 219, 219);
+    overflow-y: scroll;
+}
+
+#login-modal {
+    z-index: 10000;
+
+}
+
+#register-modal {
+    z-index: 10000;
+}
+
+#modal-first-comment {
+    display: flex;
+
+}
+
+.modal-comments {
+    display: flex;
+}
+
+.avatar-span-comments {
+    background-color: rgba(255, 255, 255);
+    border-radius: 50%;
+    margin-right: 14px;
+}
+
+.avatar-span-comments  img {
+    width: 32px;
+    height: 32px;
+}
+
+.first-modal-comment-span {
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.like-comment-div-modal {
+    margin-left: auto;
+}
+
+.name-span-modal {
+    margin-right: 5px;
+}
+
+.like-and-when-added-div {
+    display: flex;
+    gap: 10px;
+}
+
+
+
+
 
 @media (max-width: 999px) {
     #home-right-div {
@@ -749,4 +840,53 @@ main {
         background-color: rgba(255, 255, 255);
     
     }
+
+    #comments-div-img {
+        display: none;
+    }
+
+    #comments-modal {
+        padding: 0px;
+    }
+
+    #comments-modal-close {
+        display: none;
+    }
+
+    #comments-modal-content {
+        height: 100%;
+        width: 100%;
+    }
+
+    #comments-div-modal {
+        min-width: 0px;
+        max-width: 650px;
+        width: 100%;
+        border-top-right-radius: 0px;
+        border-bottom-right-radius: 0px;
+    }
+
+    #comments-div-modal .picture-card-header-div, #comments-div-modal .icons-in-comments-section, #comments-div-modal .number-of-likes-section, #comments-div-modal .added-div {
+        display: none;
+    }
+
+    #comms-modal-header-mobile {
+        display: flex;
+    }
+
+    #comments-div-modal .add-comment-section {
+        display: flex;
+        border-top: none;
+        z-index: 10000;
+    }
+
+    #modal-first-comment {
+        padding-bottom: 16px;
+        border-bottom: 1px solid #efefef;
+
+    }
+
+    
+
+    
 }
