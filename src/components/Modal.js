@@ -5,6 +5,16 @@ import { useEffect, useState } from "react";
 import ava from "../img/ava.jpeg";
 import { dropDown, hideDropDown, followMobile } from "./Home";
 import testPic from "../img/test-img.jpg";
+import {
+	AddCommentSection,
+	options,
+	pictureCardHeader,
+	pictureCardIconsSection,
+	pictureCardNumOfLikesSection,
+	whenAdded,
+	likeCommentIcon,
+	shareIcon,
+} from "./PictureCard";
 
 function Modal() {
 	const [signedIn, setSignedIn] = useState(false);
@@ -23,7 +33,6 @@ function Modal() {
 		const unfollowModal = document.getElementById("unfollow-modal");
 		const likesModal = document.getElementById("likes-modal");
 		const commentsModal = document.getElementById("comments-modal");
-		
 
 		window.onclick = (e) => {
 			if (e.target === signInModal) {
@@ -164,6 +173,42 @@ function Modal() {
 		}
 	}
 
+	function closeMobileLikesAndCommsModal(comms) {
+		return (
+			<svg
+				onClick={() => (comms ? hideCommentsModal() : hideLikesModal())}
+				id="close-likes-modal"
+				aria-label="Close"
+				color="#262626"
+				fill="#262626"
+				height="18"
+				role="img"
+				viewBox="0 0 24 24"
+				width="18"
+			>
+				<polyline
+					fill="none"
+					points="20.643 3.357 12 12 3.353 20.647"
+					stroke="currentColor"
+					strokeLinecap="round"
+					strokeLinejoin="round"
+					strokeWidth="3"
+				></polyline>
+				<line
+					fill="none"
+					stroke="currentColor"
+					strokeLinecap="round"
+					strokeLinejoin="round"
+					strokeWidth="3"
+					x1="20.649"
+					x2="3.354"
+					y1="20.649"
+					y2="3.354"
+				></line>
+			</svg>
+		);
+	}
+
 	return (
 		<>
 			<div id="register-modal" className="modal">
@@ -289,37 +334,7 @@ function Modal() {
 				<div className="likes-modal-content">
 					<div id="likes-modal-header">
 						<span>Likes</span>
-						<svg
-							onClick={() => hideLikesModal()}
-							id="close-likes-modal"
-							aria-label="Close"
-							color="#262626"
-							fill="#262626"
-							height="18"
-							role="img"
-							viewBox="0 0 24 24"
-							width="18"
-						>
-							<polyline
-								fill="none"
-								points="20.643 3.357 12 12 3.353 20.647"
-								stroke="currentColor"
-								strokeLinecap="round"
-								strokeLinejoin="round"
-								strokeWidth="3"
-							></polyline>
-							<line
-								fill="none"
-								stroke="currentColor"
-								strokeLinecap="round"
-								strokeLinejoin="round"
-								strokeWidth="3"
-								x1="20.649"
-								x2="3.354"
-								y1="20.649"
-								y2="3.354"
-							></line>
-						</svg>
+						{closeMobileLikesAndCommsModal()}
 					</div>
 					<div id="list-of-likes-div">
 						<div className="right-sug-div-list">
@@ -412,7 +427,100 @@ function Modal() {
 					<div id="comments-div-img">
 						<img src={testPic} alt="" />
 					</div>
-					<div id="comments-div-modal"></div>
+					<div id="comments-div-modal">
+						{pictureCardHeader()}
+						<div id="comms-modal-header-mobile">
+							{closeMobileLikesAndCommsModal("comms")}
+							<span>Comments</span>
+							{shareIcon()}
+							
+						</div>
+						<div id="modal-comments-section">
+							<div id="modal-first-comment">
+								<span
+									onMouseEnter={(e) => dropDown(e, "avaPic")}
+									onMouseLeave={() => hideDropDown()}
+									className="avatar-span-comments"
+								>
+									<img
+										alt=""
+										className="card-avatar-img"
+										data-testid="user-avatar"
+										draggable="false"
+										src={ava}
+									/>
+								</span>
+								<div id="first-modal-comment-div" className="modal-comment-div">
+									<div id="first-modal-comment-div-inner">
+										<div className="name-span-modal" id="first-modal-comment-span">
+											<span
+												onMouseEnter={(e) => dropDown(e)}
+												onMouseLeave={() => hideDropDown()}
+												className="first-modal-comment-span"
+											>
+												blabeksrapek
+											</span>{" "}
+											Drop a if you’re ready to go on this ride with us this month
+										</div>
+										{whenAdded("short")}
+									</div>
+								</div>
+							</div>
+							<div className="modal-comments">
+								<span
+									onMouseEnter={(e) => dropDown(e, "avaPic")}
+									onMouseLeave={() => hideDropDown()}
+									className="avatar-span-comments"
+								>
+									<img
+										alt=""
+										className="card-avatar-img"
+										data-testid="user-avatar"
+										draggable="false"
+										src={ava}
+									/>
+								</span>
+								<div className="modal-comment-div">
+									<div className="modal-comment-div-inner">
+										<div className="name-span-modal">
+											<span
+												onMouseEnter={(e) => dropDown(e)}
+												onMouseLeave={() => hideDropDown()}
+												className="first-modal-comment-span"
+											>
+												siabadub
+											</span>{" "}
+											Srele morele blabla fabla dflsjh
+										</div>
+										<div className="like-and-when-added-div">
+											<div className="added-div short">6d</div>
+											<div className="added-div short"> 1 like</div>
+										</div>
+									</div>
+								</div>
+								<div
+									onClick={(event) => likeCommentIcon(event)}
+									className="like-comment-div like-comment-div-modal"
+								>
+									<svg
+										aria-label="Like"
+										color="#262626"
+										fill="#262626"
+										height="12"
+										role="img"
+										viewBox="0 0 24 24"
+										width="12"
+									>
+										<path d="M16.792 3.904A4.989 4.989 0 0121.5 9.122c0 3.072-2.652 4.959-5.197 7.222-2.512 2.243-3.865 3.469-4.303 3.752-.477-.309-2.143-1.823-4.303-3.752C5.141 14.072 2.5 12.167 2.5 9.122a4.989 4.989 0 014.708-5.218 4.21 4.21 0 013.675 1.941c.84 1.175.98 1.763 1.12 1.763s.278-.588 1.11-1.766a4.17 4.17 0 013.679-1.938m0-2a6.04 6.04 0 00-4.797 2.127 6.052 6.052 0 00-4.787-2.127A6.985 6.985 0 00.5 9.122c0 3.61 2.55 5.827 5.015 7.97.283.246.569.494.853.747l1.027.918a44.998 44.998 0 003.518 3.018 2 2 0 002.174 0 45.263 45.263 0 003.626-3.115l.922-.824c.293-.26.59-.519.885-.774 2.334-2.025 4.98-4.32 4.98-7.94a6.985 6.985 0 00-6.708-7.218z"></path>
+									</svg>
+								</div>
+							</div>
+						</div>
+						{pictureCardIconsSection("modal")}
+						{pictureCardNumOfLikesSection()}
+						{whenAdded()}
+						{AddCommentSection()}
+					</div>
 				</div>
 			</div>
 		</>
