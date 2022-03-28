@@ -1,6 +1,5 @@
 import "../styles/Home.css";
 import PictureCard from "./PictureCard.js";
-import Modal from "./Modal.js";
 import { getAuth, signOut, onAuthStateChanged } from "firebase/auth";
 import ava from "../img/ava.jpeg";
 import { homeIcon } from "./Nav";
@@ -119,7 +118,6 @@ function Home() {
 
 	return (
 		<main>
-			<Modal></Modal>
 			<div
 				onMouseOver={() => keepDropDown()}
 				onMouseLeave={() => hideDropDown()}
