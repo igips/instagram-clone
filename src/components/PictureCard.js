@@ -61,6 +61,11 @@ function showCommentsModal() {
 	modal.style.display = "flex";
 }
 
+function showShareModal() {
+	const modal = document.getElementById("share-modal");
+	modal.style.display = "flex";
+}
+
 function commentIcon() {
 	const user = getAuth().currentUser;
 
@@ -75,6 +80,8 @@ function shareIconClicked() {
 	const user = getAuth().currentUser;
 
 	if (user) {
+		showShareModal();
+
 	} else {
 		showSignInModal();
 	}
@@ -320,7 +327,7 @@ function pictureCardNumOfLikesSection() {
 
 function whenAdded(short) {
 	if (short) {
-		return <div className="added-div short">6d</div>;
+		return <div className="short-when-added-and-likes">6d</div>;
 	} else {
 		return <div className="added-div">6 DAYS AGO</div>;
 	}
