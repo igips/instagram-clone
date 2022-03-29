@@ -6,6 +6,7 @@ import { useState } from "react";
 import { showSignInModal } from "./Nav";
 import { hideDropDown, dropDown } from "./Home.js";
 import uniqid from "uniqid";
+import ReactDOM from "react-dom";
 
 function options() {
 	const user = getAuth().currentUser;
@@ -56,24 +57,9 @@ function likeCommentIcon(container) {
 	}
 }
 
-function showCommentsModal() {
-	const modal = document.getElementById("comments-modal");
-	modal.style.display = "flex";
-}
-
 function showShareModal() {
 	const modal = document.getElementById("share-modal");
 	modal.style.display = "flex";
-}
-
-function commentIcon() {
-	const user = getAuth().currentUser;
-
-	if (user) {
-		showCommentsModal();
-	} else {
-		showSignInModal();
-	}
 }
 
 function shareIconClicked() {
@@ -81,7 +67,6 @@ function shareIconClicked() {
 
 	if (user) {
 		showShareModal();
-
 	} else {
 		showSignInModal();
 	}
@@ -135,7 +120,7 @@ function pictureCardIconsSection(modal) {
 	function commentsIcon() {
 		if (!modal) {
 			return (
-				<span onClick={() => commentIcon()} className="comms-icon-span">
+				<span onClick={() => showCommentsModal()} className="comms-icon-span">
 					<svg
 						aria-label="Comment"
 						color="#262626"
@@ -179,10 +164,141 @@ function pictureCardIconsSection(modal) {
 	);
 }
 
-function pictureCardCommentsSection() {
-	return (
-		<div className="pic-comments-div">
-			<div className="pic-comments-inner-div">
+function showCommentsModal(username, comments, description, avatar) {
+	const modal = document.getElementById("comments-modal");
+	const descriptionDiv = document.getElementById("modal-first-comment");
+	const commentsDiv = document.getElementById("modal-comments-section");
+
+	function singleComment(username, comment) {
+		const div = document.createElement("div");
+		div.classList.add("modal-comments");
+	
+		const span = document.createElement("span");
+		span.onmouseenter = (e) => dropDown(e, "avaPic");
+		span.onmouseleave = () => hideDropDown();
+		span.classList.add("avatar-span-comments");
+	
+		const img = document.createElement("img");
+		img.classList.add("card-avatar-img");
+		img.draggable = "false";
+		img.src = ava;
+		img.alt = "";
+	
+		span.appendChild(img);
+		div.appendChild(span);
+		
+		const div2 = document.createElement("div");
+		div2.classList.add("modal-comment-div");
+	
+		const div3 = document.createElement("div");
+		div3.classList.add("modal-comment-div-inner");
+	
+		const div4 = document.createElement("div");
+		div4.classList.add("name-span-modal");
+	
+		const span2 = document.createElement("span");
+		span2.classList.add("first-modal-comment-span");
+		span2.onmouseenter = (e) => dropDown(e);
+		span2.onmouseleave = () => hideDropDown();
+		span2.textContent = username + " ";
+	
+		const span3 = document.createElement("span");
+		span3.textContent = comment;
+	
+		div4.appendChild(span2);
+		div4.appendChild(span3);
+	
+		div3.appendChild(div4);
+	
+		const div5 = document.createElement("div");
+		div5.classList.add("like-and-when-added-div");
+	
+		const div6 = document.createElement("div");
+		div6.classList.add("short-when-added-and-likes");
+		div6.textContent = "6d";
+	
+		div5.appendChild(div6);
+	
+		const div7 = document.createElement("div");
+		div7.classList.add("short-when-added-and-likes");
+		div7.textContent = "1 like";
+	
+		div5.appendChild(div7);
+		div3.appendChild(div5);
+		div2.appendChild(div3);
+		div.appendChild(div2);
+	
+		const div8 = document.createElement("div");
+		div8.classList.add("like-comment-div");
+		div8.classList.add("like-comment-div-modal");
+		div8.onclick = (event) => likeCommentIcon(event);
+	
+		const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+		svg.setAttribute("aria-label", "Like");
+		svg.setAttribute("color", "#262626");
+		svg.setAttribute("fill", "#262626");
+		svg.setAttribute("height", "12");
+		svg.setAttribute("role", "img");
+		svg.setAttribute("viewBox", "0 0 24 24");
+		svg.setAttribute("width", "12");
+	
+		const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+		path.setAttribute("d", "M16.792 3.904A4.989 4.989 0 0121.5 9.122c0 3.072-2.652 4.959-5.197 7.222-2.512 2.243-3.865 3.469-4.303 3.752-.477-.309-2.143-1.823-4.303-3.752C5.141 14.072 2.5 12.167 2.5 9.122a4.989 4.989 0 014.708-5.218 4.21 4.21 0 013.675 1.941c.84 1.175.98 1.763 1.12 1.763s.278-.588 1.11-1.766a4.17 4.17 0 013.679-1.938m0-2a6.04 6.04 0 00-4.797 2.127 6.052 6.052 0 00-4.787-2.127A6.985 6.985 0 00.5 9.122c0 3.61 2.55 5.827 5.015 7.97.283.246.569.494.853.747l1.027.918a44.998 44.998 0 003.518 3.018 2 2 0 002.174 0 45.263 45.263 0 003.626-3.115l.922-.824c.293-.26.59-.519.885-.774 2.334-2.025 4.98-4.32 4.98-7.94a6.985 6.985 0 00-6.708-7.218z");
+
+		svg.appendChild(path);
+		div8.appendChild(svg);
+		div.appendChild(div8);
+	
+		const commentsDiv = document.getElementById("modal-comments-section");
+	
+		commentsDiv.appendChild(div);
+			
+	}
+
+	while(commentsDiv.childNodes.length > 1) {
+		commentsDiv.removeChild(commentsDiv.lastChild);
+	}
+
+	modal.style.display = "flex";
+
+	document.getElementById("comments-modal-id-div").textContent = username;
+	document.getElementById("comments-modal-ava-header").src = avatar;
+
+	if (description) {
+		descriptionDiv.style.display = "flex";
+		document.getElementById("description-comments-modal-username").textContent = username;
+		document.getElementById("description-comments-modal-desc").textContent = description;
+		document.getElementById("comments-modal-description-avatar").src = avatar;
+	} else if (!description) {
+		descriptionDiv.style.display = "none";
+	}
+
+	comments.forEach((comment) => {
+		singleComment(comment.username, comment.comment);
+	});
+}
+
+function PictureCardCommentsSection(props) {
+	function viewAllComments() {
+		if (props.comments.length > 2) {
+			return (
+				<div className="comment-line-div">
+					<span
+						onClick={() =>
+							showCommentsModal(props.username, props.comments, props.description, props.avatar)
+						}
+						className="view-all-coms-span"
+					>
+						View all {props.comments.length} comments
+					</span>
+				</div>
+			);
+		}
+	}
+
+	function displayDescription() {
+		if (props.description) {
+			return (
 				<div className="comment-line-div">
 					<div>
 						<span
@@ -190,76 +306,55 @@ function pictureCardCommentsSection() {
 							onMouseLeave={() => hideDropDown()}
 							className="name-span in-coms"
 						>
-							blabeksrapek
+							{props.username}
 						</span>
-						<span className="comment-span">
-							Drop a if you’re ready to go on this ride with us this month
-						</span>
+						<span className="comment-span">{props.description}</span>
 					</div>
 				</div>
-				<div className="comment-line-div">
-					<span onClick={() => showCommentsModal()} className="view-all-coms-span">
-						View all 568 comments
-					</span>
-				</div>
+			);
+		}
+	}
 
-				<div className="comment-line-div">
-					<div className="comment-line-inner-div">
-						<span
-							onMouseEnter={(e) => dropDown(e)}
-							onMouseLeave={() => hideDropDown()}
-							className="name-span in-coms"
-						>
-							kristencor
-						</span>
-						<span className="comment-span">Siala bala puku buku</span>
-					</div>
-					<div onClick={(event) => likeCommentIcon(event)} className="like-comment-div">
-						<svg
-							aria-label="Like"
-							color="#262626"
-							fill="#262626"
-							height="12"
-							role="img"
-							viewBox="0 0 24 24"
-							width="12"
-						>
-							<path d="M16.792 3.904A4.989 4.989 0 0121.5 9.122c0 3.072-2.652 4.959-5.197 7.222-2.512 2.243-3.865 3.469-4.303 3.752-.477-.309-2.143-1.823-4.303-3.752C5.141 14.072 2.5 12.167 2.5 9.122a4.989 4.989 0 014.708-5.218 4.21 4.21 0 013.675 1.941c.84 1.175.98 1.763 1.12 1.763s.278-.588 1.11-1.766a4.17 4.17 0 013.679-1.938m0-2a6.04 6.04 0 00-4.797 2.127 6.052 6.052 0 00-4.787-2.127A6.985 6.985 0 00.5 9.122c0 3.61 2.55 5.827 5.015 7.97.283.246.569.494.853.747l1.027.918a44.998 44.998 0 003.518 3.018 2 2 0 002.174 0 45.263 45.263 0 003.626-3.115l.922-.824c.293-.26.59-.519.885-.774 2.334-2.025 4.98-4.32 4.98-7.94a6.985 6.985 0 00-6.708-7.218z"></path>
-						</svg>
-					</div>
-				</div>
-
-				<div className="comment-line-div">
-					<div className="comment-line-inner-div">
-						<span
-							onMouseEnter={(e) => dropDown(e)}
-							onMouseLeave={() => hideDropDown()}
-							className="name-span in-coms"
-						>
-							labrakonks
-						</span>
-						<span className="comment-span">Tererer bakbuka</span>
-					</div>
-					<div onClick={(event) => likeCommentIcon(event)} className="like-comment-div">
-						<svg
-							aria-label="Like"
-							color="#262626"
-							fill="#262626"
-							height="12"
-							role="img"
-							viewBox="0 0 24 24"
-							width="12"
-						>
-							<path d="M16.792 3.904A4.989 4.989 0 0121.5 9.122c0 3.072-2.652 4.959-5.197 7.222-2.512 2.243-3.865 3.469-4.303 3.752-.477-.309-2.143-1.823-4.303-3.752C5.141 14.072 2.5 12.167 2.5 9.122a4.989 4.989 0 014.708-5.218 4.21 4.21 0 013.675 1.941c.84 1.175.98 1.763 1.12 1.763s.278-.588 1.11-1.766a4.17 4.17 0 013.679-1.938m0-2a6.04 6.04 0 00-4.797 2.127 6.052 6.052 0 00-4.787-2.127A6.985 6.985 0 00.5 9.122c0 3.61 2.55 5.827 5.015 7.97.283.246.569.494.853.747l1.027.918a44.998 44.998 0 003.518 3.018 2 2 0 002.174 0 45.263 45.263 0 003.626-3.115l.922-.824c.293-.26.59-.519.885-.774 2.334-2.025 4.98-4.32 4.98-7.94a6.985 6.985 0 00-6.708-7.218z"></path>
-						</svg>
-					</div>
-				</div>
+	return (
+		<div className="pic-comments-div">
+			<div className="pic-comments-inner-div">
+				{displayDescription()}
+				{viewAllComments()}
+				{props.comments.slice(0, 2).map((comment) => {
+					return (
+						<div key={uniqid()} className="comment-line-div">
+							<div className="comment-line-inner-div">
+								<span
+									onMouseEnter={(e) => dropDown(e)}
+									onMouseLeave={() => hideDropDown()}
+									className="name-span in-coms"
+								>
+									{comment.username}
+								</span>
+								<span className="comment-span">{comment.comment}</span>
+							</div>
+							<div onClick={(event) => likeCommentIcon(event)} className="like-comment-div">
+								<svg
+									aria-label="Like"
+									color="#262626"
+									fill="#262626"
+									height="12"
+									role="img"
+									viewBox="0 0 24 24"
+									width="12"
+								>
+									<path d="M16.792 3.904A4.989 4.989 0 0121.5 9.122c0 3.072-2.652 4.959-5.197 7.222-2.512 2.243-3.865 3.469-4.303 3.752-.477-.309-2.143-1.823-4.303-3.752C5.141 14.072 2.5 12.167 2.5 9.122a4.989 4.989 0 014.708-5.218 4.21 4.21 0 013.675 1.941c.84 1.175.98 1.763 1.12 1.763s.278-.588 1.11-1.766a4.17 4.17 0 013.679-1.938m0-2a6.04 6.04 0 00-4.797 2.127 6.052 6.052 0 00-4.787-2.127A6.985 6.985 0 00.5 9.122c0 3.61 2.55 5.827 5.015 7.97.283.246.569.494.853.747l1.027.918a44.998 44.998 0 003.518 3.018 2 2 0 002.174 0 45.263 45.263 0 003.626-3.115l.922-.824c.293-.26.59-.519.885-.774 2.334-2.025 4.98-4.32 4.98-7.94a6.985 6.985 0 00-6.708-7.218z"></path>
+								</svg>
+							</div>
+						</div>
+					);
+				})}
 			</div>
 		</div>
 	);
 }
 
-function pictureCardHeader() {
+function PictureCardHeader(props) {
 	return (
 		<div className="picture-card-header-div">
 			<div className="picture-card-header-inner">
@@ -272,11 +367,12 @@ function pictureCardHeader() {
 								className="avatar-span"
 							>
 								<img
+									id={props.username ? "" : "comments-modal-ava-header"}
 									alt=""
 									className="card-avatar-img"
 									data-testid="user-avatar"
 									draggable="false"
-									src={ava}
+									src={props.avatar}
 								/>
 							</span>
 						</div>
@@ -286,8 +382,9 @@ function pictureCardHeader() {
 							onMouseEnter={(e) => dropDown(e)}
 							onMouseLeave={() => hideDropDown()}
 							className="name-span"
+							id={props.username ? "" : "comments-modal-id-div"}
 						>
-							blabeksrapek
+							{props.username}
 						</span>
 					</div>
 				</header>
@@ -338,7 +435,7 @@ function showLikesModal() {
 	modal.style.display = "flex";
 }
 
-function AddCommentSection() {
+function AddCommentSection(props) {
 	const [signedIn, setSignedIn] = useState(false);
 	const [id, setId] = useState(uniqid());
 	const [commentValue, setCommentValue] = useState("");
@@ -346,6 +443,8 @@ function AddCommentSection() {
 	function submitComment(e) {
 		e.preventDefault();
 		const button = document.getElementById(id + "button");
+		const username = document.getElementById("right-login-div-top-span").textContent;
+		props.addComment({ username: username, comment: commentValue });
 
 		setCommentValue("");
 		button.classList.remove("post-div-active");
@@ -405,13 +504,26 @@ function AddCommentSection() {
 				</div>
 			</section>
 		);
+	} else {
+		return <></>;
 	}
 }
 
 function PictureCard() {
+	const [comments, setComments] = useState([]);
+	const [username, setUsername] = useState("bluberek");
+	const [description, setDescription] = useState("Drop a if you’re ready to go on this ride with us this month");
+	const [avatar, setAvatar] = useState(ava);
+
+	function addComment(comment) {
+		setComments([...comments, comment]);
+	}
+
 	return (
 		<article className="picture-card-article">
-			<div className="picture-card-div">{pictureCardHeader()}</div>
+			<div className="picture-card-div">
+				<PictureCardHeader username={username} avatar={avatar} />
+			</div>
 			<div className="picture-div">
 				<div className="picture-div-inner">
 					<img className="main-picture" src={testPic} alt="" />
@@ -421,9 +533,14 @@ function PictureCard() {
 				<div className="comments-inner-div">
 					{pictureCardIconsSection()}
 					{pictureCardNumOfLikesSection()}
-					{pictureCardCommentsSection()}
+					<PictureCardCommentsSection
+						comments={comments}
+						username={username}
+						description={description}
+						avatar={avatar}
+					/>
 					{whenAdded()}
-					{AddCommentSection()}
+					<AddCommentSection addComment={addComment} />
 				</div>
 			</div>
 		</article>
@@ -433,11 +550,11 @@ function PictureCard() {
 export default PictureCard;
 export {
 	options,
-	pictureCardHeader,
+	PictureCardHeader,
 	pictureCardIconsSection,
 	pictureCardNumOfLikesSection,
 	whenAdded,
 	AddCommentSection,
 	likeCommentIcon,
-	shareIcon
+	shareIcon,
 };
