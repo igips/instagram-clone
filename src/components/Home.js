@@ -4,7 +4,8 @@ import { getAuth, signOut, onAuthStateChanged } from "firebase/auth";
 import ava from "../img/ava.jpeg";
 import { homeIcon } from "./Nav";
 import testPic from "../img/test-img.jpg";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { getUsername } from "..";
 
 function dropDown(e, ele, right) {
 	const dropDown = document.getElementById("drop-down");
@@ -60,12 +61,23 @@ function followMobile(e) {
 
 function Home() {
 	const [signedIn, setSignedIn] = useState(false);
+	const [username, setUsername] = useState("");
+
+	useEffect(() => {
+		const user = getAuth().currentUser;
+
+		if(user) {
+			getUsername(user.uid).then((user) => setUsername(user));
+		}
+	})
 
 	onAuthStateChanged(getAuth(), (user) => {
 		if (user) {
 			setSignedIn(true);
+
 		} else {
 			setSignedIn(false);
+			setUsername("");
 		}
 	});
 
@@ -193,9 +205,9 @@ function Home() {
 							</div>
 						</div>
 
-						<PictureCard></PictureCard>
-						<PictureCard></PictureCard>
-						<PictureCard></PictureCard>
+						<PictureCard username={username}></PictureCard>
+						<PictureCard username={username}></PictureCard>
+						<PictureCard username={username}></PictureCard>
 					</div>
 				</div>
 
