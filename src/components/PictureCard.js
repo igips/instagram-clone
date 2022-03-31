@@ -1,12 +1,13 @@
-import "../styles/PictureCard.css";
+import { getAuth, onAuthStateChanged } from "firebase/auth";
+import { useEffect, useState } from "react";
+import ReactDOM from "react-dom";
+import uniqid from "uniqid";
+import { getUsername } from "..";
 import ava from "../img/ava.jpeg";
 import testPic from "../img/test-img.jpg";
-import { getAuth, onAuthStateChanged } from "firebase/auth";
-import { useState } from "react";
+import "../styles/PictureCard.css";
+import { dropDown, hideDropDown } from "./Home.js";
 import { showSignInModal } from "./Nav";
-import { hideDropDown, dropDown } from "./Home.js";
-import uniqid from "uniqid";
-import ReactDOM from "react-dom";
 
 function options() {
 	const user = getAuth().currentUser;
@@ -19,39 +20,74 @@ function options() {
 	}
 }
 
-function likeCommentIconClicked(container) {
-	if (!container.currentTarget.classList.contains("liked-mini")) {
-		container.currentTarget.classList.remove("like-comment-div");
-		container.currentTarget.classList.add("liked-mini");
-		container.currentTarget.innerHTML =
-			'<svg aria-label="Unlike" color="#ed4956" fill="#ed4956" height="12" role="img" viewBox="0 0 48 48" width="12"><path d="M34.6 3.1c-4.5 0-7.9 1.8-10.6 5.6-2.7-3.7-6.1-5.5-10.6-5.5C6 3.1 0 9.6 0 17.6c0 7.3 5.4 12 10.6 16.5.6.5 1.3 1.1 1.9 1.7l2.3 2c4.4 3.9 6.6 5.9 7.6 6.5.5.3 1.1.5 1.6.5s1.1-.2 1.6-.5c1-.6 2.8-2.2 7.8-6.8l2-1.8c.7-.6 1.3-1.2 2-1.7C42.7 29.6 48 25 48 17.6c0-8-6-14.5-13.4-14.5z"></path></svg>';
+function showLikesModal() {
+	const modal = document.getElementById("likes-modal");
+	modal.style.display = "flex";
+}
+
+function likeCommentIconClicked(users, username) {
+	if (users.includes(username)) {
+		return (
+			<svg
+				aria-label="Unlike"
+				color="#ed4956"
+				fill="#ed4956"
+				height="12"
+				role="img"
+				viewBox="0 0 48 48"
+				width="12"
+			>
+				<path d="M34.6 3.1c-4.5 0-7.9 1.8-10.6 5.6-2.7-3.7-6.1-5.5-10.6-5.5C6 3.1 0 9.6 0 17.6c0 7.3 5.4 12 10.6 16.5.6.5 1.3 1.1 1.9 1.7l2.3 2c4.4 3.9 6.6 5.9 7.6 6.5.5.3 1.1.5 1.6.5s1.1-.2 1.6-.5c1-.6 2.8-2.2 7.8-6.8l2-1.8c.7-.6 1.3-1.2 2-1.7C42.7 29.6 48 25 48 17.6c0-8-6-14.5-13.4-14.5z"></path>
+			</svg>
+		);
 	} else {
-		container.currentTarget.classList.remove("liked-mini");
-		container.currentTarget.classList.add("like-comment-div");
-		container.currentTarget.innerHTML =
-			'<svg aria-label="Like" color="#262626" fill="#262626" height="12" role="img" viewBox="0 0 24 24" width="12"><path d="M16.792 3.904A4.989 4.989 0 0121.5 9.122c0 3.072-2.652 4.959-5.197 7.222-2.512 2.243-3.865 3.469-4.303 3.752-.477-.309-2.143-1.823-4.303-3.752C5.141 14.072 2.5 12.167 2.5 9.122a4.989 4.989 0 014.708-5.218 4.21 4.21 0 013.675 1.941c.84 1.175.98 1.763 1.12 1.763s.278-.588 1.11-1.766a4.17 4.17 0 013.679-1.938m0-2a6.04 6.04 0 00-4.797 2.127 6.052 6.052 0 00-4.787-2.127A6.985 6.985 0 00.5 9.122c0 3.61 2.55 5.827 5.015 7.97.283.246.569.494.853.747l1.027.918a44.998 44.998 0 003.518 3.018 2 2 0 002.174 0 45.263 45.263 0 003.626-3.115l.922-.824c.293-.26.59-.519.885-.774 2.334-2.025 4.98-4.32 4.98-7.94a6.985 6.985 0 00-6.708-7.218z"></path></svg>';
+		return (
+			<svg aria-label="Like" color="#262626" fill="#262626" height="12" role="img" viewBox="0 0 24 24" width="12">
+				<path d="M16.792 3.904A4.989 4.989 0 0121.5 9.122c0 3.072-2.652 4.959-5.197 7.222-2.512 2.243-3.865 3.469-4.303 3.752-.477-.309-2.143-1.823-4.303-3.752C5.141 14.072 2.5 12.167 2.5 9.122a4.989 4.989 0 014.708-5.218 4.21 4.21 0 013.675 1.941c.84 1.175.98 1.763 1.12 1.763s.278-.588 1.11-1.766a4.17 4.17 0 013.679-1.938m0-2a6.04 6.04 0 00-4.797 2.127 6.052 6.052 0 00-4.787-2.127A6.985 6.985 0 00.5 9.122c0 3.61 2.55 5.827 5.015 7.97.283.246.569.494.853.747l1.027.918a44.998 44.998 0 003.518 3.018 2 2 0 002.174 0 45.263 45.263 0 003.626-3.115l.922-.824c.293-.26.59-.519.885-.774 2.334-2.025 4.98-4.32 4.98-7.94a6.985 6.985 0 00-6.708-7.218z"></path>
+			</svg>
+		);
 	}
 }
 
-function likeIconClicked(container) {
-	if (!container.currentTarget.classList.contains("liked")) {
-		container.currentTarget.classList.remove("comms-icon-span");
-		container.currentTarget.classList.add("liked");
-		container.currentTarget.innerHTML =
-			'<svg aria-label="Activity Feed" color="#ed4956" fill="#ed4956" height="24" role="img" viewBox="0 0 48 48" width="24"><path d="M34.6 3.1c-4.5 0-7.9 1.8-10.6 5.6-2.7-3.7-6.1-5.5-10.6-5.5C6 3.1 0 9.6 0 17.6c0 7.3 5.4 12 10.6 16.5.6.5 1.3 1.1 1.9 1.7l2.3 2c4.4 3.9 6.6 5.9 7.6 6.5.5.3 1.1.5 1.6.5s1.1-.2 1.6-.5c1-.6 2.8-2.2 7.8-6.8l2-1.8c.7-.6 1.3-1.2 2-1.7C42.7 29.6 48 25 48 17.6c0-8-6-14.5-13.4-14.5z"></path></svg>';
-	} else {
-		container.currentTarget.classList.remove("liked");
-		container.currentTarget.classList.add("comms-icon-span");
-		container.currentTarget.innerHTML =
-			'<svg aria-label="Like" color="#262626" fill="#262626" height="24" role="img" viewBox="0 0 24 24" width="24"><path d="M16.792 3.904A4.989 4.989 0 0121.5 9.122c0 3.072-2.652 4.959-5.197 7.222-2.512 2.243-3.865 3.469-4.303 3.752-.477-.309-2.143-1.823-4.303-3.752C5.141 14.072 2.5 12.167 2.5 9.122a4.989 4.989 0 014.708-5.218 4.21 4.21 0 013.675 1.941c.84 1.175.98 1.763 1.12 1.763s.278-.588 1.11-1.766a4.17 4.17 0 013.679-1.938m0-2a6.04 6.04 0 00-4.797 2.127 6.052 6.052 0 00-4.787-2.127A6.985 6.985 0 00.5 9.122c0 3.61 2.55 5.827 5.015 7.97.283.246.569.494.853.747l1.027.918a44.998 44.998 0 003.518 3.018 2 2 0 002.174 0 45.263 45.263 0 003.626-3.115l.922-.824c.293-.26.59-.519.885-.774 2.334-2.025 4.98-4.32 4.98-7.94a6.985 6.985 0 00-6.708-7.218z"></path></svg>';
-	}
-}
-
-function likeCommentIcon(container) {
+function likeCommentIcon(likeComment, id) {
 	const user = getAuth().currentUser;
 
 	if (user) {
-		likeCommentIconClicked(container);
+		likeComment(id);
+	} else {
+		showSignInModal();
+	}
+}
+
+function likeIconClicked(likes, username) {
+	if (likes.users.includes(username)) {
+		return (
+			<svg
+				aria-label="Activity Feed"
+				color="#ed4956"
+				fill="#ed4956"
+				height="24"
+				role="img"
+				viewBox="0 0 48 48"
+				width="24"
+			>
+				<path d="M34.6 3.1c-4.5 0-7.9 1.8-10.6 5.6-2.7-3.7-6.1-5.5-10.6-5.5C6 3.1 0 9.6 0 17.6c0 7.3 5.4 12 10.6 16.5.6.5 1.3 1.1 1.9 1.7l2.3 2c4.4 3.9 6.6 5.9 7.6 6.5.5.3 1.1.5 1.6.5s1.1-.2 1.6-.5c1-.6 2.8-2.2 7.8-6.8l2-1.8c.7-.6 1.3-1.2 2-1.7C42.7 29.6 48 25 48 17.6c0-8-6-14.5-13.4-14.5z"></path>
+			</svg>
+		);
+	} else {
+		return (
+			<svg aria-label="Like" color="#262626" fill="#262626" height="24" role="img" viewBox="0 0 24 24" width="24">
+				<path d="M16.792 3.904A4.989 4.989 0 0121.5 9.122c0 3.072-2.652 4.959-5.197 7.222-2.512 2.243-3.865 3.469-4.303 3.752-.477-.309-2.143-1.823-4.303-3.752C5.141 14.072 2.5 12.167 2.5 9.122a4.989 4.989 0 014.708-5.218 4.21 4.21 0 013.675 1.941c.84 1.175.98 1.763 1.12 1.763s.278-.588 1.11-1.766a4.17 4.17 0 013.679-1.938m0-2a6.04 6.04 0 00-4.797 2.127 6.052 6.052 0 00-4.787-2.127A6.985 6.985 0 00.5 9.122c0 3.61 2.55 5.827 5.015 7.97.283.246.569.494.853.747l1.027.918a44.998 44.998 0 003.518 3.018 2 2 0 002.174 0 45.263 45.263 0 003.626-3.115l.922-.824c.293-.26.59-.519.885-.774 2.334-2.025 4.98-4.32 4.98-7.94a6.985 6.985 0 00-6.708-7.218z"></path>
+			</svg>
+		);
+	}
+}
+
+function likeIcon(likePicture) {
+	const user = getAuth().currentUser;
+
+	if (user) {
+		likePicture();
 	} else {
 		showSignInModal();
 	}
@@ -67,16 +103,6 @@ function shareIconClicked() {
 
 	if (user) {
 		showShareModal();
-	} else {
-		showSignInModal();
-	}
-}
-
-function likeIcon(container) {
-	const user = getAuth().currentUser;
-
-	if (user) {
-		likeIconClicked(container);
 	} else {
 		showSignInModal();
 	}
@@ -116,11 +142,89 @@ function shareIcon() {
 	);
 }
 
-function pictureCardIconsSection(modal) {
+function showCommentsModal(
+	username,
+	comments,
+	description,
+	avatar,
+	addComment,
+	likeComment,
+	removeComment,
+	likes,
+	likePicture
+) {
+	const modal = document.getElementById("comments-modal");
+	const descriptionDiv = document.getElementById("modal-first-comment");
+	const commentsDiv = document.getElementById("container-for-comments-in-modal");
+	const addCommentDiv = document.getElementById("div-for-comment-section-in-comment-modal");
+	const likesDiv = document.getElementById("number-of-likes-section-modal");
+	const iconsDiv = document.getElementById("icons-in-comments-section-modal");
+
+	modal.style.display = "flex";
+
+	document.getElementById("comments-modal-id-div").textContent = username;
+	document.getElementById("comments-modal-ava-header").src = avatar;
+
+	if (description) {
+		descriptionDiv.style.display = "flex";
+		document.getElementById("description-comments-modal-username").textContent = username;
+		document.getElementById("description-comments-modal-desc").textContent = description;
+		document.getElementById("comments-modal-description-avatar").src = avatar;
+	} else if (!description) {
+		descriptionDiv.style.display = "none";
+	}
+
+	ReactDOM.render(
+		<Comments removeComment={removeComment} likeComment={likeComment} comments={comments} />,
+		commentsDiv
+	);
+	ReactDOM.render(<AddCommentSection addComment={addComment} />, addCommentDiv);
+	ReactDOM.render(<PictureCardNumOfLikesSection likes={likes} />, likesDiv);
+	ReactDOM.render(<PictureCardIconsSection likePicture={likePicture} likes={likes} modal="modal" />, iconsDiv);
+}
+
+function PictureCardIconsSection(props) {
+	const [signedIn, setSignedIn] = useState(false);
+	const [username, setUsername] = useState("");
+
+	useEffect(() => {
+		const user = getAuth().currentUser;
+
+		if (user) {
+			getUsername(user.uid).then((user) => setUsername(user));
+		}
+	});
+
+	onAuthStateChanged(getAuth(), (user) => {
+		if (user) {
+			setSignedIn(true);
+		} else {
+			setSignedIn(false);
+			setUsername("");
+		}
+	});
+
+
+
 	function commentsIcon() {
-		if (!modal) {
+		if (!props.modal) {
 			return (
-				<span onClick={() => showCommentsModal()} className="comms-icon-span">
+				<span
+					onClick={() =>
+						showCommentsModal(
+							props.username,
+							props.comments,
+							props.description,
+							props.avatar,
+							props.addComment,
+							props.likeComment,
+							props.removeComment,
+							props.likes,
+							props.likePicture
+						)
+					}
+					className="comms-icon-span"
+				>
 					<svg
 						aria-label="Comment"
 						color="#262626"
@@ -144,138 +248,113 @@ function pictureCardIconsSection(modal) {
 	}
 
 	return (
-		<section className="icons-in-comments-section">
-			<span onClick={(event) => likeIcon(event)} className="comms-icon-span">
-				<svg
-					aria-label="Like"
-					color="#262626"
-					fill="#262626"
-					height="24"
-					role="img"
-					viewBox="0 0 24 24"
-					width="24"
-				>
-					<path d="M16.792 3.904A4.989 4.989 0 0121.5 9.122c0 3.072-2.652 4.959-5.197 7.222-2.512 2.243-3.865 3.469-4.303 3.752-.477-.309-2.143-1.823-4.303-3.752C5.141 14.072 2.5 12.167 2.5 9.122a4.989 4.989 0 014.708-5.218 4.21 4.21 0 013.675 1.941c.84 1.175.98 1.763 1.12 1.763s.278-.588 1.11-1.766a4.17 4.17 0 013.679-1.938m0-2a6.04 6.04 0 00-4.797 2.127 6.052 6.052 0 00-4.787-2.127A6.985 6.985 0 00.5 9.122c0 3.61 2.55 5.827 5.015 7.97.283.246.569.494.853.747l1.027.918a44.998 44.998 0 003.518 3.018 2 2 0 002.174 0 45.263 45.263 0 003.626-3.115l.922-.824c.293-.26.59-.519.885-.774 2.334-2.025 4.98-4.32 4.98-7.94a6.985 6.985 0 00-6.708-7.218z"></path>
-				</svg>
+		<>
+			<span onClick={() => likeIcon(props.likePicture)} className="comms-icon-span">
+				{likeIconClicked(props.likes, username)}
 			</span>
 			{commentsIcon()}
 			{shareIcon()}
-		</section>
+		</>
 	);
 }
 
-function showCommentsModal(username, comments, description, avatar) {
-	const modal = document.getElementById("comments-modal");
-	const descriptionDiv = document.getElementById("modal-first-comment");
-	const commentsDiv = document.getElementById("modal-comments-section");
+function Comments(props) {
+	const [signedIn, setSignedIn] = useState(false);
+	const [username, setUsername] = useState("");
 
-	function singleComment(username, comment) {
-		const div = document.createElement("div");
-		div.classList.add("modal-comments");
-	
-		const span = document.createElement("span");
-		span.onmouseenter = (e) => dropDown(e, "avaPic");
-		span.onmouseleave = () => hideDropDown();
-		span.classList.add("avatar-span-comments");
-	
-		const img = document.createElement("img");
-		img.classList.add("card-avatar-img");
-		img.draggable = "false";
-		img.src = ava;
-		img.alt = "";
-	
-		span.appendChild(img);
-		div.appendChild(span);
-		
-		const div2 = document.createElement("div");
-		div2.classList.add("modal-comment-div");
-	
-		const div3 = document.createElement("div");
-		div3.classList.add("modal-comment-div-inner");
-	
-		const div4 = document.createElement("div");
-		div4.classList.add("name-span-modal");
-	
-		const span2 = document.createElement("span");
-		span2.classList.add("first-modal-comment-span");
-		span2.onmouseenter = (e) => dropDown(e);
-		span2.onmouseleave = () => hideDropDown();
-		span2.textContent = username + " ";
-	
-		const span3 = document.createElement("span");
-		span3.textContent = comment;
-	
-		div4.appendChild(span2);
-		div4.appendChild(span3);
-	
-		div3.appendChild(div4);
-	
-		const div5 = document.createElement("div");
-		div5.classList.add("like-and-when-added-div");
-	
-		const div6 = document.createElement("div");
-		div6.classList.add("short-when-added-and-likes");
-		div6.textContent = "6d";
-	
-		div5.appendChild(div6);
-	
-		const div7 = document.createElement("div");
-		div7.classList.add("short-when-added-and-likes");
-		div7.textContent = "1 like";
-	
-		div5.appendChild(div7);
-		div3.appendChild(div5);
-		div2.appendChild(div3);
-		div.appendChild(div2);
-	
-		const div8 = document.createElement("div");
-		div8.classList.add("like-comment-div");
-		div8.classList.add("like-comment-div-modal");
-		div8.onclick = (event) => likeCommentIcon(event);
-	
-		const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
-		svg.setAttribute("aria-label", "Like");
-		svg.setAttribute("color", "#262626");
-		svg.setAttribute("fill", "#262626");
-		svg.setAttribute("height", "12");
-		svg.setAttribute("role", "img");
-		svg.setAttribute("viewBox", "0 0 24 24");
-		svg.setAttribute("width", "12");
-	
-		const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
-		path.setAttribute("d", "M16.792 3.904A4.989 4.989 0 0121.5 9.122c0 3.072-2.652 4.959-5.197 7.222-2.512 2.243-3.865 3.469-4.303 3.752-.477-.309-2.143-1.823-4.303-3.752C5.141 14.072 2.5 12.167 2.5 9.122a4.989 4.989 0 014.708-5.218 4.21 4.21 0 013.675 1.941c.84 1.175.98 1.763 1.12 1.763s.278-.588 1.11-1.766a4.17 4.17 0 013.679-1.938m0-2a6.04 6.04 0 00-4.797 2.127 6.052 6.052 0 00-4.787-2.127A6.985 6.985 0 00.5 9.122c0 3.61 2.55 5.827 5.015 7.97.283.246.569.494.853.747l1.027.918a44.998 44.998 0 003.518 3.018 2 2 0 002.174 0 45.263 45.263 0 003.626-3.115l.922-.824c.293-.26.59-.519.885-.774 2.334-2.025 4.98-4.32 4.98-7.94a6.985 6.985 0 00-6.708-7.218z");
+	useEffect(() => {
+		const user = getAuth().currentUser;
 
-		svg.appendChild(path);
-		div8.appendChild(svg);
-		div.appendChild(div8);
-	
-		const commentsDiv = document.getElementById("modal-comments-section");
-	
-		commentsDiv.appendChild(div);
-			
-	}
-
-	while(commentsDiv.childNodes.length > 1) {
-		commentsDiv.removeChild(commentsDiv.lastChild);
-	}
-
-	modal.style.display = "flex";
-
-	document.getElementById("comments-modal-id-div").textContent = username;
-	document.getElementById("comments-modal-ava-header").src = avatar;
-
-	if (description) {
-		descriptionDiv.style.display = "flex";
-		document.getElementById("description-comments-modal-username").textContent = username;
-		document.getElementById("description-comments-modal-desc").textContent = description;
-		document.getElementById("comments-modal-description-avatar").src = avatar;
-	} else if (!description) {
-		descriptionDiv.style.display = "none";
-	}
-
-	comments.forEach((comment) => {
-		singleComment(comment.username, comment.comment);
+		if (user) {
+			getUsername(user.uid).then((user) => setUsername(user));
+		}
 	});
+
+	onAuthStateChanged(getAuth(), (user) => {
+		if (user) {
+			setSignedIn(true);
+		} else {
+			setSignedIn(false);
+			setUsername("");
+		}
+	});
+
+	useEffect(() => {
+		const div = document.getElementById("modal-comments-section");
+		div.scrollTop = div.scrollHeight;
+	}, [props.comments.length]);
+
+	function showLikes(comment) {
+		if (comment.likes.num === 0) {
+			return "";
+		} else if (comment.likes.num === 1) {
+			return "1 like";
+		} else {
+			return comment.likes.num + " likes";
+		}
+	}
+
+	function deleteComment(comment) {
+		if (signedIn && comment.username === document.getElementById("right-login-div-top-span").textContent) {
+			return "Delete";
+		}
+	}
+
+	return (
+		<>
+			{props.comments.map((comment) => {
+				return (
+					<div key={uniqid()} className="modal-comments">
+						<span
+							onMouseEnter={(e) => dropDown(e, "avaPic")}
+							onMouseLeave={() => hideDropDown()}
+							className="avatar-span-comments"
+						>
+							<img
+								alt=""
+								className="card-avatar-img"
+								data-testid="user-avatar"
+								draggable="false"
+								src={ava}
+							/>
+						</span>
+						<div className="modal-comment-div">
+							<div className="modal-comment-div-inner">
+								<div className="name-span-modal">
+									<span
+										onMouseEnter={(e) => dropDown(e)}
+										onMouseLeave={() => hideDropDown()}
+										className="first-modal-comment-span"
+									>
+										{comment.username}
+									</span>{" "}
+									{comment.comment}
+								</div>
+								<div className="like-and-when-added-div">
+									<div className="short-when-added-and-likes">6d</div>
+									<div onClick={() => showLikesModal()} className="short-when-added-and-likes">
+										{showLikes(comment)}
+									</div>
+									<div
+										onClick={() => props.removeComment(comment.id)}
+										className="short-when-added-and-likes"
+									>
+										{deleteComment(comment)}
+									</div>
+								</div>
+							</div>
+						</div>
+						<div
+							onClick={() => likeCommentIcon(props.likeComment, comment.id)}
+							className="like-comment-div like-comment-div-modal"
+						>
+							{likeCommentIconClicked(comment.likes.users, username)}
+						</div>
+					</div>
+				);
+			})}
+		</>
+	);
 }
 
 function PictureCardCommentsSection(props) {
@@ -285,7 +364,17 @@ function PictureCardCommentsSection(props) {
 				<div className="comment-line-div">
 					<span
 						onClick={() =>
-							showCommentsModal(props.username, props.comments, props.description, props.avatar)
+							showCommentsModal(
+								props.username,
+								props.comments,
+								props.description,
+								props.avatar,
+								props.addComment,
+								props.likeComment,
+								props.removeComment,
+								props.likes,
+								props.likePicture
+							)
 						}
 						className="view-all-coms-span"
 					>
@@ -333,18 +422,11 @@ function PictureCardCommentsSection(props) {
 								</span>
 								<span className="comment-span">{comment.comment}</span>
 							</div>
-							<div onClick={(event) => likeCommentIcon(event)} className="like-comment-div">
-								<svg
-									aria-label="Like"
-									color="#262626"
-									fill="#262626"
-									height="12"
-									role="img"
-									viewBox="0 0 24 24"
-									width="12"
-								>
-									<path d="M16.792 3.904A4.989 4.989 0 0121.5 9.122c0 3.072-2.652 4.959-5.197 7.222-2.512 2.243-3.865 3.469-4.303 3.752-.477-.309-2.143-1.823-4.303-3.752C5.141 14.072 2.5 12.167 2.5 9.122a4.989 4.989 0 014.708-5.218 4.21 4.21 0 013.675 1.941c.84 1.175.98 1.763 1.12 1.763s.278-.588 1.11-1.766a4.17 4.17 0 013.679-1.938m0-2a6.04 6.04 0 00-4.797 2.127 6.052 6.052 0 00-4.787-2.127A6.985 6.985 0 00.5 9.122c0 3.61 2.55 5.827 5.015 7.97.283.246.569.494.853.747l1.027.918a44.998 44.998 0 003.518 3.018 2 2 0 002.174 0 45.263 45.263 0 003.626-3.115l.922-.824c.293-.26.59-.519.885-.774 2.334-2.025 4.98-4.32 4.98-7.94a6.985 6.985 0 00-6.708-7.218z"></path>
-								</svg>
+							<div
+								onClick={() => likeCommentIcon(props.likeComment, comment.id)}
+								className="like-comment-div"
+							>
+								{likeCommentIconClicked(comment.likes.users, props.yourUsername)}
 							</div>
 						</div>
 					);
@@ -410,29 +492,12 @@ function PictureCardHeader(props) {
 	);
 }
 
-function pictureCardNumOfLikesSection() {
-	return (
-		<section className="number-of-likes-section">
-			<div className="number-of-likes-div">
-				<span onClick={() => showLikesModal()} className="likes-span">
-					25,350 likes
-				</span>
-			</div>
-		</section>
-	);
-}
-
 function whenAdded(short) {
 	if (short) {
 		return <div className="short-when-added-and-likes">6d</div>;
 	} else {
 		return <div className="added-div">6 DAYS AGO</div>;
 	}
-}
-
-function showLikesModal() {
-	const modal = document.getElementById("likes-modal");
-	modal.style.display = "flex";
 }
 
 function AddCommentSection(props) {
@@ -444,7 +509,7 @@ function AddCommentSection(props) {
 		e.preventDefault();
 		const button = document.getElementById(id + "button");
 		const username = document.getElementById("right-login-div-top-span").textContent;
-		props.addComment({ username: username, comment: commentValue });
+		props.addComment({ username: username, comment: commentValue, id: uniqid(), likes: { num: 0, users: [] } });
 
 		setCommentValue("");
 		button.classList.remove("post-div-active");
@@ -509,15 +574,123 @@ function AddCommentSection(props) {
 	}
 }
 
-function PictureCard() {
+function PictureCardNumOfLikesSection(props) {
+	function showLikes(likes) {
+		if (likes.num === 0) {
+			return "";
+		} else if (likes.num === 1) {
+			return "1 like";
+		} else {
+			return likes.num + " likes";
+		}
+	}
+
+	return (
+		<div className="number-of-likes-div">
+			<span onClick={() => showLikesModal()} className="likes-span">
+				{showLikes(props.likes)}
+			</span>
+		</div>
+	);
+}
+
+function PictureCard(props) {
+	const [signedIn, setSignedIn] = useState(false);
+	const [likes, setLikes] = useState({ num: 0, users: [] });
 	const [comments, setComments] = useState([]);
 	const [username, setUsername] = useState("bluberek");
 	const [description, setDescription] = useState("Drop a if you’re ready to go on this ride with us this month");
 	const [avatar, setAvatar] = useState(ava);
 
+	onAuthStateChanged(getAuth(), (user) => {
+		if (user) {
+			setSignedIn(true);
+		} else {
+			setSignedIn(false);
+		}
+	});
+
+	function likePicture() {
+
+		setLikes((prevLikes) => {
+			const yourUsername = document.getElementById("right-login-div-top-span").textContent;
+			
+			if(!prevLikes.users.includes(yourUsername)) {
+				return {num: prevLikes.num + 1, users: [...prevLikes.users, yourUsername]}
+
+			} else {
+				return {num: prevLikes.num - 1, users: prevLikes.users.filter((username) => username !== yourUsername)}
+			}
+		})
+	}
+
 	function addComment(comment) {
 		setComments([...comments, comment]);
 	}
+
+	function removeComment(id) {
+		setComments((prevComments) => {
+			const newComments = prevComments.filter((comment) => comment.id !== id);
+			return newComments;
+		});
+	}
+
+	function likeComment(id) {
+		setComments((prevComments) => {
+			const yourUsername = document.getElementById("right-login-div-top-span").textContent;
+
+			const newComments = prevComments.map((comment) => {
+				if (comment.id === id) {
+
+					if (!comment.likes.users.includes(yourUsername)) {
+						return {
+							...comment,
+							likes: {
+								num: comment.likes.num + 1,
+								users: [...comment.likes.users, yourUsername],
+							},
+						};
+					} else {
+						return {
+							...comment,
+							likes: {
+								num: comment.likes.num - 1,
+								users: comment.likes.users.filter((username) => username !== yourUsername),
+							},
+						};
+					}
+				}
+				return comment;
+			});
+			return newComments;
+		});
+	}
+
+	useEffect(() => {
+		ReactDOM.render(
+			<PictureCardNumOfLikesSection likes={likes} />,
+			document.getElementById("number-of-likes-section-modal")
+		);
+		ReactDOM.render(
+			<PictureCardIconsSection likePicture={likePicture}  likes={likes}  modal="modal" />,
+			document.getElementById("icons-in-comments-section-modal")
+		);
+	}, [likes]);
+
+	useEffect(() => {
+		ReactDOM.render(
+			<Comments
+				removeComment={removeComment}
+				likeComment={likeComment}
+				comments={comments}
+			/>,
+			document.getElementById("container-for-comments-in-modal")
+		);
+		ReactDOM.render(
+			<AddCommentSection addComment={addComment} />,
+			document.getElementById("div-for-comment-section-in-comment-modal")
+		);
+	}, [comments]);
 
 	return (
 		<article className="picture-card-article">
@@ -531,13 +704,36 @@ function PictureCard() {
 			</div>
 			<div className="comments-div">
 				<div className="comments-inner-div">
-					{pictureCardIconsSection()}
-					{pictureCardNumOfLikesSection()}
+					<section className="icons-in-comments-section">
+						<PictureCardIconsSection
+							comments={comments}
+							username={username}
+							description={description}
+							avatar={avatar}
+							addComment={addComment}
+							likeComment={likeComment}
+							removeComment={removeComment}
+							likes={likes}
+							likePicture={likePicture}
+						/>
+					</section>
+
+					<section className="number-of-likes-section">
+						<PictureCardNumOfLikesSection likes={likes} />
+					</section>
+
 					<PictureCardCommentsSection
 						comments={comments}
 						username={username}
 						description={description}
 						avatar={avatar}
+						addComment={addComment}
+						likeComment={likeComment}
+						signedIn={signedIn}
+						removeComment={removeComment}
+						likes={likes}
+						yourUsername={props.username}
+						likePicture={likePicture}
 					/>
 					{whenAdded()}
 					<AddCommentSection addComment={addComment} />
@@ -551,8 +747,7 @@ export default PictureCard;
 export {
 	options,
 	PictureCardHeader,
-	pictureCardIconsSection,
-	pictureCardNumOfLikesSection,
+	PictureCardIconsSection,
 	whenAdded,
 	AddCommentSection,
 	likeCommentIcon,
