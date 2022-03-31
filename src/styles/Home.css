@@ -238,7 +238,7 @@ main {
 
 #suggestions-left-div {
 	padding: 20px 0;
-	background-color: rgba(255, 255, 255);
+	background-color: rgba(250, 250, 250);
 	/* border: 1px solid rgba(219, 219, 219); */
 	border: none;
 
@@ -251,7 +251,7 @@ main {
 }
 
 #for-you-sug-span-left {
-	margin: 0 24px 12px 24px;
+	margin: 0 24px 12px 0px;
 	color: #8e8e8e;
 	font-weight: 550;
 	font-size: 14px;
@@ -268,8 +268,8 @@ main {
 	width: 100%;
 	overflow-x: auto;
 	overflow-y: hidden;
-	padding-left: 24px;
-	padding-right: 24px;
+	/* padding-left: 24px;
+	padding-right: 24px; */
 	-ms-overflow-style: none;
 	scrollbar-width: none;
 }
@@ -437,6 +437,8 @@ main {
 	border: 1px solid rgb(219, 219, 219);
 }
 
+
+
 @media (max-width: 999px) {
 	#home-right-div {
 		display: none;
@@ -498,5 +500,13 @@ main {
 
 	#suggestions-left-inner-div {
 		gap: 10px;
+        padding-left: 24px;
+        padding-right: 24px;
 	}
+
+    #for-you-sug-span-left {
+        margin-left: 24px;
+    }
+
+	
 }
