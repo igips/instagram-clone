@@ -1,17 +1,15 @@
 import favi from "../img/favicon.jpg";
 import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged } from "firebase/auth";
 import { getFirestore, addDoc, collection, getDocs } from "firebase/firestore";
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import ava from "../img/ava.jpeg";
 import { dropDown, hideDropDown, followMobile } from "./Home";
 import testPic from "../img/test-img.jpg";
 import "../styles/Modals.css";
 import {
-	AddCommentSection,
-	pictureCardIconsSection,
+	PictureCardIconsSection,
 	pictureCardNumOfLikesSection,
 	whenAdded,
-	likeCommentIcon,
 	shareIcon,
 	PictureCardHeader,
 } from "./PictureCard";
@@ -417,15 +415,6 @@ function LikesModal() {
 
 function CommentsModal() {
 	const commentsModal = document.getElementById("comments-modal");
-	const [signedIn, setSignedIn] = useState(false);
-
-	onAuthStateChanged(getAuth(), (user) => {
-		if (user) {
-			setSignedIn(true);
-		} else {
-			setSignedIn(false);
-		}
-	});
 
 	window.addEventListener("click", (e) => {
 		if (e.target === commentsModal) {
@@ -439,12 +428,6 @@ function CommentsModal() {
 
 		if (inputDiv) {
 			modal.style.display = "none";
-			if (signedIn) {
-				inputDiv.lastElementChild.lastElementChild.lastElementChild.childNodes[1].value = "";
-				const button = inputDiv.lastElementChild.lastElementChild.lastElementChild.childNodes[2];
-				button.disabled = true;
-				button.classList.remove("post-div-active");
-			}
 		}
 	}
 
@@ -523,11 +506,15 @@ function CommentsModal() {
 								</div>
 							</div>
 						</div>
+						<div id="container-for-comments-in-modal"></div>
 					</div>
-					{pictureCardIconsSection("modal")}
-					{pictureCardNumOfLikesSection()}
+					<section id="icons-in-comments-section-modal" className="icons-in-comments-section">
+						
+					</section>
+					
+					<section id="number-of-likes-section-modal" className="number-of-likes-section"></section>
 					{whenAdded()}
-					{AddCommentSection()}
+					<div id="div-for-comment-section-in-comment-modal"></div>
 				</div>
 			</div>
 		</div>
