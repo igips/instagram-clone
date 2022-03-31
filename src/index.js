@@ -51,7 +51,7 @@ onAuthStateChanged(getAuth(), (user) => {
 			suggestionsLeft.classList.add("mobile");
 			profileInfoRight.classList.add("visible");
 			suggestionsRight.classList.add("visible");
-      rightUserName.textContent = user;
+      		rightUserName.textContent = user;
 		});
 
 	} else {
@@ -59,8 +59,7 @@ onAuthStateChanged(getAuth(), (user) => {
 		rightButtons.classList.remove("buttons-not-vissible");
 		suggestionsLeft.classList.remove("mobile");
 		profileInfoRight.classList.remove("visible");
-		suggestionsRight.classList.remove("visible");
-
+		suggestionsRight.classList.remove("visible"); 
 		// User is signed out
 	}
 });
@@ -71,3 +70,5 @@ ReactDOM.render(
 	</React.StrictMode>,
 	document.getElementById("root")
 );
+
+export {getUsername}
