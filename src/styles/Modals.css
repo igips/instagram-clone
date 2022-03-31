@@ -260,6 +260,13 @@
 	height: 100%;
 	border-bottom: 1px solid rgba(219, 219, 219);
 	overflow-y: scroll;
+    word-break: break-word;
+}
+
+#container-for-comments-in-modal {
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
 }
 
 #login-modal {
@@ -304,7 +311,7 @@
 
 .like-and-when-added-div {
 	display: flex;
-	gap: 10px;
+	gap: 5px;
 }
 
 .short-when-added-and-likes {
