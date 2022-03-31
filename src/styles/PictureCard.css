@@ -402,9 +402,10 @@ canvas {
     font-size: 12px;
 } 
 
-
-
-
+.short-when-added-and-likes:not(:first-child) {
+    cursor: pointer;
+    font-weight: bolder;
+}
 
 
 
