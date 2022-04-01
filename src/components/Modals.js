@@ -1,16 +1,12 @@
 import favi from "../img/favicon.jpg";
-import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged } from "firebase/auth";
+import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword } from "firebase/auth";
 import { getFirestore, addDoc, collection, getDocs } from "firebase/firestore";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import ava from "../img/ava.jpeg";
-import { dropDown, hideDropDown, followMobile } from "./Home";
+import { dropDown, hideDropDown } from "./Home";
 import testPic from "../img/test-img.jpg";
 import "../styles/Modals.css";
-import {
-	whenAdded,
-	shareIcon,
-	PictureCardHeader,
-} from "./PictureCard";
+import { shareIcon, PictureCardHeader } from "./PictureCard";
 
 function closeModal(modal) {
 	return (
@@ -326,8 +322,6 @@ function LikesModal() {
 		modal.style.display = "none";
 	}
 
-	
-
 	return (
 		<div id="likes-modal" className="modal">
 			<div className="likes-modal-content">
@@ -337,9 +331,6 @@ function LikesModal() {
 				</div>
 				<div id="list-of-likes-div">
 					<div id="list-of-likes-div-inner"></div>
-					
-				
-					
 				</div>
 			</div>
 		</div>
@@ -436,20 +427,19 @@ function CommentsModal() {
 										<span id="description-comments-modal-desc"></span>
 									</div>
 									<div id="first-comment-when">
-										{/* {whenAdded("short")} */}
+										<div id="short-when-added-and-likes-modal" className="short-when-added-and-likes">
+											
+										</div>
 									</div>
-									
 								</div>
 							</div>
 						</div>
 						<div id="container-for-comments-in-modal"></div>
 					</div>
-					<section id="icons-in-comments-section-modal" className="icons-in-comments-section">
-						
-					</section>
-					
+					<section id="icons-in-comments-section-modal" className="icons-in-comments-section"></section>
+
 					<section id="number-of-likes-section-modal" className="number-of-likes-section"></section>
-					{/* {whenAdded()} */}
+					<div id="when-added-div-modal" className="added-div"></div>
 					<div id="div-for-comment-section-in-comment-modal"></div>
 				</div>
 			</div>
@@ -580,7 +570,6 @@ function ShareModal() {
 							</svg>
 						</div>
 					</div>
-					
 				</div>
 				<div id="send-button-div">
 					<input
