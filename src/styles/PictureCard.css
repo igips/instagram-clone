@@ -366,15 +366,14 @@ canvas {
 }
 
 .add-comment-text-area {
-    height: 18px !important;
+    height: 25px !important;
     display: flex;
-    flex-grow: 1;
     max-height: 80px;
-    width: 0;
+    width: 100%;
     outline: 0;
     font-family: Helvetica;
     resize: none;
-    overflow:hidden;
+    padding-top: 3px;
 }
 
 .post-div {
@@ -416,5 +415,17 @@ canvas {
     
     .add-comment-section {
         display: none;
+    }
+
+    .emoji-div {
+        display: none;
+    }
+
+    .comms-icon-span:hover {
+        opacity: 1;
+    }
+
+    .in-coms:hover {
+        text-decoration: none;
     }
 }
