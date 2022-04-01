@@ -198,7 +198,8 @@
 	cursor: pointer;
 }
 
-#list-of-likes-div, #list-of-likes-div-inner {
+#list-of-likes-div,
+#list-of-likes-div-inner {
 	overflow-y: scroll;
 }
 
@@ -235,7 +236,7 @@
 	min-width: 405px;
 	width: 500px;
 	max-width: 500px;
-	max-height: 100%;
+	/* max-height: 100%; */
 	background-color: white;
 	border-top-right-radius: 5px;
 	border-bottom-right-radius: 5px;
@@ -260,13 +261,13 @@
 	height: 100%;
 	border-bottom: 1px solid rgba(219, 219, 219);
 	overflow-y: scroll;
-    word-break: break-word;
+	word-break: break-word;
 }
 
 #container-for-comments-in-modal {
-    display: flex;
-    flex-direction: column;
-    gap: 30px;
+	display: flex;
+	flex-direction: column;
+	gap: 30px;
 }
 
 #login-modal {
@@ -492,12 +493,16 @@
 
 	#comms-modal-header-mobile {
 		display: flex;
+		position: absolute;
+		width: 100%;
+		top: 0;
 	}
 
 	#comments-div-modal .add-comment-section {
 		display: flex;
 		border-top: none;
 		z-index: 10000;
+		height: 60px;
 	}
 
 	#modal-first-comment {
@@ -507,6 +512,11 @@
 
 	#modal-comments-section {
 		gap: 15px;
+		overflow-y: scroll;
+		height: 100%;
+		padding-bottom: 130px;
+		position: absolute;
+		top: 47px;
 	}
 
 	#send-button-div {
@@ -518,5 +528,15 @@
 
 	.results-active {
 		border-bottom: none;
+	}
+
+	#div-for-comment-section-in-comment-modal {
+		position: absolute;
+		bottom: 0;
+		width: 100%;
+		z-index: 1000000;
+		height: 60px;
+		background-color: white;
+		border-top: 1px solid rgba(219, 219, 219);
 	}
 }
