@@ -8,21 +8,24 @@ import { useEffect, useState } from "react";
 import { getUsername } from "..";
 
 function dropDown(e, ele, right) {
-	const dropDown = document.getElementById("drop-down");
-	const rect = e.target.getBoundingClientRect();
-	const user = getAuth().currentUser;
+	if (window.innerWidth > 650) {
+		const dropDown = document.getElementById("drop-down");
+		const rect = e.target.getBoundingClientRect();
+		const user = getAuth().currentUser;
 
-	dropDown.style.display = "flex";
-	dropDown.style.left = rect.left + "px";
-	dropDown.style.top = (right ? rect.top : window.scrollY + rect.top) + (ele === "avaPic" ? 25 : 18) + "px";
-	dropDown.style.position = right ? "fixed" : "absolute";
+		dropDown.style.display = "flex";
+		dropDown.style.left = rect.left + "px";
+		dropDown.style.top = (right ? rect.top : window.scrollY + rect.top) + (ele === "avaPic" ? 25 : 18) + "px";
+		dropDown.style.position = right ? "fixed" : "absolute";
 
-	if (window.innerHeight - dropDown.getBoundingClientRect().bottom < 0) {
-		dropDown.style.top = (right ? rect.top : window.scrollY + rect.top) - (user ? 350 : 290) + "px";
-	}
+		if (window.innerHeight - dropDown.getBoundingClientRect().bottom < 0) {
+			dropDown.style.top = (right ? rect.top : window.scrollY + rect.top) - (user ? 350 : 290) + "px";
+		}
 
-	if (window.innerWidth - dropDown.getBoundingClientRect().left <= 390) {
-		dropDown.style.left = rect.left - (410 - (window.innerWidth - dropDown.getBoundingClientRect().left)) + "px";
+		if (window.innerWidth - dropDown.getBoundingClientRect().left <= 390) {
+			dropDown.style.left =
+				rect.left - (410 - (window.innerWidth - dropDown.getBoundingClientRect().left)) + "px";
+		}
 	}
 }
 
@@ -66,15 +69,14 @@ function Home() {
 	useEffect(() => {
 		const user = getAuth().currentUser;
 
-		if(user) {
+		if (user) {
 			getUsername(user.uid).then((user) => setUsername(user));
 		}
-	})
+	});
 
 	onAuthStateChanged(getAuth(), (user) => {
 		if (user) {
 			setSignedIn(true);
-
 		} else {
 			setSignedIn(false);
 			setUsername("");
@@ -126,7 +128,6 @@ function Home() {
 			);
 		}
 	}
-
 
 	return (
 		<main>
