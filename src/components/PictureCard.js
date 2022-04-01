@@ -8,6 +8,7 @@ import testPic from "../img/test-img.jpg";
 import "../styles/PictureCard.css";
 import { dropDown, hideDropDown, followMobile } from "./Home.js";
 import { showSignInModal } from "./Nav";
+import ReactTimeAgo from "react-time-ago";
 
 function options() {
 	const user = getAuth().currentUser;
@@ -146,7 +147,8 @@ function showCommentsModal(
 	likeComment,
 	removeComment,
 	likes,
-	likePicture
+	likePicture,
+	date
 ) {
 	const modal = document.getElementById("comments-modal");
 	const descriptionDiv = document.getElementById("modal-first-comment");
@@ -154,6 +156,8 @@ function showCommentsModal(
 	const addCommentDiv = document.getElementById("div-for-comment-section-in-comment-modal");
 	const likesDiv = document.getElementById("number-of-likes-section-modal");
 	const iconsDiv = document.getElementById("icons-in-comments-section-modal");
+	const whenAddedDiv = document.getElementById("when-added-div-modal");
+	const descriptionWhenAddedDiv = document.getElementById("short-when-added-and-likes-modal");
 
 	modal.style.display = "flex";
 
@@ -175,7 +179,9 @@ function showCommentsModal(
 	);
 	ReactDOM.render(<AddCommentSection addComment={addComment} />, addCommentDiv);
 	ReactDOM.render(<PictureCardNumOfLikesSection likes={likes} />, likesDiv);
-	ReactDOM.render(<PictureCardIconsSection likePicture={likePicture} likes={likes} modal="modal" />, iconsDiv);
+	ReactDOM.render(<PictureCardIconsSection date={date} likePicture={likePicture} likes={likes} modal="modal" />, iconsDiv);
+	ReactDOM.render(<ReactTimeAgo date={date} locale="en-US" />, whenAddedDiv);
+	ReactDOM.render(<ReactTimeAgo timeStyle="mini-minute-now" date={date} locale="en-US" />,  descriptionWhenAddedDiv);
 }
 
 function PictureCardIconsSection(props) {
@@ -213,7 +219,8 @@ function PictureCardIconsSection(props) {
 							props.likeComment,
 							props.removeComment,
 							props.likes,
-							props.likePicture
+							props.likePicture,
+							props.date
 						)
 					}
 					className="comms-icon-span"
@@ -324,7 +331,7 @@ function Comments(props) {
 									{comment.comment}
 								</div>
 								<div className="like-and-when-added-div">
-									<div className="short-when-added-and-likes">6d</div>
+									<div className="short-when-added-and-likes"><ReactTimeAgo timeStyle="mini-minute-now" date={comment.date} locale="en-US" /></div>
 									<div onClick={() => showLikesModal(comment)} className="short-when-added-and-likes">
 										{showLikes(comment)}
 									</div>
@@ -366,7 +373,8 @@ function PictureCardCommentsSection(props) {
 								props.likeComment,
 								props.removeComment,
 								props.likes,
-								props.likePicture
+								props.likePicture,
+								props.date
 							)
 						}
 						className="view-all-coms-span"
@@ -494,7 +502,7 @@ function AddCommentSection(props) {
 		e.preventDefault();
 		const button = document.getElementById(id + "button");
 		const username = document.getElementById("right-login-div-top-span").textContent;
-		props.addComment({ username: username, comment: commentValue, id: uniqid(), likes: { num: 0, users: [] } });
+		props.addComment({ username: username, comment: commentValue, id: uniqid(), likes: { num: 0, users: [] }, date: new Date() });
 
 		setCommentValue("");
 		button.classList.remove("post-div-active");
@@ -638,17 +646,6 @@ function Likes(props) {
 	);
 }
 
-function whenAdded(time, short) {
-	if (short) {
-		return (
-			<div className="short-when-added-and-likes">
-				{formatDistanceToNow(time, { addSuffix: true })}
-			</div>
-		);
-	} else {
-		return <div className="added-div">{formatDistanceToNow(time, { addSuffix: true })}</div>;
-	}
-}
 
 function PictureCard(props) {
 	const [signedIn, setSignedIn] = useState(false);
@@ -729,7 +726,7 @@ function PictureCard(props) {
 			document.getElementById("number-of-likes-section-modal")
 		);
 		ReactDOM.render(
-			<PictureCardIconsSection likePicture={likePicture} likes={likes} modal="modal" />,
+			<PictureCardIconsSection date={date} likePicture={likePicture} likes={likes} modal="modal" />,
 			document.getElementById("icons-in-comments-section-modal")
 		);
 	}, [likes]);
@@ -768,6 +765,7 @@ function PictureCard(props) {
 							removeComment={removeComment}
 							likes={likes}
 							likePicture={likePicture}
+							date={date}
 						/>
 					</section>
 
@@ -787,8 +785,11 @@ function PictureCard(props) {
 						likes={likes}
 						yourUsername={props.username}
 						likePicture={likePicture}
+						date={date}
 					/>
-					{whenAdded(date)}
+					<div className="added-div">
+						<ReactTimeAgo  date={date} locale="en-US" />
+					</div>
 					<AddCommentSection addComment={addComment} />
 				</div>
 			</div>
@@ -801,7 +802,6 @@ export {
 	options,
 	PictureCardHeader,
 	PictureCardIconsSection,
-	whenAdded,
 	AddCommentSection,
 	likeCommentIcon,
 	shareIcon,
