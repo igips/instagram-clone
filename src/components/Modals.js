@@ -7,8 +7,6 @@ import { dropDown, hideDropDown, followMobile } from "./Home";
 import testPic from "../img/test-img.jpg";
 import "../styles/Modals.css";
 import {
-	PictureCardIconsSection,
-	pictureCardNumOfLikesSection,
 	whenAdded,
 	shareIcon,
 	PictureCardHeader,
@@ -315,16 +313,6 @@ function UnfollowModal() {
 }
 
 function LikesModal() {
-	const [signedIn, setSignedIn] = useState(false);
-
-	onAuthStateChanged(getAuth(), (user) => {
-		if (user) {
-			setSignedIn(true);
-		} else {
-			setSignedIn(false);
-		}
-	});
-
 	const likesModal = document.getElementById("likes-modal");
 
 	window.addEventListener("click", (e) => {
@@ -338,15 +326,7 @@ function LikesModal() {
 		modal.style.display = "none";
 	}
 
-	function followButtonForLikes() {
-		if (signedIn) {
-			return (
-				<button onClick={(e) => followMobile(e)} className="likes-modal-follow">
-					Follow
-				</button>
-			);
-		}
-	}
+	
 
 	return (
 		<div id="likes-modal" className="modal">
@@ -356,57 +336,10 @@ function LikesModal() {
 					{closeModal(hideLikesModal)}
 				</div>
 				<div id="list-of-likes-div">
-					<div className="right-sug-div-list">
-						<div
-							onMouseEnter={(e) => dropDown(e, "avaPic", "right")}
-							onMouseLeave={() => hideDropDown()}
-							className="right-sug-ava-div"
-						>
-							<img className="ava-img-likes" src={ava} alt="" />
-						</div>
-						<span
-							onMouseEnter={(e) => dropDown(e, "no", "right")}
-							onMouseLeave={() => hideDropDown()}
-							className="sug-login-right"
-						>
-							sialabala
-						</span>
-						{followButtonForLikes()}
-					</div>
-					<div className="right-sug-div-list">
-						<div
-							onMouseEnter={(e) => dropDown(e, "avaPic", "right")}
-							onMouseLeave={() => hideDropDown()}
-							className="right-sug-ava-div"
-						>
-							<img className="ava-img-likes" src={ava} alt="" />
-						</div>
-						<span
-							onMouseEnter={(e) => dropDown(e, "no", "right")}
-							onMouseLeave={() => hideDropDown()}
-							className="sug-login-right"
-						>
-							sialabala
-						</span>
-						{followButtonForLikes()}
-					</div>
-					<div className="right-sug-div-list">
-						<div
-							onMouseEnter={(e) => dropDown(e, "avaPic", "right")}
-							onMouseLeave={() => hideDropDown()}
-							className="right-sug-ava-div"
-						>
-							<img className="ava-img-likes" src={ava} alt="" />
-						</div>
-						<span
-							onMouseEnter={(e) => dropDown(e, "no", "right")}
-							onMouseLeave={() => hideDropDown()}
-							className="sug-login-right"
-						>
-							sialabala
-						</span>
-						{followButtonForLikes()}
-					</div>
+					<div id="list-of-likes-div-inner"></div>
+					
+				
+					
 				</div>
 			</div>
 		</div>
@@ -502,7 +435,10 @@ function CommentsModal() {
 										></span>{" "}
 										<span id="description-comments-modal-desc"></span>
 									</div>
-									{whenAdded("short")}
+									<div id="first-comment-when">
+										{/* {whenAdded("short")} */}
+									</div>
+									
 								</div>
 							</div>
 						</div>
@@ -513,7 +449,7 @@ function CommentsModal() {
 					</section>
 					
 					<section id="number-of-likes-section-modal" className="number-of-likes-section"></section>
-					{whenAdded()}
+					{/* {whenAdded()} */}
 					<div id="div-for-comment-section-in-comment-modal"></div>
 				</div>
 			</div>
@@ -644,6 +580,7 @@ function ShareModal() {
 							</svg>
 						</div>
 					</div>
+					
 				</div>
 				<div id="send-button-div">
 					<input

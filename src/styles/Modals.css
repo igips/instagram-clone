@@ -198,7 +198,7 @@
 	cursor: pointer;
 }
 
-#list-of-likes-div {
+#list-of-likes-div, #list-of-likes-div-inner {
 	overflow-y: scroll;
 }
 

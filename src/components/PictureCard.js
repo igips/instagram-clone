@@ -6,7 +6,7 @@ import { getUsername } from "..";
 import ava from "../img/ava.jpeg";
 import testPic from "../img/test-img.jpg";
 import "../styles/PictureCard.css";
-import { dropDown, hideDropDown } from "./Home.js";
+import { dropDown, hideDropDown, followMobile } from "./Home.js";
 import { showSignInModal } from "./Nav";
 
 function options() {
@@ -18,11 +18,6 @@ function options() {
 	} else {
 		showSignInModal();
 	}
-}
-
-function showLikesModal() {
-	const modal = document.getElementById("likes-modal");
-	modal.style.display = "flex";
 }
 
 function likeCommentIconClicked(users, username) {
@@ -204,8 +199,6 @@ function PictureCardIconsSection(props) {
 		}
 	});
 
-
-
 	function commentsIcon() {
 		if (!props.modal) {
 			return (
@@ -332,7 +325,7 @@ function Comments(props) {
 								</div>
 								<div className="like-and-when-added-div">
 									<div className="short-when-added-and-likes">6d</div>
-									<div onClick={() => showLikesModal()} className="short-when-added-and-likes">
+									<div onClick={() => showLikesModal(comment)} className="short-when-added-and-likes">
 										{showLikes(comment)}
 									</div>
 									<div
@@ -492,14 +485,6 @@ function PictureCardHeader(props) {
 	);
 }
 
-function whenAdded(short) {
-	if (short) {
-		return <div className="short-when-added-and-likes">6d</div>;
-	} else {
-		return <div className="added-div">6 DAYS AGO</div>;
-	}
-}
-
 function AddCommentSection(props) {
 	const [signedIn, setSignedIn] = useState(false);
 	const [id, setId] = useState(uniqid());
@@ -587,11 +572,82 @@ function PictureCardNumOfLikesSection(props) {
 
 	return (
 		<div className="number-of-likes-div">
-			<span onClick={() => showLikesModal()} className="likes-span">
+			<span onClick={() => showLikesModal(props.likes)} className="likes-span">
 				{showLikes(props.likes)}
 			</span>
 		</div>
 	);
+}
+
+function showLikesModal(likes) {
+	const modal = document.getElementById("likes-modal");
+	const container = document.getElementById("list-of-likes-div-inner");
+
+	modal.style.display = "flex";
+
+	ReactDOM.render(<Likes likes={likes} />, container);
+}
+
+function Likes(props) {
+	const [signedIn, setSignedIn] = useState(false);
+
+	const likes = props.likes.users ? props.likes.users : props.likes.likes.users;
+
+	onAuthStateChanged(getAuth(), (user) => {
+		if (user) {
+			setSignedIn(true);
+		} else {
+			setSignedIn(false);
+		}
+	});
+
+	function followButtonForLikes() {
+		if (signedIn) {
+			return (
+				<button onClick={(e) => followMobile(e)} className="likes-modal-follow">
+					Follow
+				</button>
+			);
+		}
+	}
+
+	return (
+		<>
+			{likes.map((user) => {
+				return (
+					<div key={uniqid()} className="right-sug-div-list">
+						<div
+							onMouseEnter={(e) => dropDown(e, "avaPic", "right")}
+							onMouseLeave={() => hideDropDown()}
+							className="right-sug-ava-div"
+						>
+							<img className="ava-img-likes" src={ava} alt="" />
+						</div>
+						<span
+							onMouseEnter={(e) => dropDown(e, "no", "right")}
+							onMouseLeave={() => hideDropDown()}
+							className="sug-login-right"
+						>
+							{user}
+						</span>
+						{followButtonForLikes()}
+					</div>
+				);
+			})}
+		</>
+	);
+}
+
+function whenAdded(time, short) {
+	if (short) {
+		return (
+			<div className="short-when-added-and-likes">
+				{formatDistanceToNow(time, { addSuffix: true })}
+			</div>
+		);
+	} else {
+		return <div className="added-div">{formatDistanceToNow(time, { addSuffix: true })}</div>;
+	}
 }
 
 function PictureCard(props) {
@@ -601,6 +657,7 @@ function PictureCard(props) {
 	const [username, setUsername] = useState("bluberek");
 	const [description, setDescription] = useState("Drop a if you’re ready to go on this ride with us this month");
 	const [avatar, setAvatar] = useState(ava);
+	const [date, setDate] = useState(new Date());
 
 	onAuthStateChanged(getAuth(), (user) => {
 		if (user) {
@@ -611,17 +668,18 @@ function PictureCard(props) {
 	});
 
 	function likePicture() {
-
 		setLikes((prevLikes) => {
 			const yourUsername = document.getElementById("right-login-div-top-span").textContent;
-			
-			if(!prevLikes.users.includes(yourUsername)) {
-				return {num: prevLikes.num + 1, users: [...prevLikes.users, yourUsername]}
 
+			if (!prevLikes.users.includes(yourUsername)) {
+				return { num: prevLikes.num + 1, users: [...prevLikes.users, yourUsername] };
 			} else {
-				return {num: prevLikes.num - 1, users: prevLikes.users.filter((username) => username !== yourUsername)}
+				return {
+					num: prevLikes.num - 1,
+					users: prevLikes.users.filter((username) => username !== yourUsername),
+				};
 			}
-		})
+		});
 	}
 
 	function addComment(comment) {
@@ -641,7 +699,6 @@ function PictureCard(props) {
 
 			const newComments = prevComments.map((comment) => {
 				if (comment.id === id) {
-
 					if (!comment.likes.users.includes(yourUsername)) {
 						return {
 							...comment,
@@ -672,18 +729,14 @@ function PictureCard(props) {
 			document.getElementById("number-of-likes-section-modal")
 		);
 		ReactDOM.render(
-			<PictureCardIconsSection likePicture={likePicture}  likes={likes}  modal="modal" />,
+			<PictureCardIconsSection likePicture={likePicture} likes={likes} modal="modal" />,
 			document.getElementById("icons-in-comments-section-modal")
 		);
 	}, [likes]);
 
 	useEffect(() => {
 		ReactDOM.render(
-			<Comments
-				removeComment={removeComment}
-				likeComment={likeComment}
-				comments={comments}
-			/>,
+			<Comments removeComment={removeComment} likeComment={likeComment} comments={comments} />,
 			document.getElementById("container-for-comments-in-modal")
 		);
 		ReactDOM.render(
@@ -735,7 +788,7 @@ function PictureCard(props) {
 						yourUsername={props.username}
 						likePicture={likePicture}
 					/>
-					{whenAdded()}
+					{whenAdded(date)}
 					<AddCommentSection addComment={addComment} />
 				</div>
 			</div>
