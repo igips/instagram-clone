@@ -9,6 +9,7 @@ import "../styles/PictureCard.css";
 import { dropDown, hideDropDown, followMobile } from "./Home.js";
 import { showSignInModal } from "./Nav";
 import ReactTimeAgo from "react-time-ago";
+import Picker from "emoji-picker-react";
 
 function options() {
 	const user = getAuth().currentUser;
@@ -179,9 +180,12 @@ function showCommentsModal(
 	);
 	ReactDOM.render(<AddCommentSection addComment={addComment} />, addCommentDiv);
 	ReactDOM.render(<PictureCardNumOfLikesSection likes={likes} />, likesDiv);
-	ReactDOM.render(<PictureCardIconsSection date={date} likePicture={likePicture} likes={likes} modal="modal" />, iconsDiv);
+	ReactDOM.render(
+		<PictureCardIconsSection date={date} likePicture={likePicture} likes={likes} modal="modal" />,
+		iconsDiv
+	);
 	ReactDOM.render(<ReactTimeAgo date={date} locale="en-US" />, whenAddedDiv);
-	ReactDOM.render(<ReactTimeAgo timeStyle="mini-minute-now" date={date} locale="en-US" />,  descriptionWhenAddedDiv);
+	ReactDOM.render(<ReactTimeAgo timeStyle="mini-minute-now" date={date} locale="en-US" />, descriptionWhenAddedDiv);
 }
 
 function PictureCardIconsSection(props) {
@@ -331,7 +335,9 @@ function Comments(props) {
 									{comment.comment}
 								</div>
 								<div className="like-and-when-added-div">
-									<div className="short-when-added-and-likes"><ReactTimeAgo timeStyle="mini-minute-now" date={comment.date} locale="en-US" /></div>
+									<div className="short-when-added-and-likes">
+										<ReactTimeAgo timeStyle="mini-minute-now" date={comment.date} locale="en-US" />
+									</div>
 									<div onClick={() => showLikesModal(comment)} className="short-when-added-and-likes">
 										{showLikes(comment)}
 									</div>
@@ -502,7 +508,13 @@ function AddCommentSection(props) {
 		e.preventDefault();
 		const button = document.getElementById(id + "button");
 		const username = document.getElementById("right-login-div-top-span").textContent;
-		props.addComment({ username: username, comment: commentValue, id: uniqid(), likes: { num: 0, users: [] }, date: new Date() });
+		props.addComment({
+			username: username,
+			comment: commentValue,
+			id: uniqid(),
+			likes: { num: 0, users: [] },
+			date: new Date(),
+		});
 
 		setCommentValue("");
 		button.classList.remove("post-div-active");
@@ -531,13 +543,43 @@ function AddCommentSection(props) {
 		}
 	});
 
+	function showEmojiiPicker(e) {
+		if (!document.getElementById(id + "emo").firstChild) {
+			ReactDOM.render(
+				<Picker
+					natvie={true}
+					disableSearchBar={true}
+					pickerStyle={{ position: "absolute", bottom: "35px", left: "0px" }}
+				/>,
+				document.getElementById(id + "emo")
+			);
+			
+			window.addEventListener("click", (e) => {
+				let found = false;
+				e.path.forEach((ele) => {
+					if (ele.id === id + "emo" || ele.id === id + "svg" || ele.id === id + "path") {
+						found = true;
+					}
+				});
+
+				if (!found) {
+					ReactDOM.unmountComponentAtNode(document.getElementById(id + "emo"));
+				}
+			});
+		} else if (e.target.tagName === "svg" || e.target.tagName === "path") {
+			ReactDOM.unmountComponentAtNode(document.getElementById(id + "emo"));
+		}
+	}
+
 	if (signedIn) {
 		return (
 			<section className="add-comment-section">
 				<div className="add-comment-section-inner">
 					<form onSubmit={(e) => submitComment(e)} className="comment-form">
-						<div className="emoji-div">
+						<div onClick={(e) => showEmojiiPicker(e)} className="emoji-div">
+							<div id={id + "emo"}></div>
 							<svg
+								id={id + "svg"}
 								aria-label="Emoji"
 								color="#262626"
 								fill="#262626"
@@ -546,7 +588,10 @@ function AddCommentSection(props) {
 								viewBox="0 0 24 24"
 								width="24"
 							>
-								<path d="M15.83 10.997a1.167 1.167 0 101.167 1.167 1.167 1.167 0 00-1.167-1.167zm-6.5 1.167a1.167 1.167 0 10-1.166 1.167 1.167 1.167 0 001.166-1.167zm5.163 3.24a3.406 3.406 0 01-4.982.007 1 1 0 10-1.557 1.256 5.397 5.397 0 008.09 0 1 1 0 00-1.55-1.263zM12 .503a11.5 11.5 0 1011.5 11.5A11.513 11.513 0 0012 .503zm0 21a9.5 9.5 0 119.5-9.5 9.51 9.51 0 01-9.5 9.5z"></path>
+								<path
+									id={id + "path"}
+									d="M15.83 10.997a1.167 1.167 0 101.167 1.167 1.167 1.167 0 00-1.167-1.167zm-6.5 1.167a1.167 1.167 0 10-1.166 1.167 1.167 1.167 0 001.166-1.167zm5.163 3.24a3.406 3.406 0 01-4.982.007 1 1 0 10-1.557 1.256 5.397 5.397 0 008.09 0 1 1 0 00-1.55-1.263zM12 .503a11.5 11.5 0 1011.5 11.5A11.513 11.513 0 0012 .503zm0 21a9.5 9.5 0 119.5-9.5 9.51 9.51 0 01-9.5 9.5z"
+								></path>
 							</svg>
 						</div>
 						<textarea
@@ -646,7 +691,6 @@ function Likes(props) {
 	);
 }
 
-
 function PictureCard(props) {
 	const [signedIn, setSignedIn] = useState(false);
 	const [likes, setLikes] = useState({ num: 0, users: [] });
@@ -743,7 +787,7 @@ function PictureCard(props) {
 	}, [comments]);
 
 	return (
-		<article className="picture-card-article">
+		<div className="picture-card-article">
 			<div className="picture-card-div">
 				<PictureCardHeader username={username} avatar={avatar} />
 			</div>
@@ -788,21 +832,14 @@ function PictureCard(props) {
 						date={date}
 					/>
 					<div className="added-div">
-						<ReactTimeAgo  date={date} locale="en-US" />
+						<ReactTimeAgo date={date} locale="en-US" />
 					</div>
 					<AddCommentSection addComment={addComment} />
 				</div>
 			</div>
-		</article>
+		</div>
 	);
 }
 
 export default PictureCard;
-export {
-	options,
-	PictureCardHeader,
-	PictureCardIconsSection,
-	AddCommentSection,
-	likeCommentIcon,
-	shareIcon,
-};
+export { options, PictureCardHeader, PictureCardIconsSection, AddCommentSection, likeCommentIcon, shareIcon };
