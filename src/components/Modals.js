@@ -7,6 +7,10 @@ import { dropDown, hideDropDown } from "./Home";
 import testPic from "../img/test-img.jpg";
 import "../styles/Modals.css";
 import { shareIcon, PictureCardHeader } from "./PictureCard";
+import uniqid from "uniqid";
+import { searchFunction } from "./Nav";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faSpinner } from "@fortawesome/free-solid-svg-icons";
 
 function closeModal(modal) {
 	return (
@@ -136,7 +140,7 @@ function SignUpModal() {
 				</span>
 				<img className="img-modal" src={favi} alt="" />
 				<p>Sign Up</p>
-				<form onSubmit={(e) => signUp(e)} id="reg-form">
+				<form autoComplete="off" onSubmit={(e) => signUp(e)} id="reg-form">
 					<input
 						maxLength="15"
 						required
@@ -246,7 +250,7 @@ function SignInModal() {
 				</span>
 				<img className="img-modal" src={favi} alt="" />
 				<p>Sign In</p>
-				<form onSubmit={(e) => signIn(e)} id="login-form">
+				<form autoComplete="off" onSubmit={(e) => signIn(e)} id="login-form">
 					<input
 						maxLength="15"
 						required
@@ -427,9 +431,10 @@ function CommentsModal() {
 										<span id="description-comments-modal-desc"></span>
 									</div>
 									<div id="first-comment-when">
-										<div id="short-when-added-and-likes-modal" className="short-when-added-and-likes">
-											
-										</div>
+										<div
+											id="short-when-added-and-likes-modal"
+											className="short-when-added-and-likes"
+										></div>
 									</div>
 								</div>
 							</div>
@@ -449,6 +454,8 @@ function CommentsModal() {
 
 function ShareModal() {
 	const shareModal = document.getElementById("share-modal");
+	const [shareModalSearchUser, setShareModalSearchUser] = useState("");
+	const [searchResults, setSearchResults] = useState([]);
 
 	window.addEventListener("click", (e) => {
 		if (e.target === shareModal) {
@@ -456,27 +463,49 @@ function ShareModal() {
 		}
 	});
 
-	const [shareModalSearchUser, setShareModalSearchUser] = useState("");
-
 	function handleShareSearchUser(e) {
+		const div = document.getElementById("share-to-modal-search-results");
+		const notFound = document.getElementById("not-found-share-modal");
+		const spinner = document.getElementById("spinner-share-modal");
+		const smallSpinner = document.getElementById("small-spinner-share-modal");
+
 		setShareModalSearchUser(e.target.value);
 
-		const div = document.getElementById("share-to-modal-search-results");
+		if (e.target.value !== "") {
+			if (searchResults.length === 0 && notFound.style.display === "none") {
+				spinner.style.display = "flex";
+			}
+
+			smallSpinner.style.display = "flex";
+
+			searchFunction(e.target.value).then((result) => {
+				smallSpinner.style.display = "none";
+				spinner.style.display = "none";
+
+				setSearchResults(result);
+
+				result.length === 0 && e.target.value !== ""
+					? (notFound.style.display = "flex")
+					: (notFound.style.display = "none");
+			});
+		}
 
 		if (e.target.value !== "" && !div.classList.contains("results-active")) {
 			div.classList.add("results-active");
 		} else if (e.target.value === "") {
 			div.classList.remove("results-active");
+			notFound.style.display = "none";
+			setSearchResults([]);
 		}
 	}
 
 	function cleanInputsShareModal() {
 		setShareModalSearchUser("");
+		setSearchResults([]);
 		document.getElementById("sending-to-div-for-picked").innerHTML = "";
 		document.getElementById("share-modal-text-input-message").value = "";
 		document.getElementById("send-share-button").disabled = "true";
 		document.getElementById("share-to-modal-search-results").classList.remove("results-active");
-		document.getElementById("share-to-modal-search-results").innerHTML = "";
 		document.getElementById("share-modal-text-input-message").style.display = "none";
 	}
 
@@ -496,6 +525,7 @@ function ShareModal() {
 
 		div.innerHTML =
 			'<svg aria-label="Toggle selection" color="#0095f6" fill="#0095f6" height="24" role="img" viewBox="0 0 24 24" width="24"><path d="M12.001.504a11.5 11.5 0 1011.5 11.5 11.513 11.513 0 00-11.5-11.5zm5.706 9.21l-6.5 6.495a1 1 0 01-1.414-.001l-3.5-3.503a1 1 0 111.414-1.414l2.794 2.796L16.293 8.3a1 1 0 011.414 1.415z"></path></svg>';
+			
 		setShareModalSearchUser("");
 
 		divForSearchResults.classList.remove("results-active");
@@ -522,7 +552,7 @@ function ShareModal() {
 			hideShareModal();
 		});
 		messageInput.style.display = "block";
-		divForSearchResults.innerHTML = "";
+		setSearchResults([]);
 	}
 
 	return (
@@ -536,6 +566,7 @@ function ShareModal() {
 					<span>To:</span>
 					<div id="sending-to-div-for-picked"></div>
 					<input
+						autoComplete="off"
 						onChange={(e) => handleShareSearchUser(e)}
 						value={shareModalSearchUser}
 						type="text"
@@ -543,36 +574,50 @@ function ShareModal() {
 						className="share-modal-text-input"
 						placeholder="Search..."
 					/>
+					<div id="small-spinner-share-modal" style={{ display: "none" }}>
+						<FontAwesomeIcon icon={faSpinner} className="fa-spin" />
+					</div>
 				</div>
 				<div id="share-to-modal-search-results" className="share-to-modal-search-results">
-					<div className="share-modal-single-result">
-						<img src={ava} alt="" />
-						<span>siabadabadu</span>
-						<div onClick={(e) => checkBoxOnClick(e)} className="div-for-checkbox-button">
-							<svg
-								aria-label="Toggle selection"
-								color="#262626"
-								fill="#262626"
-								height="24"
-								role="img"
-								viewBox="0 0 24 24"
-								width="24"
-							>
-								<circle
-									cx="12.008"
-									cy="12"
-									fill="none"
-									r="11.25"
-									stroke="currentColor"
-									strokeLinejoin="round"
-									strokeWidth="1.5"
-								></circle>
-							</svg>
-						</div>
+					<div style={{ display: "none" }} id="not-found-share-modal">
+						No results found
 					</div>
+					<div id="spinner-share-modal">
+						<FontAwesomeIcon icon={faSpinner} className="fa-spin" />
+					</div>
+					{searchResults.map((result) => {
+						return (
+							<div key={uniqid()} className="share-modal-single-result">
+								<img src={ava} alt="" />
+								<span>{result}</span>
+								<div onClick={(e) => checkBoxOnClick(e)} className="div-for-checkbox-button">
+									<svg
+										aria-label="Toggle selection"
+										color="#262626"
+										fill="#262626"
+										height="24"
+										role="img"
+										viewBox="0 0 24 24"
+										width="24"
+									>
+										<circle
+											cx="12.008"
+											cy="12"
+											fill="none"
+											r="11.25"
+											stroke="currentColor"
+											strokeLinejoin="round"
+											strokeWidth="1.5"
+										></circle>
+									</svg>
+								</div>
+							</div>
+						);
+					})}
 				</div>
 				<div id="send-button-div">
 					<input
+						autoComplete="off"
 						type="text"
 						id="share-modal-text-input-message"
 						className="share-modal-text-input"
