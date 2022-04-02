@@ -507,18 +507,21 @@ function AddCommentSection(props) {
 	function submitComment(e) {
 		e.preventDefault();
 		const button = document.getElementById(id + "button");
-		const username = document.getElementById("right-login-div-top-span").textContent;
-		props.addComment({
-			username: username,
-			comment: commentValue,
-			id: uniqid(),
-			likes: { num: 0, users: [] },
-			date: new Date(),
-		});
 
-		setCommentValue("");
-		button.classList.remove("post-div-active");
-		button.disabled = true;
+		if (button.classList.contains("post-div-active")) {
+			const username = document.getElementById("right-login-div-top-span").textContent;
+			props.addComment({
+				username: username,
+				comment: commentValue,
+				id: uniqid(),
+				likes: { num: 0, users: [] },
+				date: new Date(),
+			});
+
+			setCommentValue("");
+			button.classList.remove("post-div-active");
+			button.disabled = true;
+		}
 	}
 
 	function handleCommentTextAreaChange(e) {
@@ -535,6 +538,18 @@ function AddCommentSection(props) {
 		}
 	}
 
+	function handleCommentEmoji(e, emojiObject) {
+		const textarea = document.getElementById(id + "text");
+		setCommentValue(textarea.value + emojiObject.emoji);
+
+		const button = document.getElementById(id + "button");
+
+		if (!button.classList.contains("post-div-active")) {
+			button.classList.add("post-div-active");
+			button.disabled = false;
+		}
+	}
+
 	onAuthStateChanged(getAuth(), (user) => {
 		if (user) {
 			setSignedIn(true);
@@ -544,28 +559,33 @@ function AddCommentSection(props) {
 	});
 
 	function showEmojiiPicker(e) {
+		function hideEmojiiPicker(e) {
+			let found = false;
+
+			e.path.forEach((ele) => {
+				if (ele.id === id + "emo" || ele.id === id + "svg" || ele.id === id + "path") {
+					found = true;
+				}
+			});
+
+			if (!found) {
+				ReactDOM.unmountComponentAtNode(document.getElementById(id + "emo"));
+				window.removeEventListener("click", hideEmojiiPicker);
+			}
+		}
+
 		if (!document.getElementById(id + "emo").firstChild) {
 			ReactDOM.render(
 				<Picker
 					natvie={true}
 					disableSearchBar={true}
 					pickerStyle={{ position: "absolute", bottom: "35px", left: "0px" }}
+					onEmojiClick={(e, emojiObject) => handleCommentEmoji(e, emojiObject)}
 				/>,
 				document.getElementById(id + "emo")
 			);
-			
-			window.addEventListener("click", (e) => {
-				let found = false;
-				e.path.forEach((ele) => {
-					if (ele.id === id + "emo" || ele.id === id + "svg" || ele.id === id + "path") {
-						found = true;
-					}
-				});
 
-				if (!found) {
-					ReactDOM.unmountComponentAtNode(document.getElementById(id + "emo"));
-				}
-			});
+			window.addEventListener("click", hideEmojiiPicker);
 		} else if (e.target.tagName === "svg" || e.target.tagName === "path") {
 			ReactDOM.unmountComponentAtNode(document.getElementById(id + "emo"));
 		}
@@ -575,7 +595,13 @@ function AddCommentSection(props) {
 		return (
 			<section className="add-comment-section">
 				<div className="add-comment-section-inner">
-					<form onSubmit={(e) => submitComment(e)} className="comment-form">
+					<form
+						onKeyDown={(e) => {
+							if (e.key === "Enter") submitComment(e);
+						}}
+						onSubmit={(e) => submitComment(e)}
+						className="comment-form"
+					>
 						<div onClick={(e) => showEmojiiPicker(e)} className="emoji-div">
 							<div id={id + "emo"}></div>
 							<svg
@@ -595,10 +621,12 @@ function AddCommentSection(props) {
 							</svg>
 						</div>
 						<textarea
+							id={id + "text"}
 							value={commentValue}
 							onChange={(e) => handleCommentTextAreaChange(e)}
 							placeholder="Add a comment…"
 							className="add-comment-text-area"
+							autoComplete="off"
 						></textarea>
 						<button id={id + "button"} className="post-div" disabled>
 							Post
