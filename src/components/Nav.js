@@ -1,7 +1,12 @@
 import "../styles/Nav.css";
 import ava from "../img/ava.jpeg";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
-import { useState } from "react";
+import { getFirestore, collection, getDocs } from "firebase/firestore";
+import { useEffect, useState } from "react";
+import uniqid from "uniqid";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faSpinner } from "@fortawesome/free-solid-svg-icons";
+import { faCircleXmark } from "@fortawesome/free-regular-svg-icons";
 
 function showSignInModal() {
 	const modal = document.getElementById("login-modal");
@@ -153,8 +158,98 @@ function addPostIcon() {
 	}
 }
 
+async function searchFunction(value) {
+	const data = await getDocs(collection(getFirestore(), "usernames"));
+	const results = [];
+
+	data.forEach((doc) => {
+		if (doc.data().username.toLowerCase().includes(value.toLowerCase())) {
+			results.push(doc.data().username);
+		}
+	});
+
+	return results;
+}
+
 function Nav() {
 	const [avatar, setAvatar] = useState(0);
+	const [searchValue, setSearchValue] = useState("");
+	const [searchResults, setSearchResults] = useState([]);
+
+	useEffect(() => {
+		window.addEventListener("click", (e) => {
+			if (document.getElementById("search-results-div").style.display === "flex") {
+				let found = false;
+
+				e.path.forEach((ele) => {
+					if (ele.id === "search-div") {
+						found = true;
+					}
+				});
+
+				if (!found) {
+					cancelSearch();
+				}
+			}
+		});
+	});
+
+	function cancelSearch() {
+		setSearchResults([]);
+		setSearchValue("");
+		document.getElementById("search-arrow-div").style.display = "none";
+		document.getElementById("search-results-div").style.display = "none";
+		document.getElementById("not-found").style.display = "none";
+		document.getElementById("close-search-result-div").style.display = "none";
+	}
+
+	function handleSearch(e) {
+		const searchArrowDiv = document.getElementById("search-arrow-div");
+		const searchResultsDiv = document.getElementById("search-results-div");
+		const notFound = document.getElementById("not-found");
+		const spinner = document.getElementById("spinner");
+		const smallSpinner = document.getElementById("small-spinner");
+		const closeSearch = document.getElementById("close-search-result-div");
+
+		function hideSearchResultDiv() {
+			setSearchResults([]);
+			searchArrowDiv.style.display = "none";
+			searchResultsDiv.style.display = "none";
+			notFound.style.display = "none";
+			closeSearch.style.display = "none";
+		}
+
+		setSearchValue(e.target.value);
+
+		if (e.target.value !== "") {
+			if (searchResults.length === 0 && notFound.style.display === "none") {
+				spinner.style.display = "flex";
+			}
+
+			closeSearch.style.display = "none";
+			smallSpinner.style.display = "flex";
+
+			searchFunction(e.target.value).then((result) => {
+				smallSpinner.style.display = "none";
+				spinner.style.display = "none";
+
+				setSearchResults(result);
+
+				result.length === 0 && e.target.value !== ""
+					? (notFound.style.display = "flex")
+					: (notFound.style.display = "none");
+
+				closeSearch.style.display = "flex";
+			});
+
+			searchArrowDiv.style.display = "flex";
+			searchResultsDiv.style.display = "flex";
+		} else if (e.target.value === "") {
+			hideSearchResultDiv();
+		}
+	}
+
+	
 
 	onAuthStateChanged(getAuth(), (user) => {
 		if (user) {
@@ -213,7 +308,6 @@ function Nav() {
 
 	return (
 		<>
-			
 			<nav id="top-nav">
 				<div className="nav-container">
 					<div className="nav-inner-container">
@@ -221,7 +315,42 @@ function Nav() {
 							<span id="logo-span">Fakegram</span>
 						</div>
 						<div id="search-div">
-							<input id="search-input" className="search-input" type="text" placeholder="Search" />
+							<input
+								value={searchValue}
+								onChange={(e) => handleSearch(e)}
+								autoComplete="off"
+								id="search-input"
+								className="search-input"
+								type="text"
+								placeholder="Search"
+							/>
+							<div
+								onClick={() => cancelSearch()}
+								id="close-search-result-div"
+								style={{ display: "none" }}
+							>
+								<FontAwesomeIcon icon={faCircleXmark} />
+							</div>
+							<div id="small-spinner" style={{ display: "none" }}>
+								<FontAwesomeIcon icon={faSpinner} className="fa-spin" />
+							</div>
+							<div id="search-arrow-div"></div>
+							<div id="search-results-div">
+								<div id="spinner">
+									<FontAwesomeIcon icon={faSpinner} className="fa-spin" />
+								</div>
+								<div style={{ display: "none" }} id="not-found">
+									No results found
+								</div>
+								{searchResults.map((result) => {
+									return (
+										<div key={uniqid()} className="share-modal-single-result">
+											<img src={ava} alt="" />
+											<span>{result}</span>
+										</div>
+									);
+								})}
+							</div>
 						</div>
 						<div id="icon-div">
 							<div onClick={() => homeIcon()} className="icon-inner-div icon-to-hide">
@@ -454,4 +583,4 @@ function Nav() {
 }
 
 export default Nav;
-export { homeIcon, showSignInModal };
+export { homeIcon, showSignInModal, searchFunction};
