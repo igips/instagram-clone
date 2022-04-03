@@ -11,11 +11,99 @@ import { showSignInModal } from "./Nav";
 import ReactTimeAgo from "react-time-ago";
 import Picker from "emoji-picker-react";
 
+window.addEventListener("popstate", (e) => {
+	const likesModal = document.getElementById("likes-modal");
+	const commsModal = document.getElementById("comments-modal");
+	const shareModal = document.getElementById("share-modal");
+	const optionsModal = document.getElementById("unfollow-modal");
+	const signInModal = document.getElementById("login-modal");
+	const signUpModal = document.getElementById("register-modal");
+	const user = getAuth().currentUser;
+
+	if (
+		(likesModal.style.display === "flex" && commsModal.style.display === "flex") ||
+		likesModal.style.display === "flex"
+	) {
+		likesModal.style.display = "none";
+	} else if (
+		(shareModal.style.display === "flex" && commsModal.style.display === "flex") ||
+		shareModal.style.display === "flex"
+	) {
+		shareModal.style.display = "none";
+	} else if (
+		(optionsModal.style.display === "flex" && commsModal.style.display === "flex") ||
+		optionsModal.style.display === "flex"
+	) {
+		optionsModal.style.display = "none";
+	} else if (
+		(signInModal.style.display === "flex" && commsModal.style.display === "flex") ||
+		signInModal.style.display === "flex"
+	) {
+		signInModal.style.display = "none";
+	} else if (
+		(signUpModal.style.display === "flex" && commsModal.style.display === "flex") ||
+		signUpModal.style.display === "flex"
+	) {
+		signUpModal.style.display = "none";
+	} else if (commsModal.style.display === "flex") {
+		commsModal.style.display = "none";
+	}
+
+	if (window.location.href.includes("signUpM") && user) {
+		signUpModal.style.display = "none";
+		window.history.pushState("/", "Title", "/");
+	} else if (window.location.href.includes("signInM") && user) {
+		signInModal.style.display = "none";
+		window.history.pushState("/", "Title", "/");
+
+	} else if(window.location.href.includes("signUpM") && !user) {
+		signUpModal.style.display = "flex";
+
+	} else if(window.location.href.includes("signInM") && !user) {
+		signInModal.style.display = "flex";
+
+	} else if(window.location.href.includes("shareM") && !user) {
+		shareModal.style.display = "none";
+		window.history.pushState("/", "Title", "/");
+
+	} else if(window.location.href.includes("shareM") && user) {
+		shareModal.style.display = "flex";
+
+	} else if(window.location.href.includes("commentsM")) {
+		commsModal.style.display = "flex";
+
+	} else if(window.location.href.includes("likesM")) {
+		likesModal.style.display = "flex";
+
+	} else if(window.location.href.includes("optionsM") && !user) {
+		optionsModal.style.display = "none";
+		window.history.pushState("/", "Title", "/");
+
+	} else if(window.location.href.includes("optionsM") && user) {
+		optionsModal.style.display = "flex";
+
+	} 
+
+	if (window.location.href === "http://localhost:3000/") {
+		likesModal.style.display = "none";
+		shareModal.style.display = "none";
+		optionsModal.style.display = "none";
+		commsModal.style.display = "none";
+		signInModal.style.display = "none";
+		signUpModal.style.display = "none";
+	}
+
+});
+
 function options() {
 	const user = getAuth().currentUser;
 
 	if (user) {
 		const modal = document.getElementById("unfollow-modal");
+		if(!window.location.href.includes("optionsM")) {
+			window.history.pushState("optionsM", "Title", "optionsM");
+		}
+		
 		modal.style.display = "flex";
 	} else {
 		showSignInModal();
@@ -92,6 +180,10 @@ function likeIcon(likePicture) {
 
 function showShareModal() {
 	const modal = document.getElementById("share-modal");
+	if(!window.location.href.includes("shareM")) {
+		window.history.pushState("shareM", "Title", "shareM");
+	}
+	
 	modal.style.display = "flex";
 }
 
@@ -159,6 +251,11 @@ function showCommentsModal(
 	const iconsDiv = document.getElementById("icons-in-comments-section-modal");
 	const whenAddedDiv = document.getElementById("when-added-div-modal");
 	const descriptionWhenAddedDiv = document.getElementById("short-when-added-and-likes-modal");
+	if(!window.location.href.includes("commentsM")) {
+		window.history.pushState("commentsM", "Title", "commentsM");
+	}
+	
+	
 
 	modal.style.display = "flex";
 
@@ -663,6 +760,10 @@ function PictureCardNumOfLikesSection(props) {
 function showLikesModal(likes) {
 	const modal = document.getElementById("likes-modal");
 	const container = document.getElementById("list-of-likes-div-inner");
+	if(!window.location.href.includes("likesM")) {
+		window.history.pushState("likesM", "Title", "likesM");
+	}
+	
 
 	modal.style.display = "flex";
 
