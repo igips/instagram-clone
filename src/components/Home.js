@@ -2,7 +2,7 @@ import "../styles/Home.css";
 import PictureCard from "./PictureCard.js";
 import { getAuth, signOut, onAuthStateChanged } from "firebase/auth";
 import ava from "../img/ava.jpeg";
-import { homeIcon } from "./Nav";
+import { homeIcon, showSignInModal } from "./Nav";
 import testPic from "../img/test-img.jpg";
 import { useEffect, useState } from "react";
 import { getUsername } from "..";
@@ -27,6 +27,15 @@ function dropDown(e, ele, right) {
 				rect.left - (410 - (window.innerWidth - dropDown.getBoundingClientRect().left)) + "px";
 		}
 	}
+}
+
+function showSignUpModal() {
+	const modal = document.getElementById("register-modal");
+	
+	if(!window.location.href.includes("signUpM")) {
+		window.history.pushState('signUpM', 'Title', 'signUpM');
+	}
+	modal.style.display = "flex";
 }
 
 function hideDropDown() {
@@ -167,13 +176,13 @@ function Home() {
 					<div id="home-left-inner">
 						<div className="mobile" id="home-left-button-div">
 							<button
-								onClick={() => (document.getElementById("register-modal").style.display = "flex")}
+								onClick={() => showSignUpModal()}
 								className="sign-login-butt"
 							>
 								Sign Up
 							</button>
 							<button
-								onClick={() => (document.getElementById("login-modal").style.display = "flex")}
+								onClick={() => showSignInModal()}
 								className="sign-login-butt"
 							>
 								Sign In
@@ -216,13 +225,13 @@ function Home() {
 					<div id="home-right-profile">
 						<div className="visible" id="right-div-for-buttons">
 							<button
-								onClick={() => (document.getElementById("register-modal").style.display = "flex")}
+								onClick={() => showSignUpModal()}
 								className="sign-login-butt"
 							>
 								Sign Up
 							</button>
 							<button
-								onClick={() => (document.getElementById("login-modal").style.display = "flex")}
+								onClick={() => showSignInModal()}
 								className="sign-login-butt"
 							>
 								Sign In
@@ -347,4 +356,4 @@ function Home() {
 }
 
 export default Home;
-export { dropDown, hideDropDown, keepDropDown, followMobile };
+export { dropDown, hideDropDown, keepDropDown, followMobile, showSignUpModal };
