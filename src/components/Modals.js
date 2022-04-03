@@ -3,12 +3,12 @@ import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword } f
 import { getFirestore, addDoc, collection, getDocs } from "firebase/firestore";
 import React, { useState } from "react";
 import ava from "../img/ava.jpeg";
-import { dropDown, hideDropDown } from "./Home";
+import { dropDown, hideDropDown, showSignUpModal } from "./Home";
 import testPic from "../img/test-img.jpg";
 import "../styles/Modals.css";
 import { shareIcon, PictureCardHeader } from "./PictureCard";
 import uniqid from "uniqid";
-import { searchFunction } from "./Nav";
+import { searchFunction, showSignInModal } from "./Nav";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faSpinner } from "@fortawesome/free-solid-svg-icons";
 
@@ -54,6 +54,7 @@ function SignUpModal() {
 	window.addEventListener("click", (e) => {
 		if (e.target === signUpModal) {
 			signUpModal.style.display = "none";
+			window.history.pushState("/", "Title", "/");
 			clearSignUpInputs();
 		}
 	});
@@ -111,6 +112,7 @@ function SignUpModal() {
 						});
 
 						signUpModal.style.display = "none";
+						window.history.pushState("/", "Title", "/");
 						clearSignUpInputs();
 					})
 					.catch((error) => {
@@ -132,6 +134,7 @@ function SignUpModal() {
 				<span
 					onClick={() => {
 						document.getElementById("register-modal").style.display = "none";
+						window.history.pushState("/", "Title", "/");
 						clearSignUpInputs();
 					}}
 					className="close-modal"
@@ -140,7 +143,7 @@ function SignUpModal() {
 				</span>
 				<img className="img-modal" src={favi} alt="" />
 				<p>Sign Up</p>
-				<form autoComplete="off" onSubmit={(e) => signUp(e)} id="reg-form">
+				<form  onSubmit={(e) => signUp(e)} id="reg-form">
 					<input
 						maxLength="15"
 						required
@@ -183,7 +186,7 @@ function SignUpModal() {
 				<p
 					onClick={() => {
 						document.getElementById("register-modal").style.display = "none";
-						document.getElementById("login-modal").style.display = "flex";
+						showSignInModal();
 						clearSignUpInputs();
 					}}
 					id="already-sign-ip"
@@ -201,6 +204,7 @@ function SignInModal() {
 	window.addEventListener("click", (e) => {
 		if (e.target === signInModal) {
 			signInModal.style.display = "none";
+			window.history.pushState("/", "Title", "/");
 			clearSigInInputs();
 		}
 	});
@@ -221,7 +225,7 @@ function SignInModal() {
 		signInWithEmailAndPassword(getAuth(), email.value, pass.value)
 			.then((userCredential) => {
 				const user = userCredential.user;
-
+				window.history.pushState("/", "Title", "/");
 				loginModal.style.display = "none";
 				clearSigInInputs();
 			})
@@ -242,6 +246,7 @@ function SignInModal() {
 				<span
 					onClick={() => {
 						document.getElementById("login-modal").style.display = "none";
+						window.history.pushState("/", "Title", "/");
 						clearSigInInputs();
 					}}
 					className="close-modal"
@@ -250,7 +255,7 @@ function SignInModal() {
 				</span>
 				<img className="img-modal" src={favi} alt="" />
 				<p>Sign In</p>
-				<form autoComplete="off" onSubmit={(e) => signIn(e)} id="login-form">
+				<form onSubmit={(e) => signIn(e)} id="login-form">
 					<input
 						maxLength="15"
 						required
@@ -276,7 +281,7 @@ function SignInModal() {
 				<p
 					onClick={() => {
 						document.getElementById("login-modal").style.display = "none";
-						document.getElementById("register-modal").style.display = "flex";
+						showSignUpModal();
 						clearSigInInputs();
 					}}
 					id="already-login-ip"
@@ -299,6 +304,7 @@ function UnfollowModal() {
 
 	function hideUnFollowModal() {
 		const modal = document.getElementById("unfollow-modal");
+		window.history.pushState("/", "Title", "/");
 		modal.style.display = "none";
 	}
 
@@ -323,6 +329,7 @@ function LikesModal() {
 
 	function hideLikesModal() {
 		const modal = document.getElementById("likes-modal");
+		window.history.pushState("/", "Title", "/");
 		modal.style.display = "none";
 	}
 
@@ -353,10 +360,13 @@ function CommentsModal() {
 	function hideCommentsModal() {
 		const modal = document.getElementById("comments-modal");
 		const inputDiv = document.getElementById("comments-div-modal");
+		window.history.pushState("/", "Title", "/");
+		modal.style.display = "none";
 
-		if (inputDiv) {
-			modal.style.display = "none";
-		}
+		// if (inputDiv) {
+		// 	modal.style.display = "none";
+			
+		// }
 	}
 
 	return (
@@ -456,6 +466,8 @@ function ShareModal() {
 	const shareModal = document.getElementById("share-modal");
 	const [shareModalSearchUser, setShareModalSearchUser] = useState("");
 	const [searchResults, setSearchResults] = useState([]);
+	const [picked, setPicked] = useState([]);
+	const [buttonDisabled, setButtonDisabled] = useState(true);
 
 	window.addEventListener("click", (e) => {
 		if (e.target === shareModal) {
@@ -482,9 +494,15 @@ function ShareModal() {
 				smallSpinner.style.display = "none";
 				spinner.style.display = "none";
 
-				setSearchResults(result);
+				const newResult = result.filter((res) => {
+					if (!picked.includes(res)) {
+						return res;
+					}
+				});
 
-				result.length === 0 && e.target.value !== ""
+				setSearchResults(newResult);
+
+				newResult.length === 0 && e.target.value !== ""
 					? (notFound.style.display = "flex")
 					: (notFound.style.display = "none");
 			});
@@ -502,7 +520,7 @@ function ShareModal() {
 	function cleanInputsShareModal() {
 		setShareModalSearchUser("");
 		setSearchResults([]);
-		document.getElementById("sending-to-div-for-picked").innerHTML = "";
+		setPicked([]);
 		document.getElementById("share-modal-text-input-message").value = "";
 		document.getElementById("send-share-button").disabled = "true";
 		document.getElementById("share-to-modal-search-results").classList.remove("results-active");
@@ -512,45 +530,37 @@ function ShareModal() {
 	function hideShareModal() {
 		const modal = document.getElementById("share-modal");
 		modal.style.display = "none";
+		window.history.pushState("/", "Title", "/");
 		cleanInputsShareModal();
+	}
+
+	function removeFromPicked(e) {
+		const messageInput = document.getElementById("share-modal-text-input-message");
+		const username = e.currentTarget.textContent;
+
+		setPicked((oldPicked) => {
+			const newPicked = oldPicked.filter((pick) => pick !== username);
+
+			if (newPicked.length === 0) {
+				setButtonDisabled(true);
+				messageInput.style.display = "none";
+			}
+
+			return newPicked;
+		});
 	}
 
 	function checkBoxOnClick(e) {
 		const div = e.currentTarget;
-		const divParentNode = div.parentNode;
-		const divForPicked = document.getElementById("sending-to-div-for-picked");
 		const divForSearchResults = document.getElementById("share-to-modal-search-results");
-		const sendButton = document.getElementById("send-share-button");
 		const messageInput = document.getElementById("share-modal-text-input-message");
 
-		div.innerHTML =
-			'<svg aria-label="Toggle selection" color="#0095f6" fill="#0095f6" height="24" role="img" viewBox="0 0 24 24" width="24"><path d="M12.001.504a11.5 11.5 0 1011.5 11.5 11.513 11.513 0 00-11.5-11.5zm5.706 9.21l-6.5 6.495a1 1 0 01-1.414-.001l-3.5-3.503a1 1 0 111.414-1.414l2.794 2.796L16.293 8.3a1 1 0 011.414 1.415z"></path></svg>';
-			
 		setShareModalSearchUser("");
 
+		setPicked([...picked, div.childNodes[1].textContent]);
+
 		divForSearchResults.classList.remove("results-active");
-
-		const button = document.createElement("button");
-
-		button.innerHTML =
-			divParentNode.childNodes[1].textContent +
-			' <svg aria-label="Delete Item"  color="#0095f6" fill="#0095f6" height="12" role="img" viewBox="0 0 24 24" width="12"><polyline fill="none" points="20.643 3.357 12 12 3.353 20.647" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="3"></polyline><line fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="3" x1="20.649" x2="3.354" y1="20.649" y2="3.354"></line></svg>';
-		button.classList.add("picked-button");
-
-		button.addEventListener("click", (e) => {
-			if (e.target.tagName === "svg" || e.target.tagName === "line" || e.target.tagName === "polyline") {
-				divForPicked.removeChild(button);
-				if (!divForPicked.childNodes[0]) {
-					sendButton.disabled = true;
-					messageInput.style.display = "none";
-				}
-			}
-		});
-		divForPicked.appendChild(button);
-		sendButton.disabled = false;
-		sendButton.addEventListener("click", () => {
-			hideShareModal();
-		});
+		setButtonDisabled(false);
 		messageInput.style.display = "block";
 		setSearchResults([]);
 	}
@@ -564,7 +574,44 @@ function ShareModal() {
 				</div>
 				<div id="share-to-modal">
 					<span>To:</span>
-					<div id="sending-to-div-for-picked"></div>
+					<div id="sending-to-div-for-picked">
+						{picked.map((name) => {
+							return (
+								<button key={uniqid()} onClick={(e) => removeFromPicked(e)} className="picked-button">
+									{name}
+									<svg
+										aria-label="Delete Item"
+										color="#0095f6"
+										fill="#0095f6"
+										height="12"
+										role="img"
+										viewBox="0 0 24 24"
+										width="12"
+									>
+										<polyline
+											fill="none"
+											points="20.643 3.357 12 12 3.353 20.647"
+											stroke="currentColor"
+											strokeLinecap="round"
+											strokeLinejoin="round"
+											strokeWidth="3"
+										></polyline>
+										<line
+											fill="none"
+											stroke="currentColor"
+											strokeLinecap="round"
+											strokeLinejoin="round"
+											strokeWidth="3"
+											x1="20.649"
+											x2="3.354"
+											y1="20.649"
+											y2="3.354"
+										></line>
+									</svg>
+								</button>
+							);
+						})}
+					</div>
 					<input
 						autoComplete="off"
 						onChange={(e) => handleShareSearchUser(e)}
@@ -587,10 +634,14 @@ function ShareModal() {
 					</div>
 					{searchResults.map((result) => {
 						return (
-							<div key={uniqid()} className="share-modal-single-result">
+							<div
+								onClick={(e) => checkBoxOnClick(e)}
+								key={uniqid()}
+								className="share-modal-single-result"
+							>
 								<img src={ava} alt="" />
 								<span>{result}</span>
-								<div onClick={(e) => checkBoxOnClick(e)} className="div-for-checkbox-button">
+								<div className="div-for-checkbox-button">
 									<svg
 										aria-label="Toggle selection"
 										color="#262626"
@@ -623,7 +674,7 @@ function ShareModal() {
 						className="share-modal-text-input"
 						placeholder="Write a message..."
 					/>
-					<button id="send-share-button" disabled>
+					<button onClick={() => hideShareModal()} id="send-share-button" disabled={buttonDisabled}>
 						Send
 					</button>
 				</div>
