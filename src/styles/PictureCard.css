@@ -350,6 +350,8 @@ canvas {
     align-items: center;
     justify-content: center;
     cursor: pointer;
+    /* height: 40px;
+    width: 40px; */
 
 }
 
@@ -405,6 +407,7 @@ canvas {
     cursor: pointer;
     font-weight: bolder;
 }
+
 
 
 @media (max-width: 650px) {
