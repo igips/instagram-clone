@@ -10,6 +10,10 @@ import { faCircleXmark } from "@fortawesome/free-regular-svg-icons";
 
 function showSignInModal() {
 	const modal = document.getElementById("login-modal");
+	if(!window.location.href.includes("signInM")) {
+		window.history.pushState('signInM', 'Title', 'signInM');
+	}
+	
 	modal.style.display = "flex";
 }
 
