@@ -26,13 +26,38 @@ async function getUsername(id) {
 	const data = await getDocs(collection(getFirestore(), "usernames"));
 	let userName;
 
-  data.forEach((doc) => {
+  	data.forEach((doc) => {
 		if (doc.data().uid === id) {
 			userName = doc.data().username;
 		}
 	});
 
 	return userName;
+}
+
+async function getFollowing(id) {
+	const data = await getDocs(collection(getFirestore(), "usernames"));
+	let following;
+
+	data.forEach((doc) => {
+		if (doc.data().uid === id) {
+			following = doc.data().following;
+		}
+	});
+
+	return following;
+
+}
+
+async function getUsers() {
+	const data = await getDocs(collection(getFirestore(), "usernames"));
+	let users = [];
+
+	data.forEach((doc) => {
+		users.push(doc.data().username);
+	});
+
+	return users;
 }
 
 
@@ -74,4 +99,4 @@ ReactDOM.render(
 	document.getElementById("root")
 );
 
-export {getUsername}
+export {getUsername, getUsers, getFollowing}
