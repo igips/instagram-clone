@@ -170,7 +170,7 @@
 	padding-top: 10px;
 }
 
-#not-found, #spinner, #not-found-share-modal, #spinner-share-modal {
+#not-found, #spinner, #not-found-share-modal, #spinner-share-modal, #spinner-modal, #not-found-modal {
 	display: none;
 	color: #8e8e8e;
 	align-self: center;
@@ -178,7 +178,7 @@
 	margin-bottom: auto;
 }
 
-#close-search-result-div, #small-spinner, #small-spinner-share-modal {
+#close-search-result-div, #small-spinner, #small-spinner-share-modal, #close-search-result-div-modal, #small-spinner-modal {
 	color: #8e8e8e;
 	position: absolute;
 	right: 12px;
