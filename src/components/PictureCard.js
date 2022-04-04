@@ -18,6 +18,7 @@ window.addEventListener("popstate", (e) => {
 	const optionsModal = document.getElementById("unfollow-modal");
 	const signInModal = document.getElementById("login-modal");
 	const signUpModal = document.getElementById("register-modal");
+	const searchModal = document.getElementById("search-modal-container");
 	const user = getAuth().currentUser;
 
 	if (
@@ -45,8 +46,12 @@ window.addEventListener("popstate", (e) => {
 		signUpModal.style.display === "flex"
 	) {
 		signUpModal.style.display = "none";
+
 	} else if (commsModal.style.display === "flex") {
 		commsModal.style.display = "none";
+
+	} else if(searchModal.style.display === "flex") {
+		searchModal.style.display = "none";
 	}
 
 	if (window.location.href.includes("signUpM") && user) {
@@ -82,7 +87,9 @@ window.addEventListener("popstate", (e) => {
 	} else if(window.location.href.includes("optionsM") && user) {
 		optionsModal.style.display = "flex";
 
-	} 
+	} else if(window.location.href.includes("searchM")) {
+		searchModal.style.display = "flex";
+	}
 
 	if (window.location.href === "http://localhost:3000/") {
 		likesModal.style.display = "none";
@@ -91,6 +98,7 @@ window.addEventListener("popstate", (e) => {
 		commsModal.style.display = "none";
 		signInModal.style.display = "none";
 		signUpModal.style.display = "none";
+		searchModal.style.display = "none";
 	}
 
 });
