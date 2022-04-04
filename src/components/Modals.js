@@ -1,16 +1,18 @@
 import favi from "../img/favicon.jpg";
 import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword } from "firebase/auth";
 import { getFirestore, addDoc, collection, getDocs } from "firebase/firestore";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import ava from "../img/ava.jpeg";
 import { dropDown, hideDropDown, showSignUpModal } from "./Home";
 import testPic from "../img/test-img.jpg";
 import "../styles/Modals.css";
 import { shareIcon, PictureCardHeader } from "./PictureCard";
 import uniqid from "uniqid";
-import { searchFunction, showSignInModal } from "./Nav";
+import { homeIcon, searchFunction, showSignInModal } from "./Nav";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faSpinner } from "@fortawesome/free-solid-svg-icons";
+import { faCircleXmark } from "@fortawesome/free-regular-svg-icons";
+
 
 function closeModal(modal) {
 	return (
@@ -49,15 +51,28 @@ function closeModal(modal) {
 }
 
 function SignUpModal() {
-	const signUpModal = document.getElementById("register-modal");
+	useEffect(() => {
+		const signUpModal = document.getElementById("register-modal");
 
-	window.addEventListener("click", (e) => {
-		if (e.target === signUpModal) {
-			signUpModal.style.display = "none";
+		signUpModal.addEventListener("click", (e) => {
+			if (e.target === signUpModal) {
+				closeSignUpModal();
+				clearSignUpInputs();
+			}
+		});
+	},[]);
+
+	function closeSignUpModal() {
+		const signUpModal = document.getElementById("register-modal");
+		// window.history.back();
+
+		if (document.getElementById("comments-modal").style.display === "flex") {
+			window.history.back();
+		} else {
 			window.history.pushState("/", "Title", "/");
-			clearSignUpInputs();
 		}
-	});
+		signUpModal.style.display = "none";
+	}
 
 	function clearSignUpInputs() {
 		document.getElementById("password-input").value = "";
@@ -98,7 +113,6 @@ function SignUpModal() {
 		const pass = document.getElementById("password-input-rep");
 		const userName = document.getElementById("username-input");
 		const formSubmitButton = document.getElementById("submit-sign-up-form-button");
-		const signUpModal = document.getElementById("register-modal");
 
 		usernameAvailable().then((avail) => {
 			if (avail) {
@@ -109,10 +123,10 @@ function SignUpModal() {
 						addDoc(collection(getFirestore(), "usernames"), {
 							uid: user.uid,
 							username: userName.value,
+							following: [],
 						});
 
-						signUpModal.style.display = "none";
-						window.history.pushState("/", "Title", "/");
+						closeSignUpModal();
 						clearSignUpInputs();
 					})
 					.catch((error) => {
@@ -133,8 +147,7 @@ function SignUpModal() {
 			<div className="modal-content">
 				<span
 					onClick={() => {
-						document.getElementById("register-modal").style.display = "none";
-						window.history.pushState("/", "Title", "/");
+						closeSignUpModal();
 						clearSignUpInputs();
 					}}
 					className="close-modal"
@@ -143,7 +156,7 @@ function SignUpModal() {
 				</span>
 				<img className="img-modal" src={favi} alt="" />
 				<p>Sign Up</p>
-				<form  onSubmit={(e) => signUp(e)} id="reg-form">
+				<form onSubmit={(e) => signUp(e)} id="reg-form">
 					<input
 						maxLength="15"
 						required
@@ -199,15 +212,29 @@ function SignUpModal() {
 }
 
 function SignInModal() {
-	const signInModal = document.getElementById("login-modal");
+	useEffect(() => {
+		const signInModal = document.getElementById("login-modal");
 
-	window.addEventListener("click", (e) => {
-		if (e.target === signInModal) {
-			signInModal.style.display = "none";
+		signInModal.addEventListener("click", (e) => {
+			if (e.target === signInModal) {
+				closeSignInModal();
+				clearSigInInputs();
+			}
+		});
+	},[]);
+
+	function closeSignInModal() {
+		const signInModal = document.getElementById("login-modal");
+		// window.history.back();
+
+		if (document.getElementById("comments-modal").style.display === "flex") {
+			window.history.back();
+		} else {
 			window.history.pushState("/", "Title", "/");
-			clearSigInInputs();
 		}
-	});
+
+		signInModal.style.display = "none";
+	}
 
 	function clearSigInInputs() {
 		document.getElementById("login-username-input").value = "";
@@ -220,13 +247,11 @@ function SignInModal() {
 		const email = document.getElementById("login-username-input");
 		const pass = document.getElementById("login-password-input");
 		const signInButton = document.getElementById("sign-in-submit-button");
-		const loginModal = document.getElementById("login-modal");
 
 		signInWithEmailAndPassword(getAuth(), email.value, pass.value)
 			.then((userCredential) => {
 				const user = userCredential.user;
-				window.history.pushState("/", "Title", "/");
-				loginModal.style.display = "none";
+				closeSignInModal();
 				clearSigInInputs();
 			})
 			.catch((error) => {
@@ -245,8 +270,7 @@ function SignInModal() {
 			<div className="modal-content">
 				<span
 					onClick={() => {
-						document.getElementById("login-modal").style.display = "none";
-						window.history.pushState("/", "Title", "/");
+						closeSignInModal();
 						clearSigInInputs();
 					}}
 					className="close-modal"
@@ -294,17 +318,19 @@ function SignInModal() {
 }
 
 function UnfollowModal() {
-	const unfollowModal = document.getElementById("unfollow-modal");
+	useEffect(() => {
+		const unfollowModal = document.getElementById("unfollow-modal");
 
-	window.addEventListener("click", (e) => {
-		if (e.target === unfollowModal) {
-			hideUnFollowModal();
-		}
-	});
+		unfollowModal.addEventListener("click", (e) => {
+			if (e.target === unfollowModal) {
+				hideUnFollowModal();
+			}
+		});
+	},[]);
 
 	function hideUnFollowModal() {
 		const modal = document.getElementById("unfollow-modal");
-		window.history.pushState("/", "Title", "/");
+		window.history.back();
 		modal.style.display = "none";
 	}
 
@@ -319,17 +345,19 @@ function UnfollowModal() {
 }
 
 function LikesModal() {
-	const likesModal = document.getElementById("likes-modal");
+	useEffect(() => {
+		const likesModal = document.getElementById("likes-modal");
 
-	window.addEventListener("click", (e) => {
-		if (e.target === likesModal) {
-			hideLikesModal();
-		}
-	});
+		likesModal.addEventListener("click", (e) => {
+			if (e.target === likesModal) {
+				hideLikesModal();
+			}
+		});
+	},[]);
 
 	function hideLikesModal() {
 		const modal = document.getElementById("likes-modal");
-		window.history.pushState("/", "Title", "/");
+		window.history.back();
 		modal.style.display = "none";
 	}
 
@@ -349,24 +377,20 @@ function LikesModal() {
 }
 
 function CommentsModal() {
-	const commentsModal = document.getElementById("comments-modal");
+	useEffect(() => {
+		const commentsModal = document.getElementById("comments-modal");
 
-	window.addEventListener("click", (e) => {
-		if (e.target === commentsModal) {
-			hideCommentsModal();
-		}
-	});
+		commentsModal.addEventListener("click", (e) => {
+			if (e.target === commentsModal) {
+				hideCommentsModal();
+			}
+		});
+	},[]);
 
 	function hideCommentsModal() {
 		const modal = document.getElementById("comments-modal");
-		const inputDiv = document.getElementById("comments-div-modal");
-		window.history.pushState("/", "Title", "/");
+		window.history.back();
 		modal.style.display = "none";
-
-		// if (inputDiv) {
-		// 	modal.style.display = "none";
-			
-		// }
 	}
 
 	return (
@@ -463,17 +487,20 @@ function CommentsModal() {
 }
 
 function ShareModal() {
-	const shareModal = document.getElementById("share-modal");
 	const [shareModalSearchUser, setShareModalSearchUser] = useState("");
 	const [searchResults, setSearchResults] = useState([]);
 	const [picked, setPicked] = useState([]);
 	const [buttonDisabled, setButtonDisabled] = useState(true);
 
-	window.addEventListener("click", (e) => {
-		if (e.target === shareModal) {
-			hideShareModal();
-		}
-	});
+	useEffect(() => {
+		const shareModal = document.getElementById("share-modal");
+
+		shareModal.addEventListener("click", (e) => {
+			if (e.target === shareModal) {
+				hideShareModal();
+			}
+		});
+	},[]);
 
 	function handleShareSearchUser(e) {
 		const div = document.getElementById("share-to-modal-search-results");
@@ -530,7 +557,7 @@ function ShareModal() {
 	function hideShareModal() {
 		const modal = document.getElementById("share-modal");
 		modal.style.display = "none";
-		window.history.pushState("/", "Title", "/");
+		window.history.back();
 		cleanInputsShareModal();
 	}
 
@@ -683,9 +710,117 @@ function ShareModal() {
 	);
 }
 
+function SearchModal() {
+	const [searchValue, setSearchValue] = useState("");
+	const [searchResults, setSearchResults] = useState([]);
+
+	function hideSearchModal() {
+		const modal = document.getElementById("search-modal-container");
+		modal.style.display = "none";
+		window.history.back();
+		cancelSearch();	
+		homeIcon();	
+		
+	}
+
+	function handleSearch(e) {
+		const notFound = document.getElementById("not-found-modal");
+		const spinner = document.getElementById("spinner-modal");
+		const smallSpinner = document.getElementById("small-spinner-modal");
+		const closeSearch = document.getElementById("close-search-result-div-modal");
+
+		function hideSearchResultDiv() {
+			setSearchResults([]);
+			notFound.style.display = "none";
+			closeSearch.style.display = "none";
+			
+		}
+
+		setSearchValue(e.target.value);
+
+		if (e.target.value !== "") {
+			if (searchResults.length === 0 && notFound.style.display === "none") {
+				spinner.style.display = "flex";
+			}
+
+			closeSearch.style.display = "none";
+			smallSpinner.style.display = "flex";
+
+			searchFunction(e.target.value).then((result) => {
+				smallSpinner.style.display = "none";
+				spinner.style.display = "none";
+
+				setSearchResults(result);
+
+				result.length === 0 && e.target.value !== ""
+					? (notFound.style.display = "flex")
+					: (notFound.style.display = "none");
+
+				closeSearch.style.display = "flex";
+			});
+
+		} else if (e.target.value === "") {
+			hideSearchResultDiv();
+		}
+	}
+
+	function cancelSearch() {
+		setSearchResults([]);
+		setSearchValue("");
+		document.getElementById("not-found-modal").style.display = "none";
+		document.getElementById("close-search-result-div-modal").style.display = "none";
+	}
+
+
+
+
+	return (
+		<div id="search-modal-container">
+			<div id="search-modal-header">
+				<span>Search</span>
+				{closeModal(hideSearchModal)}
+			</div>
+			<div id="search-div-modal-input-div">
+				<input
+					value={searchValue}
+					onChange={(e) => handleSearch(e)}
+					autoComplete="off"
+					id="search-input-modal"
+					className="search-input"
+					type="text"
+					placeholder="Search"
+				/>
+				<div onClick={() => cancelSearch()} id="close-search-result-div-modal" style={{ display: "none" }}>
+					<FontAwesomeIcon icon={faCircleXmark} />
+				</div>
+				<div id="small-spinner-modal" style={{ display: "none" }}>
+					<FontAwesomeIcon icon={faSpinner} className="fa-spin" />
+				</div>
+			</div>
+			<div id="search-results-div-modal">
+				<div id="spinner-modal">
+					<FontAwesomeIcon icon={faSpinner} className="fa-spin" />
+				</div>
+				<div style={{ display: "none" }} id="not-found-modal">
+					No results found
+				</div>
+				{searchResults.map((result) => {
+					return (
+						<div key={uniqid()} className="share-modal-single-result">
+							<img src={ava} alt="" />
+							<span>{result}</span>
+						</div>
+					);
+				})}
+			</div>
+		</div>
+	);
+}
+
 function Modals() {
 	return (
 		<>
+			<SearchModal />
 			<SignUpModal />
 			<SignInModal />
 			<UnfollowModal />
