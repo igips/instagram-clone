@@ -96,17 +96,27 @@ function avatarIconClicked() {
 }
 
 function searchIcon() {
-	const user = getAuth().currentUser;
+	const searchModal = document.getElementById("search-modal-container");
 
 	searchIconClicked();
 	homeIconNotClicked();
-
-	if (user) {
-		messageIconNotClicked();
-		notificationIconNotClicked();
-		avatarIconNotClicked();
-	} else {
+	messageIconNotClicked();
+	notificationIconNotClicked();
+	avatarIconNotClicked();
+	searchModal.style.display = "flex";
+	if(!window.location.href.includes("searchM")) {
+		window.history.pushState("searchM", "Title", "searchM");
 	}
+
+	//const user = getAuth().currentUser;
+	// if (user) {
+		// messageIconNotClicked();
+		// notificationIconNotClicked();
+		// avatarIconNotClicked();
+	// } else {
+	// }
+
+
 }
 
 function notificationIcon() {
