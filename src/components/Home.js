@@ -5,7 +5,8 @@ import ava from "../img/ava.jpeg";
 import { homeIcon, showSignInModal } from "./Nav";
 import testPic from "../img/test-img.jpg";
 import { useEffect, useState } from "react";
-import { getUsername } from "..";
+import { getFollowing, getUsername, getUsers } from "..";
+import uniqid from "uniqid";
 
 function dropDown(e, ele, right) {
 	if (window.innerWidth > 650) {
@@ -31,9 +32,9 @@ function dropDown(e, ele, right) {
 
 function showSignUpModal() {
 	const modal = document.getElementById("register-modal");
-	
-	if(!window.location.href.includes("signUpM")) {
-		window.history.pushState('signUpM', 'Title', 'signUpM');
+
+	if (!window.location.href.includes("signUpM")) {
+		window.history.pushState("signUpM", "Title", "signUpM");
 	}
 	modal.style.display = "flex";
 }
@@ -74,14 +75,18 @@ function followMobile(e) {
 function Home() {
 	const [signedIn, setSignedIn] = useState(false);
 	const [username, setUsername] = useState("");
+	const [following, setFollowing] = useState([]);
+	const [users, setUsers] = useState([]);
 
 	useEffect(() => {
 		const user = getAuth().currentUser;
 
 		if (user) {
 			getUsername(user.uid).then((user) => setUsername(user));
+			getFollowing(user.uid).then((following) => setFollowing(following));
+			getUsers().then((users) => setUsers(users));
 		}
-	});
+	}, [signedIn]);
 
 	onAuthStateChanged(getAuth(), (user) => {
 		if (user) {
@@ -89,6 +94,8 @@ function Home() {
 		} else {
 			setSignedIn(false);
 			setUsername("");
+			setFollowing([]);
+			setUsers([]);
 		}
 	});
 
@@ -175,43 +182,32 @@ function Home() {
 				<div id="home-left-div">
 					<div id="home-left-inner">
 						<div className="mobile" id="home-left-button-div">
-							<button
-								onClick={() => showSignUpModal()}
-								className="sign-login-butt"
-							>
+							<button onClick={() => showSignUpModal()} className="sign-login-butt">
 								Sign Up
 							</button>
-							<button
-								onClick={() => showSignInModal()}
-								className="sign-login-butt"
-							>
+							<button onClick={() => showSignInModal()} className="sign-login-butt">
 								Sign In
 							</button>
 						</div>
 						<div className="not-visible" id="suggestions-left-div">
 							<span id="for-you-sug-span-left">Suggestions For You</span>
 							<div id="suggestions-left-inner-div">
-								<div className="sug-box-left">
-									<img className="sug-box-left-ava" src={ava} alt="" />
-									<span style={{ marginBottom: "10px" }}>Siabadab Abrakap</span>
-									<button onClick={(e) => followMobile(e)} className="sug-box-left-follow">
-										Follow
-									</button>
-								</div>
-								<div className="sug-box-left">
-									<img className="sug-box-left-ava" src={ava} alt="" />
-									<span style={{ marginBottom: "10px" }}>Siabadab Abrakap</span>
-									<button onClick={(e) => followMobile(e)} className="sug-box-left-follow">
-										Follow
-									</button>
-								</div>
-								<div className="sug-box-left">
-									<img className="sug-box-left-ava" src={ava} alt="" />
-									<span style={{ marginBottom: "10px" }}>Siabadab Abrakap</span>
-									<button onClick={(e) => followMobile(e)} className="sug-box-left-follow">
-										Follow
-									</button>
-								</div>
+								{users.slice(0, 3).map((user) => {
+									if (!following.includes(user)) {
+										return (
+											<div key={uniqid()} className="sug-box-left">
+												<img className="sug-box-left-ava" src={ava} alt="" />
+												<span style={{ marginBottom: "10px" }}>{user}</span>
+												<button
+													onClick={(e) => followMobile(e)}
+													className="sug-box-left-follow"
+												>
+													Follow
+												</button>
+											</div>
+										);
+									}
+								})}
 							</div>
 						</div>
 
@@ -224,16 +220,10 @@ function Home() {
 				<div id="home-right-div">
 					<div id="home-right-profile">
 						<div className="visible" id="right-div-for-buttons">
-							<button
-								onClick={() => showSignUpModal()}
-								className="sign-login-butt"
-							>
+							<button onClick={() => showSignUpModal()} className="sign-login-butt">
 								Sign Up
 							</button>
-							<button
-								onClick={() => showSignInModal()}
-								className="sign-login-butt"
-							>
+							<button onClick={() => showSignInModal()} className="sign-login-butt">
 								Sign In
 							</button>
 						</div>
@@ -252,101 +242,31 @@ function Home() {
 					<div className="not-visible" id="suggestions-div-right">
 						<span id="for-you-sug-span">Suggestions For You</span>
 						<div id="list-of-sug-div">
-							<div className="right-sug-div-list">
-								<div
-									onMouseEnter={(e) => dropDown(e, "avaPic", "right")}
-									onMouseLeave={() => hideDropDown()}
-									className="right-sug-ava-div"
-								>
-									<img className="ava-img-sug" src={ava} alt="" />
-								</div>
-								<span
-									onMouseEnter={(e) => dropDown(e, "no", "right")}
-									onMouseLeave={() => hideDropDown()}
-									className="sug-login-right"
-								>
-									sialabala
-								</span>
-								<button onClick={(e) => followDesktop(e)} className="sug-right-follow">
-									Follow
-								</button>
-							</div>
-							<div className="right-sug-div-list">
-								<div
-									onMouseEnter={(e) => dropDown(e, "avaPic", "right")}
-									onMouseLeave={() => hideDropDown()}
-									className="right-sug-ava-div"
-								>
-									<img className="ava-img-sug" src={ava} alt="" />
-								</div>
-								<span
-									onMouseEnter={(e) => dropDown(e, "no", "right")}
-									onMouseLeave={() => hideDropDown()}
-									className="sug-login-right"
-								>
-									sialabala
-								</span>
-								<button onClick={(e) => followDesktop(e)} className="sug-right-follow">
-									Follow
-								</button>
-							</div>
-							<div className="right-sug-div-list">
-								<div
-									onMouseEnter={(e) => dropDown(e, "avaPic", "right")}
-									onMouseLeave={() => hideDropDown()}
-									className="right-sug-ava-div"
-								>
-									<img className="ava-img-sug" src={ava} alt="" />
-								</div>
-								<span
-									onMouseEnter={(e) => dropDown(e, "no", "right")}
-									onMouseLeave={() => hideDropDown()}
-									className="sug-login-right"
-								>
-									sialabala
-								</span>
-								<button onClick={(e) => followDesktop(e)} className="sug-right-follow">
-									Follow
-								</button>
-							</div>
-							<div className="right-sug-div-list">
-								<div
-									onMouseEnter={(e) => dropDown(e, "avaPic", "right")}
-									onMouseLeave={() => hideDropDown()}
-									className="right-sug-ava-div"
-								>
-									<img className="ava-img-sug" src={ava} alt="" />
-								</div>
-								<span
-									onMouseEnter={(e) => dropDown(e, "no", "right")}
-									onMouseLeave={() => hideDropDown()}
-									className="sug-login-right"
-								>
-									sialabala
-								</span>
-								<button onClick={(e) => followDesktop(e)} className="sug-right-follow">
-									Follow
-								</button>
-							</div>
-							<div className="right-sug-div-list">
-								<div
-									onMouseEnter={(e) => dropDown(e, "avaPic", "right")}
-									onMouseLeave={() => hideDropDown()}
-									className="right-sug-ava-div"
-								>
-									<img className="ava-img-sug" src={ava} alt="" />
-								</div>
-								<span
-									onMouseEnter={(e) => dropDown(e, "no", "right")}
-									onMouseLeave={() => hideDropDown()}
-									className="sug-login-right"
-								>
-									sialabala
-								</span>
-								<button onClick={(e) => followDesktop(e)} className="sug-right-follow">
-									Follow
-								</button>
-							</div>
+							{users.slice(0, 5).map((user) => {
+								if (!following.includes(user)) {
+									return (
+										<div key={uniqid()} className="right-sug-div-list">
+											<div
+												onMouseEnter={(e) => dropDown(e, "avaPic", "right")}
+												onMouseLeave={() => hideDropDown()}
+												className="right-sug-ava-div"
+											>
+												<img className="ava-img-sug" src={ava} alt="" />
+											</div>
+											<span
+												onMouseEnter={(e) => dropDown(e, "no", "right")}
+												onMouseLeave={() => hideDropDown()}
+												className="sug-login-right"
+											>
+												{user}
+											</span>
+											<button onClick={(e) => followDesktop(e)} className="sug-right-follow">
+												Follow
+											</button>
+										</div>
+									);
+								}
+							})}
 						</div>
 					</div>
 				</div>
