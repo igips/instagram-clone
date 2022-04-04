@@ -5,14 +5,12 @@ import Modals from "./Modals.js";
 
 
 function App() {
+
   return (
     <section id="top-section">
       <Modals></Modals>
       <Nav></Nav>
       <Home></Home>
-      
-      
-
     </section>
   );
 }
