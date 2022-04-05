@@ -4,15 +4,35 @@ import { getAuth, signOut, onAuthStateChanged } from "firebase/auth";
 import ava from "../img/ava.jpeg";
 import { homeIcon, showSignInModal } from "./Nav";
 import testPic from "../img/test-img.jpg";
-import { useEffect, useState } from "react";
-import { getFollowing, getUsername, getUsers } from "..";
+import { useEffect, useRef, useState } from "react";
+import { getDocId, getUserData, getUsers } from "..";
 import uniqid from "uniqid";
+import { arrayUnion, doc, getFirestore, updateDoc } from "firebase/firestore";
+import ReactDOM from "react-dom";
 
-function dropDown(e, ele, right) {
+function dropDown(userData, following, follow, unFollow, e, ele, right) {
 	if (window.innerWidth > 650) {
+		const user = getAuth().currentUser;
 		const dropDown = document.getElementById("drop-down");
 		const rect = e.target.getBoundingClientRect();
-		const user = getAuth().currentUser;
+
+		ReactDOM.render(
+			<DropDown
+				right={right}
+				username={userData.username}
+				following={following}
+				follow={follow}
+				unFollow={unFollow}
+				userData={userData}
+			/>,
+			document.getElementById("drop-down")
+		);
+
+		if (user) {
+			document.getElementById("drop-down-inner-fourth").style.display = "flex";
+		} else {
+			document.getElementById("drop-down-inner-fourth").style.display = "none";
+		}
 
 		dropDown.style.display = "flex";
 		dropDown.style.left = rect.left + "px";
@@ -52,16 +72,6 @@ function keepDropDown() {
 	dropDown.style.display = "flex";
 }
 
-function followDesktop(e) {
-	if (e.currentTarget.textContent === "Follow") {
-		e.currentTarget.style.color = "rgb(38,38,38)";
-		e.currentTarget.textContent = "Following";
-	} else if (e.currentTarget.textContent === "Following") {
-		e.currentTarget.style.color = "#0095f6";
-		e.currentTarget.textContent = "Follow";
-	}
-}
-
 function followMobile(e) {
 	if (e.currentTarget.textContent === "Follow") {
 		e.currentTarget.classList.add("sug-box-left-follow-active");
@@ -72,20 +82,158 @@ function followMobile(e) {
 	}
 }
 
+function shuffleArray(array) {
+	for (let i = array.length - 1; i > 0; i--) {
+		const j = Math.floor(Math.random() * (i + 1));
+		[array[i], array[j]] = [array[j], array[i]];
+	}
+}
+
+function DropDown(props) {
+	const [signedIn, setSignedIn] = useState(false);
+	const user = getAuth().currentUser;
+
+	onAuthStateChanged(getAuth(), (user) => {
+		if (user) {
+			setSignedIn(true);
+		} else {
+			setSignedIn(false);
+		}
+	});
+
+	function button() {
+		if (signedIn) {
+			if (props.userData.uid === user.uid) {
+				return <button className="drop-down-button">Edit Profile</button>;
+			} else if (!props.following.includes(props.username)) {
+				return (
+					<button onClick={() => props.follow(props.username, props.right)} id="drop-down-button">
+						Follow
+					</button>
+				);
+			} else {
+				return (
+					<>
+						<button className="drop-down-button">Message</button>{" "}
+						<button
+							onClick={() => props.unFollow(props.username)}
+							id="drop-down-following-button"
+							className="drop-down-button"
+						>
+							Unfollow
+						</button>
+					</>
+				);
+			}
+		}
+	}
+
+	return (
+		<>
+			<div className="drop-down-inner-first">
+				<img id="drop-down-ava" src={ava} alt="" />
+				<span id="drop-down-username">{props.userData.username}</span>
+			</div>
+			<div className="drop-down-inner-second">
+				<div className="drop-down-inner-second-inner">
+					<span id="drop-down-num-of-posts">{props.userData.posts.length}</span>
+					<span>posts</span>
+				</div>
+				<div className="drop-down-inner-second-inner">
+					<span id="drop-down-num-of-followers">{props.userData.followers.length}</span>
+					<span>followers</span>
+				</div>
+				<div className="drop-down-inner-second-inner">
+					<span id="drop-down-num-of-following">{props.userData.following.length}</span>
+					<span>following</span>
+				</div>
+			</div>
+			<div className="drop-down-inner-third">
+				<img src={testPic} alt="" />
+				<img src={testPic} alt="" />
+				<img src={testPic} alt="" />
+			</div>
+			<div id="drop-down-inner-fourth">{button()}</div>
+		</>
+	);
+}
+
 function Home() {
 	const [signedIn, setSignedIn] = useState(false);
 	const [username, setUsername] = useState("");
 	const [following, setFollowing] = useState([]);
 	const [users, setUsers] = useState([]);
+	const [firestoreDocId, setfirestoreDocId] = useState("");
+	const didMount = useRef(false);
+	let num = 0;
+	let num2 = 0;
+
+	function follow(who, right) {
+		setFollowing([...following, who]);
+		setUsers((oldUsers) => {
+			const newUsers = oldUsers.map((user) => {
+				if (user.username === who) {
+					return {
+						...user,
+						followers: [...user.followers, username],
+					};
+				} else {
+					return user;
+				}
+			});
+			return newUsers;
+		});
+		getDocId(who).then((id) =>
+			updateDoc(doc(getFirestore(), "usernames", id), { followers: arrayUnion(username) })
+		);
+		updateDoc(doc(getFirestore(), "usernames", firestoreDocId), { following: arrayUnion(who) });
+
+		if (right) {
+			hideDropDown();
+		}
+	}
+
+	useEffect(() => {
+		if (!didMount.current) {
+			return (didMount.current = true);
+		} else if (document.getElementById("drop-down").style.display === "flex") {
+			let userD;
+			users.forEach((user) => {
+				if (user.username === following[following.length - 1]) {
+					userD = user;
+				}
+			});
+
+			ReactDOM.render(
+				<DropDown
+					username={following[following.length - 1]}
+					following={following}
+					follow={follow}
+					unFollow={unFollow}
+					userData={userD}
+				/>,
+				document.getElementById("drop-down")
+			);
+		}
+	}, [users]);
+
+	function unFollow(who) {}
 
 	useEffect(() => {
 		const user = getAuth().currentUser;
 
-		if (user) {
-			getUsername(user.uid).then((user) => setUsername(user));
-			getFollowing(user.uid).then((following) => setFollowing(following));
-			getUsers().then((users) => setUsers(users));
+		if (signedIn) {
+			getUserData(user.uid).then((user) => {
+				setfirestoreDocId(user.id);
+				setUsername(user.data().username);
+				setFollowing(user.data().following);
+			});
 		}
+
+		getUsers().then((users) => {
+			shuffleArray(users);
+			setUsers(users);
+		});
 	}, [signedIn]);
 
 	onAuthStateChanged(getAuth(), (user) => {
@@ -94,8 +242,6 @@ function Home() {
 		} else {
 			setSignedIn(false);
 			setUsername("");
-			setFollowing([]);
-			setUsers([]);
 		}
 	});
 
@@ -107,44 +253,6 @@ function Home() {
 			.catch((error) => {});
 	}
 
-	function followDropDown(e) {
-		const container = document.getElementById("drop-down-inner-fourth");
-
-		if (e.currentTarget.textContent === "Follow") {
-			const secondButton = document.getElementById("drop-down-button");
-
-			if (secondButton) {
-				secondButton.removeEventListener("click", followDropDown);
-			}
-
-			container.innerHTML =
-				"<button class='drop-down-button'>Message</button> <button id='drop-down-following-button' class='drop-down-button'>Following</button>";
-
-			const button = document.getElementById("drop-down-following-button");
-			button.addEventListener("click", (e) => followDropDown(e));
-		} else if (e.currentTarget.textContent === "Following") {
-			const button = document.getElementById("drop-down-following-button");
-			button.removeEventListener("click", followDropDown);
-
-			container.innerHTML = "<button id='drop-down-button'>Follow</button>";
-
-			const secondButton = document.getElementById("drop-down-button");
-			secondButton.addEventListener("click", (e) => followDropDown(e));
-		}
-	}
-
-	function dropDownBottomSection() {
-		if (signedIn) {
-			return (
-				<div id="drop-down-inner-fourth">
-					<button onClick={(e) => followDropDown(e)} id="drop-down-button">
-						Follow
-					</button>
-				</div>
-			);
-		}
-	}
-
 	return (
 		<main>
 			<div
@@ -152,32 +260,7 @@ function Home() {
 				onMouseLeave={() => hideDropDown()}
 				className="drop-down"
 				id="drop-down"
-			>
-				<div className="drop-down-inner-first">
-					<img id="drop-down-ava" src={ava} alt="" />
-					<span>sialabala</span>
-				</div>
-				<div className="drop-down-inner-second">
-					<div className="drop-down-inner-second-inner">
-						<span>23</span>
-						<span>posts</span>
-					</div>
-					<div className="drop-down-inner-second-inner">
-						<span>173</span>
-						<span>followers</span>
-					</div>
-					<div className="drop-down-inner-second-inner">
-						<span>233</span>
-						<span>following</span>
-					</div>
-				</div>
-				<div className="drop-down-inner-third">
-					<img src={testPic} alt="" />
-					<img src={testPic} alt="" />
-					<img src={testPic} alt="" />
-				</div>
-				{dropDownBottomSection()}
-			</div>
+			></div>
 			<section id="home-section">
 				<div id="home-left-div">
 					<div id="home-left-inner">
@@ -192,14 +275,15 @@ function Home() {
 						<div className="not-visible" id="suggestions-left-div">
 							<span id="for-you-sug-span-left">Suggestions For You</span>
 							<div id="suggestions-left-inner-div">
-								{users.slice(0, 3).map((user) => {
-									if (!following.includes(user)) {
+								{users.map((user) => {
+									if (!following.includes(user.username) && num < 3 && user.username !== username) {
+										num++;
 										return (
 											<div key={uniqid()} className="sug-box-left">
 												<img className="sug-box-left-ava" src={ava} alt="" />
-												<span style={{ marginBottom: "10px" }}>{user}</span>
+												<span style={{ marginBottom: "10px" }}>{user.username}</span>
 												<button
-													onClick={(e) => followMobile(e)}
+													onClick={(e) => follow(user.username)}
 													className="sug-box-left-follow"
 												>
 													Follow
@@ -211,9 +295,27 @@ function Home() {
 							</div>
 						</div>
 
-						<PictureCard username={username}></PictureCard>
-						<PictureCard username={username}></PictureCard>
-						<PictureCard username={username}></PictureCard>
+						<PictureCard
+							users={users}
+							follow={follow}
+							unFollow={unFollow}
+							following={following}
+							username={username}
+						></PictureCard>
+						<PictureCard
+							users={users}
+							follow={follow}
+							unFollow={unFollow}
+							following={following}
+							username={username}
+						></PictureCard>
+						<PictureCard
+							users={users}
+							follow={follow}
+							unFollow={unFollow}
+							following={following}
+							username={username}
+						></PictureCard>
 					</div>
 				</div>
 
@@ -242,25 +344,30 @@ function Home() {
 					<div className="not-visible" id="suggestions-div-right">
 						<span id="for-you-sug-span">Suggestions For You</span>
 						<div id="list-of-sug-div">
-							{users.slice(0, 5).map((user) => {
-								if (!following.includes(user)) {
+							{users.map((user) => {
+								if (!following.includes(user.username) && num2 < 5 && user.username !== username) {
+									num2++;
 									return (
 										<div key={uniqid()} className="right-sug-div-list">
 											<div
-												onMouseEnter={(e) => dropDown(e, "avaPic", "right")}
+												onMouseEnter={(e) =>
+													dropDown(user, following, follow, unFollow, e, "avaPic", "right")
+												}
 												onMouseLeave={() => hideDropDown()}
 												className="right-sug-ava-div"
 											>
 												<img className="ava-img-sug" src={ava} alt="" />
 											</div>
 											<span
-												onMouseEnter={(e) => dropDown(e, "no", "right")}
+												onMouseEnter={(e) =>
+													dropDown(user, following, follow, unFollow, e, "no", "right")
+												}
 												onMouseLeave={() => hideDropDown()}
 												className="sug-login-right"
 											>
-												{user}
+												{user.username}
 											</span>
-											<button onClick={(e) => followDesktop(e)} className="sug-right-follow">
+											<button onClick={(e) => follow(user.username)} className="sug-right-follow">
 												Follow
 											</button>
 										</div>
