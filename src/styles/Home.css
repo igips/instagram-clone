@@ -225,6 +225,10 @@ main {
 	background-color: rgba(250, 250, 250);
 }
 
+.sug-right-follow:active {
+	color: #0062C3;
+}
+
 #home-left-button-div {
 	margin-bottom: 30px;
 	gap: 10px;
@@ -313,6 +317,10 @@ main {
 	align-items: center;
 	justify-content: center;
 	cursor: pointer;
+}
+
+.sug-box-left-follow:active {
+	background-color: #0062C3;
 }
 
 .sug-box-left-follow-active {
