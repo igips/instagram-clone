@@ -5,10 +5,10 @@ import "./styles/index.css";
 import { initializeApp } from "firebase/app";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 import { getFirestore, collection, getDocs } from "firebase/firestore";
-import TimeAgo from 'javascript-time-ago'
-import en from 'javascript-time-ago/locale/en.json'
+import TimeAgo from "javascript-time-ago";
+import en from "javascript-time-ago/locale/en.json";
 
-TimeAgo.addDefaultLocale(en)
+TimeAgo.addDefaultLocale(en);
 
 const firebaseConfig = {
 	apiKey: "AIzaSyDft-ERJnOSLsjY01BIvYaXN3BSQFcVvos",
@@ -21,46 +21,49 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig);
 
-
-async function getUsername(id) {
+async function getUserData(id) {
 	const data = await getDocs(collection(getFirestore(), "usernames"));
-	let userName;
-
-  	data.forEach((doc) => {
-		if (doc.data().uid === id) {
-			userName = doc.data().username;
-		}
-	});
-
-	return userName;
-}
-
-async function getFollowing(id) {
-	const data = await getDocs(collection(getFirestore(), "usernames"));
-	let following;
+	let userData;
 
 	data.forEach((doc) => {
-		if (doc.data().uid === id) {
-			following = doc.data().following;
+		if (id.length > 15) {
+			if (doc.data().uid === id) {
+				userData = doc;
+			}
+		} else {
+			if (doc.data().username === id) {
+				userData = doc;
+			}
 		}
 	});
 
-	return following;
-
+	return userData;
 }
 
 async function getUsers() {
 	const data = await getDocs(collection(getFirestore(), "usernames"));
+	const user = getAuth().currentUser;
 	let users = [];
 
 	data.forEach((doc) => {
-		users.push(doc.data().username);
+		users.push(doc.data());
 	});
 
 	return users;
 }
 
+async function getDocId(username) {
+	const data = await getDocs(collection(getFirestore(), "usernames"));
+	let docId;
 
+	data.forEach((doc) => {
+		if (doc.data().username === username) {
+			docId = doc.id;
+		}
+	});
+
+	return docId;
+}
 
 onAuthStateChanged(getAuth(), (user) => {
 	const rightButtons = document.getElementById("right-div-for-buttons");
@@ -73,21 +76,20 @@ onAuthStateChanged(getAuth(), (user) => {
 	if (user) {
 		const uid = user.uid;
 
-		getUsername(uid).then((user) => {
+		getUserData(uid).then((user) => {
 			leftButtons.classList.add("mobile-not-vissible");
 			rightButtons.classList.add("buttons-not-vissible");
 			suggestionsLeft.classList.add("mobile");
 			profileInfoRight.classList.add("visible");
 			suggestionsRight.classList.add("visible");
-      		rightUserName.textContent = user;
+			rightUserName.textContent = user.data().username;
 		});
-
 	} else {
 		leftButtons.classList.remove("mobile-not-vissible");
 		rightButtons.classList.remove("buttons-not-vissible");
 		suggestionsLeft.classList.remove("mobile");
 		profileInfoRight.classList.remove("visible");
-		suggestionsRight.classList.remove("visible"); 
+		suggestionsRight.classList.remove("visible");
 		// User is signed out
 	}
 });
@@ -99,4 +101,4 @@ ReactDOM.render(
 	document.getElementById("root")
 );
 
-export {getUsername, getUsers, getFollowing}
+export { getUserData, getUsers, getDocId };
