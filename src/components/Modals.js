@@ -124,6 +124,8 @@ function SignUpModal() {
 							uid: user.uid,
 							username: userName.value,
 							following: [],
+							followers: [],
+							posts: [],
 						});
 
 						closeSignUpModal();
