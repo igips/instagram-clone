@@ -2,7 +2,7 @@ import { getAuth, onAuthStateChanged } from "firebase/auth";
 import { useEffect, useState } from "react";
 import ReactDOM from "react-dom";
 import uniqid from "uniqid";
-import { getUsername } from "..";
+import { getUserData } from "..";
 import ava from "../img/ava.jpeg";
 import testPic from "../img/test-img.jpg";
 import "../styles/PictureCard.css";
@@ -46,11 +46,9 @@ window.addEventListener("popstate", (e) => {
 		signUpModal.style.display === "flex"
 	) {
 		signUpModal.style.display = "none";
-
 	} else if (commsModal.style.display === "flex") {
 		commsModal.style.display = "none";
-
-	} else if(searchModal.style.display === "flex") {
+	} else if (searchModal.style.display === "flex") {
 		searchModal.style.display = "none";
 	}
 
@@ -60,34 +58,25 @@ window.addEventListener("popstate", (e) => {
 	} else if (window.location.href.includes("signInM") && user) {
 		signInModal.style.display = "none";
 		window.history.pushState("/", "Title", "/");
-
-	} else if(window.location.href.includes("signUpM") && !user) {
+	} else if (window.location.href.includes("signUpM") && !user) {
 		signUpModal.style.display = "flex";
-
-	} else if(window.location.href.includes("signInM") && !user) {
+	} else if (window.location.href.includes("signInM") && !user) {
 		signInModal.style.display = "flex";
-
-	} else if(window.location.href.includes("shareM") && !user) {
+	} else if (window.location.href.includes("shareM") && !user) {
 		shareModal.style.display = "none";
 		window.history.pushState("/", "Title", "/");
-
-	} else if(window.location.href.includes("shareM") && user) {
+	} else if (window.location.href.includes("shareM") && user) {
 		shareModal.style.display = "flex";
-
-	} else if(window.location.href.includes("commentsM")) {
+	} else if (window.location.href.includes("commentsM")) {
 		commsModal.style.display = "flex";
-
-	} else if(window.location.href.includes("likesM")) {
+	} else if (window.location.href.includes("likesM")) {
 		likesModal.style.display = "flex";
-
-	} else if(window.location.href.includes("optionsM") && !user) {
+	} else if (window.location.href.includes("optionsM") && !user) {
 		optionsModal.style.display = "none";
 		window.history.pushState("/", "Title", "/");
-
-	} else if(window.location.href.includes("optionsM") && user) {
+	} else if (window.location.href.includes("optionsM") && user) {
 		optionsModal.style.display = "flex";
-
-	} else if(window.location.href.includes("searchM")) {
+	} else if (window.location.href.includes("searchM")) {
 		searchModal.style.display = "flex";
 	}
 
@@ -100,7 +89,6 @@ window.addEventListener("popstate", (e) => {
 		signUpModal.style.display = "none";
 		searchModal.style.display = "none";
 	}
-
 });
 
 function options() {
@@ -108,10 +96,10 @@ function options() {
 
 	if (user) {
 		const modal = document.getElementById("unfollow-modal");
-		if(!window.location.href.includes("optionsM")) {
+		if (!window.location.href.includes("optionsM")) {
 			window.history.pushState("optionsM", "Title", "optionsM");
 		}
-		
+
 		modal.style.display = "flex";
 	} else {
 		showSignInModal();
@@ -188,10 +176,10 @@ function likeIcon(likePicture) {
 
 function showShareModal() {
 	const modal = document.getElementById("share-modal");
-	if(!window.location.href.includes("shareM")) {
+	if (!window.location.href.includes("shareM")) {
 		window.history.pushState("shareM", "Title", "shareM");
 	}
-	
+
 	modal.style.display = "flex";
 }
 
@@ -249,7 +237,11 @@ function showCommentsModal(
 	removeComment,
 	likes,
 	likePicture,
-	date
+	date,
+	users,
+	follow,
+	unFollow,
+	following
 ) {
 	const modal = document.getElementById("comments-modal");
 	const descriptionDiv = document.getElementById("modal-first-comment");
@@ -259,11 +251,9 @@ function showCommentsModal(
 	const iconsDiv = document.getElementById("icons-in-comments-section-modal");
 	const whenAddedDiv = document.getElementById("when-added-div-modal");
 	const descriptionWhenAddedDiv = document.getElementById("short-when-added-and-likes-modal");
-	if(!window.location.href.includes("commentsM")) {
+	if (!window.location.href.includes("commentsM")) {
 		window.history.pushState("commentsM", "Title", "commentsM");
 	}
-	
-	
 
 	modal.style.display = "flex";
 
@@ -285,10 +275,7 @@ function showCommentsModal(
 	);
 	ReactDOM.render(<AddCommentSection addComment={addComment} />, addCommentDiv);
 	ReactDOM.render(<PictureCardNumOfLikesSection likes={likes} />, likesDiv);
-	ReactDOM.render(
-		<PictureCardIconsSection date={date} likePicture={likePicture} likes={likes} modal="modal" />,
-		iconsDiv
-	);
+	ReactDOM.render(<PictureCardIconsSection date={date} likePicture={likePicture} likes={likes} modal="modal" />,iconsDiv);
 	ReactDOM.render(<ReactTimeAgo date={date} locale="en-US" />, whenAddedDiv);
 	ReactDOM.render(<ReactTimeAgo timeStyle="mini-minute-now" date={date} locale="en-US" />, descriptionWhenAddedDiv);
 }
@@ -300,10 +287,10 @@ function PictureCardIconsSection(props) {
 	useEffect(() => {
 		const user = getAuth().currentUser;
 
-		if (user) {
-			getUsername(user.uid).then((user) => setUsername(user));
+		if (signedIn) {
+			getUserData(user.uid).then((user) => setUsername(user.data().username));
 		}
-	});
+	}, [signedIn]);
 
 	onAuthStateChanged(getAuth(), (user) => {
 		if (user) {
@@ -329,7 +316,11 @@ function PictureCardIconsSection(props) {
 							props.removeComment,
 							props.likes,
 							props.likePicture,
-							props.date
+							props.date,
+							props.users,
+							props.follow,
+							props.unFollow,
+							props.following
 						)
 					}
 					className="comms-icon-span"
@@ -374,10 +365,10 @@ function Comments(props) {
 	useEffect(() => {
 		const user = getAuth().currentUser;
 
-		if (user) {
-			getUsername(user.uid).then((user) => setUsername(user));
+		if (signedIn) {
+			getUserData(user.uid).then((user) => setUsername(user.data().username));
 		}
-	});
+	}, [signedIn]);
 
 	onAuthStateChanged(getAuth(), (user) => {
 		if (user) {
@@ -485,7 +476,11 @@ function PictureCardCommentsSection(props) {
 								props.removeComment,
 								props.likes,
 								props.likePicture,
-								props.date
+								props.date,
+								props.users,
+								props.follow,
+								props.unFollow,
+								props.following
 							)
 						}
 						className="view-all-coms-span"
@@ -503,7 +498,15 @@ function PictureCardCommentsSection(props) {
 				<div className="comment-line-div">
 					<div>
 						<span
-							onMouseEnter={(e) => dropDown(e)}
+							onMouseEnter={(e) =>
+								dropDown(
+									getUserDataFromUsersArray(props.users, props.username),
+									props.following,
+									props.follow,
+									props.unFollow,
+									e
+								)
+							}
 							onMouseLeave={() => hideDropDown()}
 							className="name-span in-coms"
 						>
@@ -526,7 +529,15 @@ function PictureCardCommentsSection(props) {
 						<div key={uniqid()} className="comment-line-div">
 							<div className="comment-line-inner-div">
 								<span
-									onMouseEnter={(e) => dropDown(e)}
+									onMouseEnter={(e) =>
+										dropDown(
+											getUserDataFromUsersArray(props.users, comment.username),
+											props.following,
+											props.follow,
+											props.unFollow,
+											e
+										)
+									}
 									onMouseLeave={() => hideDropDown()}
 									className="name-span in-coms"
 								>
@@ -548,6 +559,16 @@ function PictureCardCommentsSection(props) {
 	);
 }
 
+function getUserDataFromUsersArray(array, userName) {
+	let userData;
+	array.forEach((user) => {
+		if (user.username === userName) {
+			userData = user;
+		}
+	});
+	return userData;
+}
+
 function PictureCardHeader(props) {
 	return (
 		<div className="picture-card-header-div">
@@ -556,7 +577,16 @@ function PictureCardHeader(props) {
 					<div className="picture-card-avatar-div">
 						<div className="picture-card-avatar-div-inner">
 							<span
-								onMouseEnter={(e) => dropDown(e, "avaPic")}
+								onMouseEnter={(e) => {
+									dropDown(
+										getUserDataFromUsersArray(props.users, props.username),
+										props.following,
+										props.follow,
+										props.unFollow,
+										e,
+										"avaPic"
+									);
+								}}
 								onMouseLeave={() => hideDropDown()}
 								className="avatar-span"
 							>
@@ -573,7 +603,15 @@ function PictureCardHeader(props) {
 					</div>
 					<div className="picture-card-name-div">
 						<span
-							onMouseEnter={(e) => dropDown(e)}
+							onMouseEnter={(e) => {
+								dropDown(
+									getUserDataFromUsersArray(props.users, props.username),
+									props.following,
+									props.follow,
+									props.unFollow,
+									e
+								);
+							}}
 							onMouseLeave={() => hideDropDown()}
 							className="name-span"
 							id={props.username ? "" : "comments-modal-id-div"}
@@ -768,10 +806,9 @@ function PictureCardNumOfLikesSection(props) {
 function showLikesModal(likes) {
 	const modal = document.getElementById("likes-modal");
 	const container = document.getElementById("list-of-likes-div-inner");
-	if(!window.location.href.includes("likesM")) {
+	if (!window.location.href.includes("likesM")) {
 		window.history.pushState("likesM", "Title", "likesM");
 	}
-	
 
 	modal.style.display = "flex";
 
@@ -832,7 +869,7 @@ function PictureCard(props) {
 	const [signedIn, setSignedIn] = useState(false);
 	const [likes, setLikes] = useState({ num: 0, users: [] });
 	const [comments, setComments] = useState([]);
-	const [username, setUsername] = useState("bluberek");
+	const [username, setUsername] = useState("John12");
 	const [description, setDescription] = useState("Drop a if you’re ready to go on this ride with us this month");
 	const [avatar, setAvatar] = useState(ava);
 	const [date, setDate] = useState(new Date());
@@ -902,31 +939,42 @@ function PictureCard(props) {
 	}
 
 	useEffect(() => {
-		ReactDOM.render(
-			<PictureCardNumOfLikesSection likes={likes} />,
-			document.getElementById("number-of-likes-section-modal")
-		);
-		ReactDOM.render(
-			<PictureCardIconsSection date={date} likePicture={likePicture} likes={likes} modal="modal" />,
-			document.getElementById("icons-in-comments-section-modal")
-		);
+		if (document.getElementById("comments-modal").style.display === "flex") {
+			ReactDOM.render(
+				<PictureCardNumOfLikesSection likes={likes} />,
+				document.getElementById("number-of-likes-section-modal")
+			);
+			ReactDOM.render(
+				<PictureCardIconsSection date={date} likePicture={likePicture} likes={likes} modal="modal" />,
+				document.getElementById("icons-in-comments-section-modal")
+			);
+		}
 	}, [likes]);
 
 	useEffect(() => {
-		ReactDOM.render(
-			<Comments removeComment={removeComment} likeComment={likeComment} comments={comments} />,
-			document.getElementById("container-for-comments-in-modal")
-		);
-		ReactDOM.render(
-			<AddCommentSection addComment={addComment} />,
-			document.getElementById("div-for-comment-section-in-comment-modal")
-		);
+		if (document.getElementById("comments-modal").style.display === "flex") {
+			ReactDOM.render(
+				<Comments removeComment={removeComment} likeComment={likeComment} comments={comments} />,
+				document.getElementById("container-for-comments-in-modal")
+			);
+			ReactDOM.render(
+				<AddCommentSection addComment={addComment} />,
+				document.getElementById("div-for-comment-section-in-comment-modal")
+			);
+		}
 	}, [comments]);
 
 	return (
 		<div className="picture-card-article">
 			<div className="picture-card-div">
-				<PictureCardHeader username={username} avatar={avatar} />
+				<PictureCardHeader
+					users={props.users}
+					follow={props.follow}
+					unFollow={props.unFollow}
+					following={props.following}
+					username={username}
+					avatar={avatar}
+				/>
 			</div>
 			<div className="picture-div">
 				<div className="picture-div-inner">
@@ -947,6 +995,10 @@ function PictureCard(props) {
 							likes={likes}
 							likePicture={likePicture}
 							date={date}
+							users={props.users}
+							follow={props.follow}
+							unFollow={props.unFollow}
+							following={props.following}
 						/>
 					</section>
 
@@ -967,6 +1019,10 @@ function PictureCard(props) {
 						yourUsername={props.username}
 						likePicture={likePicture}
 						date={date}
+						users={props.users}
+						follow={props.follow}
+						unFollow={props.unFollow}
+						following={props.following}
 					/>
 					<div className="added-div">
 						<ReactTimeAgo date={date} locale="en-US" />
@@ -979,4 +1035,4 @@ function PictureCard(props) {
 }
 
 export default PictureCard;
-export { options, PictureCardHeader, PictureCardIconsSection, AddCommentSection, likeCommentIcon, shareIcon };
+export { options, PictureCardHeader, AddCommentSection, likeCommentIcon, shareIcon };
