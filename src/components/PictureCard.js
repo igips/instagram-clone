@@ -1,12 +1,12 @@
 import { getAuth, onAuthStateChanged } from "firebase/auth";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import ReactDOM from "react-dom";
 import uniqid from "uniqid";
 import { getUserData } from "..";
 import ava from "../img/ava.jpeg";
 import testPic from "../img/test-img.jpg";
 import "../styles/PictureCard.css";
-import { dropDown, hideDropDown, followMobile } from "./Home.js";
+import { dropDown, hideDropDown} from "./Home.js";
 import { showSignInModal } from "./Nav";
 import ReactTimeAgo from "react-time-ago";
 import Picker from "emoji-picker-react";
@@ -241,43 +241,75 @@ function showCommentsModal(
 	users,
 	follow,
 	unFollow,
-	following
+	following,
+	addToFlag
 ) {
 	const modal = document.getElementById("comments-modal");
-	const descriptionDiv = document.getElementById("modal-first-comment");
-	const commentsDiv = document.getElementById("container-for-comments-in-modal");
+	const commentsDiv = document.getElementById("modal-comments-section");
 	const addCommentDiv = document.getElementById("div-for-comment-section-in-comment-modal");
 	const likesDiv = document.getElementById("number-of-likes-section-modal");
 	const iconsDiv = document.getElementById("icons-in-comments-section-modal");
 	const whenAddedDiv = document.getElementById("when-added-div-modal");
 	const descriptionWhenAddedDiv = document.getElementById("short-when-added-and-likes-modal");
+	const headerDiv = document.getElementById("comments-modal-header-section");
 	if (!window.location.href.includes("commentsM")) {
 		window.history.pushState("commentsM", "Title", "commentsM");
 	}
 
 	modal.style.display = "flex";
 
-	document.getElementById("comments-modal-id-div").textContent = username;
-	document.getElementById("comments-modal-ava-header").src = avatar;
-
-	if (description) {
-		descriptionDiv.style.display = "flex";
-		document.getElementById("description-comments-modal-username").textContent = username;
-		document.getElementById("description-comments-modal-desc").textContent = description;
-		document.getElementById("comments-modal-description-avatar").src = avatar;
-	} else if (!description) {
-		descriptionDiv.style.display = "none";
-	}
+	ReactDOM.render(
+		<PictureCardHeader
+			users={users}
+			follow={follow}
+			unFollow={unFollow}
+			following={following}
+			username={username}
+			avatar={avatar}
+			addToFlag={addToFlag}
+		/>,
+		headerDiv
+	);
 
 	ReactDOM.render(
-		<Comments removeComment={removeComment} likeComment={likeComment} comments={comments} />,
+		<Comments
+			users={users}
+			follow={follow}
+			unFollow={unFollow}
+			following={following}
+			removeComment={removeComment}
+			likeComment={likeComment}
+			comments={comments}
+			description={description}
+			username={username}
+			avatar={avatar}
+			addToFlag={addToFlag}
+		/>,
 		commentsDiv
 	);
 	ReactDOM.render(<AddCommentSection addComment={addComment} />, addCommentDiv);
-	ReactDOM.render(<PictureCardNumOfLikesSection likes={likes} />, likesDiv);
-	ReactDOM.render(<PictureCardIconsSection date={date} likePicture={likePicture} likes={likes} modal="modal" />,iconsDiv);
+	ReactDOM.render(
+		<PictureCardNumOfLikesSection
+			users={users}
+			follow={follow}
+			unFollow={unFollow}
+			following={following}
+			addToFlag={addToFlag}
+			likes={likes}
+		/>,
+		likesDiv
+	);
+	ReactDOM.render(
+		<PictureCardIconsSection date={date} likePicture={likePicture} likes={likes} modal="modal" />,
+		iconsDiv
+	);
 	ReactDOM.render(<ReactTimeAgo date={date} locale="en-US" />, whenAddedDiv);
-	ReactDOM.render(<ReactTimeAgo timeStyle="mini-minute-now" date={date} locale="en-US" />, descriptionWhenAddedDiv);
+	if (descriptionWhenAddedDiv) {
+		ReactDOM.render(
+			<ReactTimeAgo timeStyle="mini-minute-now" date={date} locale="en-US" />,
+			descriptionWhenAddedDiv
+		);
+	}
 }
 
 function PictureCardIconsSection(props) {
@@ -320,7 +352,8 @@ function PictureCardIconsSection(props) {
 							props.users,
 							props.follow,
 							props.unFollow,
-							props.following
+							props.following,
+							props.addToFlag
 						)
 					}
 					className="comms-icon-span"
@@ -400,61 +433,167 @@ function Comments(props) {
 		}
 	}
 
+	function description() {
+		if (props.description) {
+			return (
+				<div id="modal-first-comment">
+					<span
+						onMouseEnter={(e) => {
+							dropDown(
+								getUserDataFromUsersArray(props.users, props.username),
+								props.following,
+								props.follow,
+								props.unFollow,
+								e,
+								"avaPic"
+							);
+						}}
+						onMouseLeave={() => {
+							props.addToFlag();
+							hideDropDown();
+						}}
+						className="avatar-span-comments"
+					>
+						<img
+							id="comments-modal-description-avatar"
+							alt=""
+							className="card-avatar-img"
+							data-testid="user-avatar"
+							draggable="false"
+							src={props.avatar}
+						/>
+					</span>
+					<div id="first-modal-comment-div" className="modal-comment-div">
+						<div id="first-modal-comment-div-inner">
+							<div className="name-span-modal" id="first-modal-comment-span">
+								<span
+									onMouseEnter={(e) => {
+										dropDown(
+											getUserDataFromUsersArray(props.users, props.username),
+											props.following,
+											props.follow,
+											props.unFollow,
+											e
+										);
+									}}
+									onMouseLeave={() => {
+										props.addToFlag();
+										hideDropDown();
+									}}
+									className="first-modal-comment-span"
+									id="description-comments-modal-username"
+								>
+									{props.username}
+								</span>{" "}
+								<span id="description-comments-modal-desc">{props.description}</span>
+							</div>
+							<div id="first-comment-when">
+								<div id="short-when-added-and-likes-modal" className="short-when-added-and-likes"></div>
+							</div>
+						</div>
+					</div>
+				</div>
+			);
+		}
+	}
+
 	return (
 		<>
-			{props.comments.map((comment) => {
-				return (
-					<div key={uniqid()} className="modal-comments">
-						<span
-							onMouseEnter={(e) => dropDown(e, "avaPic")}
-							onMouseLeave={() => hideDropDown()}
-							className="avatar-span-comments"
-						>
-							<img
-								alt=""
-								className="card-avatar-img"
-								data-testid="user-avatar"
-								draggable="false"
-								src={ava}
-							/>
-						</span>
-						<div className="modal-comment-div">
-							<div className="modal-comment-div-inner">
-								<div className="name-span-modal">
-									<span
-										onMouseEnter={(e) => dropDown(e)}
-										onMouseLeave={() => hideDropDown()}
-										className="first-modal-comment-span"
-									>
-										{comment.username}
-									</span>{" "}
-									{comment.comment}
-								</div>
-								<div className="like-and-when-added-div">
-									<div className="short-when-added-and-likes">
-										<ReactTimeAgo timeStyle="mini-minute-now" date={comment.date} locale="en-US" />
+			{description()}
+			<div id="container-for-comments-in-modal">
+				{props.comments.map((comment) => {
+					return (
+						<div key={uniqid()} className="modal-comments">
+							<span
+								onMouseEnter={(e) => {
+									dropDown(
+										getUserDataFromUsersArray(props.users, comment.username),
+										props.following,
+										props.follow,
+										props.unFollow,
+										e,
+										"avaPic"
+									);
+								}}
+								onMouseLeave={() => {
+									props.addToFlag();
+									hideDropDown();
+								}}
+								className="avatar-span-comments"
+							>
+								<img
+									alt=""
+									className="card-avatar-img"
+									data-testid="user-avatar"
+									draggable="false"
+									src={ava}
+								/>
+							</span>
+							<div className="modal-comment-div">
+								<div className="modal-comment-div-inner">
+									<div className="name-span-modal">
+										<span
+											onMouseEnter={(e) => {
+												dropDown(
+													getUserDataFromUsersArray(props.users, comment.username),
+													props.following,
+													props.follow,
+													props.unFollow,
+													e
+												);
+											}}
+											onMouseLeave={() => {
+												props.addToFlag();
+												hideDropDown();
+											}}
+											className="first-modal-comment-span"
+										>
+											{comment.username}
+										</span>{" "}
+										{comment.comment}
 									</div>
-									<div onClick={() => showLikesModal(comment)} className="short-when-added-and-likes">
-										{showLikes(comment)}
-									</div>
-									<div
-										onClick={() => props.removeComment(comment.id)}
-										className="short-when-added-and-likes"
-									>
-										{deleteComment(comment)}
+									<div className="like-and-when-added-div">
+										<div className="short-when-added-and-likes">
+											<ReactTimeAgo
+												timeStyle="mini-minute-now"
+												date={comment.date}
+												locale="en-US"
+											/>
+										</div>
+										<div
+											onClick={() =>
+												showLikesModal(
+													comment,
+													props.users,
+													props.follow,
+													props.unFollow,
+													props.following,
+													props.addToFlag
+												)
+											}
+											className="short-when-added-and-likes"
+										>
+											{showLikes(comment)}
+										</div>
+										<div
+											onClick={() => props.removeComment(comment.id)}
+											className="short-when-added-and-likes"
+										>
+											{deleteComment(comment)}
+										</div>
 									</div>
 								</div>
 							</div>
+							<div
+								onClick={() => likeCommentIcon(props.likeComment, comment.id)}
+								className="like-comment-div like-comment-div-modal"
+							>
+								{likeCommentIconClicked(comment.likes.users, username)}
+							</div>
 						</div>
-						<div
-							onClick={() => likeCommentIcon(props.likeComment, comment.id)}
-							className="like-comment-div like-comment-div-modal"
-						>
-							{likeCommentIconClicked(comment.likes.users, username)}
-						</div>
-					</div>
-				);
-			})}
+					);
+				})}
+			</div>
 		</>
 	);
 }
@@ -480,7 +619,8 @@ function PictureCardCommentsSection(props) {
 								props.users,
 								props.follow,
 								props.unFollow,
-								props.following
+								props.following,
+								props.addToFlag
 							)
 						}
 						className="view-all-coms-span"
@@ -587,7 +727,10 @@ function PictureCardHeader(props) {
 										"avaPic"
 									);
 								}}
-								onMouseLeave={() => hideDropDown()}
+								onMouseLeave={() => {
+									props.addToFlag();
+									hideDropDown();
+								}}
 								className="avatar-span"
 							>
 								<img
@@ -612,7 +755,10 @@ function PictureCardHeader(props) {
 									e
 								);
 							}}
-							onMouseLeave={() => hideDropDown()}
+							onMouseLeave={() => {
+								props.addToFlag();
+								hideDropDown();
+							}}
 							className="name-span"
 							id={props.username ? "" : "comments-modal-id-div"}
 						>
@@ -796,14 +942,26 @@ function PictureCardNumOfLikesSection(props) {
 
 	return (
 		<div className="number-of-likes-div">
-			<span onClick={() => showLikesModal(props.likes)} className="likes-span">
+			<span
+				onClick={() =>
+					showLikesModal(
+						props.likes,
+						props.users,
+						props.follow,
+						props.unFollow,
+						props.following,
+						props.addToFlag
+					)
+				}
+				className="likes-span"
+			>
 				{showLikes(props.likes)}
 			</span>
 		</div>
 	);
 }
 
-function showLikesModal(likes) {
+function showLikesModal(likes, users, follow, unFollow, following, addToFlag) {
 	const modal = document.getElementById("likes-modal");
 	const container = document.getElementById("list-of-likes-div-inner");
 	if (!window.location.href.includes("likesM")) {
@@ -812,7 +970,17 @@ function showLikesModal(likes) {
 
 	modal.style.display = "flex";
 
-	ReactDOM.render(<Likes likes={likes} />, container);
+	ReactDOM.render(
+		<Likes
+			users={users}
+			follow={follow}
+			unFollow={unFollow}
+			following={following}
+			addToFlag={addToFlag}
+			likes={likes}
+		/>,
+		container
+	);
 }
 
 function Likes(props) {
@@ -828,11 +996,19 @@ function Likes(props) {
 		}
 	});
 
-	function followButtonForLikes() {
-		if (signedIn) {
+	function followButtonForLikes(user) {
+		const userR = getAuth().currentUser;
+
+		if (signedIn && !props.following.includes(user) && getUserDataFromUsersArray(props.users, user).uid !== userR.uid) {
 			return (
-				<button onClick={(e) => followMobile(e)} className="likes-modal-follow">
+				<button onClick={() => {props.addToFlag(); props.follow(user)}} className="likes-modal-follow">
 					Follow
+				</button>
+			);
+		} else if (signedIn && props.following.includes(user)) {
+			return (
+				<button onClick={() => {props.addToFlag(); props.unFollow(user)}} className="likes-modal-follow sug-box-left-follow-active">
+					Following
 				</button>
 			);
 		}
@@ -844,20 +1020,45 @@ function Likes(props) {
 				return (
 					<div key={uniqid()} className="right-sug-div-list">
 						<div
-							onMouseEnter={(e) => dropDown(e, "avaPic", "right")}
-							onMouseLeave={() => hideDropDown()}
+							onMouseEnter={(e) => {
+								dropDown(
+									getUserDataFromUsersArray(props.users, user),
+									props.following,
+									props.follow,
+									props.unFollow,
+									e,
+									"avaPic"
+								);
+							}}
+							onMouseLeave={() => {
+								props.addToFlag();
+								hideDropDown();
+							}}
 							className="right-sug-ava-div"
 						>
 							<img className="ava-img-likes" src={ava} alt="" />
 						</div>
 						<span
-							onMouseEnter={(e) => dropDown(e, "no", "right")}
-							onMouseLeave={() => hideDropDown()}
+							onMouseEnter={(e) =>
+								dropDown(
+									getUserDataFromUsersArray(props.users, user),
+									props.following,
+									props.follow,
+									props.unFollow,
+									e,
+									"no",
+									"right"
+								)
+							}
+							onMouseLeave={() => {
+								props.addToFlag();
+								hideDropDown();
+							}}
 							className="sug-login-right"
 						>
 							{user}
 						</span>
-						{followButtonForLikes()}
+						{followButtonForLikes(user)}
 					</div>
 				);
 			})}
@@ -873,6 +1074,9 @@ function PictureCard(props) {
 	const [description, setDescription] = useState("Drop a if you’re ready to go on this ride with us this month");
 	const [avatar, setAvatar] = useState(ava);
 	const [date, setDate] = useState(new Date());
+	const [flag, setFlag] = useState(0);
+	const [flag2, setFlag2] = useState(0);
+	const prev = useRef({ flag2, flag });
 
 	onAuthStateChanged(getAuth(), (user) => {
 		if (user) {
@@ -881,6 +1085,10 @@ function PictureCard(props) {
 			setSignedIn(false);
 		}
 	});
+
+	function addToFlag() {
+		setFlag(flag + 1);
+	}
 
 	function likePicture() {
 		setLikes((prevLikes) => {
@@ -941,22 +1149,104 @@ function PictureCard(props) {
 	useEffect(() => {
 		if (document.getElementById("comments-modal").style.display === "flex") {
 			ReactDOM.render(
-				<PictureCardNumOfLikesSection likes={likes} />,
+				<PictureCardNumOfLikesSection
+					users={props.users}
+					follow={props.follow}
+					unFollow={props.unFollow}
+					following={props.following}
+					addToFlag={addToFlag}
+					likes={likes}
+				/>,
 				document.getElementById("number-of-likes-section-modal")
 			);
 			ReactDOM.render(
-				<PictureCardIconsSection date={date} likePicture={likePicture} likes={likes} modal="modal" />,
+				<PictureCardIconsSection
+					addToFlag={addToFlag}
+					date={date}
+					likePicture={likePicture}
+					likes={likes}
+					modal="modal"
+				/>,
 				document.getElementById("icons-in-comments-section-modal")
 			);
 		}
+
+		
 	}, [likes]);
+
+	useEffect(() => {
+		setFlag2(flag2 + 1);
+
+		if (prev.current.flag2 !== flag2 && prev.current.flag !== flag) {
+			if (document.getElementById("comments-modal").style.display === "flex") {
+				ReactDOM.render(
+					<PictureCardHeader
+						users={props.users}
+						follow={props.follow}
+						unFollow={props.unFollow}
+						following={props.following}
+						username={username}
+						avatar={avatar}
+						addToFlag={addToFlag}
+					/>,
+					document.getElementById("comments-modal-header-section")
+				);
+				ReactDOM.render(
+					<Comments
+						users={props.users}
+						follow={props.follow}
+						unFollow={props.unFollow}
+						following={props.following}
+						removeComment={removeComment}
+						likeComment={likeComment}
+						comments={comments}
+						description={description}
+						username={username}
+						avatar={avatar}
+						addToFlag={addToFlag}
+					/>,
+					document.getElementById("modal-comments-section")
+				);
+			}
+
+			if(document.getElementById("likes-modal").style.display === "flex") {
+				ReactDOM.render(
+					<Likes
+						users={props.users}
+						follow={props.follow}
+						unFollow={props.unFollow}
+						following={props.following}
+						addToFlag={addToFlag}
+						likes={likes}
+					/>,
+					document.getElementById("list-of-likes-div-inner")
+				);
+			}
+			prev.current = { flag2, flag };
+		}
+
+		
+	}, [props.following]);
 
 	useEffect(() => {
 		if (document.getElementById("comments-modal").style.display === "flex") {
 			ReactDOM.render(
-				<Comments removeComment={removeComment} likeComment={likeComment} comments={comments} />,
-				document.getElementById("container-for-comments-in-modal")
+				<Comments
+					users={props.users}
+					follow={props.follow}
+					unFollow={props.unFollow}
+					following={props.following}
+					removeComment={removeComment}
+					likeComment={likeComment}
+					comments={comments}
+					description={description}
+					username={username}
+					avatar={avatar}
+					addToFlag={addToFlag}
+				/>,
+				document.getElementById("modal-comments-section")
 			);
+
 			ReactDOM.render(
 				<AddCommentSection addComment={addComment} />,
 				document.getElementById("div-for-comment-section-in-comment-modal")
@@ -974,6 +1264,7 @@ function PictureCard(props) {
 					following={props.following}
 					username={username}
 					avatar={avatar}
+					addToFlag={addToFlag}
 				/>
 			</div>
 			<div className="picture-div">
@@ -999,11 +1290,19 @@ function PictureCard(props) {
 							follow={props.follow}
 							unFollow={props.unFollow}
 							following={props.following}
+							addToFlag={addToFlag}
 						/>
 					</section>
 
 					<section className="number-of-likes-section">
-						<PictureCardNumOfLikesSection likes={likes} />
+						<PictureCardNumOfLikesSection
+							users={props.users}
+							follow={props.follow}
+							unFollow={props.unFollow}
+							following={props.following}
+							addToFlag={addToFlag}
+							likes={likes}
+						/>
 					</section>
 
 					<PictureCardCommentsSection
@@ -1023,6 +1322,7 @@ function PictureCard(props) {
 						follow={props.follow}
 						unFollow={props.unFollow}
 						following={props.following}
+						addToFlag={addToFlag}
 					/>
 					<div className="added-div">
 						<ReactTimeAgo date={date} locale="en-US" />
