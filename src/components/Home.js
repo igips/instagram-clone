@@ -7,7 +7,7 @@ import testPic from "../img/test-img.jpg";
 import { useEffect, useRef, useState } from "react";
 import { getDocId, getUserData, getUsers } from "..";
 import uniqid from "uniqid";
-import { arrayUnion, doc, getFirestore, updateDoc } from "firebase/firestore";
+import { arrayRemove, arrayUnion, doc, getFirestore, updateDoc } from "firebase/firestore";
 import ReactDOM from "react-dom";
 
 function dropDown(userData, following, follow, unFollow, e, ele, right) {
@@ -177,6 +177,11 @@ function Home() {
 						...user,
 						followers: [...user.followers, username],
 					};
+				} else if (user.username === username) {
+					return {
+						...user,
+						following: [...user.following, who],
+					};
 				} else {
 					return user;
 				}
@@ -188,10 +193,44 @@ function Home() {
 		);
 		updateDoc(doc(getFirestore(), "usernames", firestoreDocId), { following: arrayUnion(who) });
 
-		if (right) {
+		if (right && document.getElementById("likes-modal").style.display !== "flex") {
 			hideDropDown();
 		}
 	}
+
+	function unFollow(who) {
+		setFollowing((oldFollowing) => {
+			const newFollowing = oldFollowing.filter((name) => name !== who);
+			return newFollowing;
+		});
+		setUsers((oldUsers) => {
+			const newUsers = oldUsers.map((user) => {
+				if(user.username === who) {
+					return {
+						...user,
+						followers: user.followers.filter((name) => name !== username),
+					}
+
+				} else if(user.username === username) {
+					return {
+						...user,
+						following: user.following.filter((name) => name !== who),
+					}
+
+				} else {
+					return user;
+				}
+				
+			});
+			return newUsers;
+		});
+		getDocId(who).then((id) =>
+			updateDoc(doc(getFirestore(), "usernames", id), { followers: arrayRemove(username) })
+		);
+		updateDoc(doc(getFirestore(), "usernames", firestoreDocId), { following: arrayRemove(who) });		
+	}
+
+	
 
 	useEffect(() => {
 		if (!didMount.current) {
@@ -217,7 +256,7 @@ function Home() {
 		}
 	}, [users]);
 
-	function unFollow(who) {}
+	
 
 	useEffect(() => {
 		const user = getAuth().currentUser;
@@ -253,6 +292,7 @@ function Home() {
 			.catch((error) => {});
 	}
 
+	
 	return (
 		<main>
 			<div
@@ -292,6 +332,7 @@ function Home() {
 										);
 									}
 								})}
+								
 							</div>
 						</div>
 
