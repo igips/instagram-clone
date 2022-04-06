@@ -266,7 +266,9 @@ main {
 	height: 216px;
 	flex: 0 0 auto;
 	display: flex;
-	justify-content: space-between;
+	/* justify-content: space-between; */
+	justify-content:flex-start;
+	gap: 44px;
 	align-items: stretch;
 	height: 100%;
 	width: 100%;
@@ -507,7 +509,7 @@ main {
 	}
 
 	#suggestions-left-inner-div {
-		gap: 10px;
+		gap: 50px;
         padding-left: 24px;
         padding-right: 24px;
 	}
@@ -517,4 +519,11 @@ main {
     }
 
 	
+}
+
+@media (max-width: 450px) {
+	#suggestions-left-inner-div {
+		gap: 10px;
+       
+	}
 }
