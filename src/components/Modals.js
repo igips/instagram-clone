@@ -433,52 +433,15 @@ function CommentsModal() {
 					<img src={testPic} alt="" />
 				</div>
 				<div id="comments-div-modal">
-					<PictureCardHeader />
 					<div id="comms-modal-header-mobile">
 						{closeModal(hideCommentsModal)}
 						<span>Comments</span>
 						{shareIcon()}
 					</div>
+					<div id="comments-modal-header-section"></div>
 					<div id="modal-comments-section">
-						<div id="modal-first-comment">
-							<span
-								onMouseEnter={(e) => dropDown(e, "avaPic")}
-								onMouseLeave={() => hideDropDown()}
-								className="avatar-span-comments"
-							>
-								<img
-									id="comments-modal-description-avatar"
-									alt=""
-									className="card-avatar-img"
-									data-testid="user-avatar"
-									draggable="false"
-									src={ava}
-								/>
-							</span>
-							<div id="first-modal-comment-div" className="modal-comment-div">
-								<div id="first-modal-comment-div-inner">
-									<div className="name-span-modal" id="first-modal-comment-span">
-										<span
-											onMouseEnter={(e) => dropDown(e)}
-											onMouseLeave={() => hideDropDown()}
-											className="first-modal-comment-span"
-											id="description-comments-modal-username"
-										></span>{" "}
-										<span id="description-comments-modal-desc"></span>
-									</div>
-									<div id="first-comment-when">
-										<div
-											id="short-when-added-and-likes-modal"
-											className="short-when-added-and-likes"
-										></div>
-									</div>
-								</div>
-							</div>
-						</div>
-						<div id="container-for-comments-in-modal"></div>
 					</div>
 					<section id="icons-in-comments-section-modal" className="icons-in-comments-section"></section>
-
 					<section id="number-of-likes-section-modal" className="number-of-likes-section"></section>
 					<div id="when-added-div-modal" className="added-div"></div>
 					<div id="div-for-comment-section-in-comment-modal"></div>
