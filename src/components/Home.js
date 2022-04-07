@@ -165,6 +165,7 @@ function Home() {
 	const [users, setUsers] = useState([]);
 	const [firestoreDocId, setfirestoreDocId] = useState("");
 	const didMount = useRef(false);
+	const lastFollowEdit = useRef();
 	let num = 0;
 	let num2 = 0;
 
@@ -188,6 +189,8 @@ function Home() {
 			});
 			return newUsers;
 		});
+		lastFollowEdit.current = who;
+
 		getDocId(who).then((id) =>
 			updateDoc(doc(getFirestore(), "usernames", id), { followers: arrayUnion(username) })
 		);
@@ -224,6 +227,7 @@ function Home() {
 			});
 			return newUsers;
 		});
+		lastFollowEdit.current = who;
 		getDocId(who).then((id) =>
 			updateDoc(doc(getFirestore(), "usernames", id), { followers: arrayRemove(username) })
 		);
@@ -238,14 +242,14 @@ function Home() {
 		} else if (document.getElementById("drop-down").style.display === "flex") {
 			let userD;
 			users.forEach((user) => {
-				if (user.username === following[following.length - 1]) {
+				if (user.username === lastFollowEdit.current) {
 					userD = user;
 				}
 			});
-
+			
 			ReactDOM.render(
 				<DropDown
-					username={following[following.length - 1]}
+					username={lastFollowEdit.current}
 					following={following}
 					follow={follow}
 					unFollow={unFollow}

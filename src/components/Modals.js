@@ -3,10 +3,10 @@ import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword } f
 import { getFirestore, addDoc, collection, getDocs } from "firebase/firestore";
 import React, { useState, useEffect } from "react";
 import ava from "../img/ava.jpeg";
-import { dropDown, hideDropDown, showSignUpModal } from "./Home";
+import { showSignUpModal } from "./Home";
 import testPic from "../img/test-img.jpg";
 import "../styles/Modals.css";
-import { shareIcon, PictureCardHeader } from "./PictureCard";
+import { shareIcon} from "./PictureCard";
 import uniqid from "uniqid";
 import { homeIcon, searchFunction, showSignInModal } from "./Nav";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -319,6 +319,13 @@ function SignInModal() {
 	);
 }
 
+function hideUnFollowModal() {
+	const modal = document.getElementById("unfollow-modal");
+	window.history.back();
+	modal.style.display = "none";
+}
+
+
 function UnfollowModal() {
 	useEffect(() => {
 		const unfollowModal = document.getElementById("unfollow-modal");
@@ -330,17 +337,11 @@ function UnfollowModal() {
 		});
 	},[]);
 
-	function hideUnFollowModal() {
-		const modal = document.getElementById("unfollow-modal");
-		window.history.back();
-		modal.style.display = "none";
-	}
-
 	return (
 		<div id="unfollow-modal" className="modal">
-			<div className="unfollow-modal-content">
-				<span>Unfollow</span>
-				<span onClick={() => hideUnFollowModal()}>Cancel</span>
+			<div id="unfollow-modal-content" className="unfollow-modal-content">
+				{/* <span>Unfollow</span>
+				<span onClick={() => hideUnFollowModal()}>Cancel</span> */}
 			</div>
 		</div>
 	);
@@ -797,3 +798,4 @@ function Modals() {
 }
 
 export default Modals;
+export { hideUnFollowModal}

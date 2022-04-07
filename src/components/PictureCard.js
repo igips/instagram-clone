@@ -6,10 +6,11 @@ import { getUserData } from "..";
 import ava from "../img/ava.jpeg";
 import testPic from "../img/test-img.jpg";
 import "../styles/PictureCard.css";
-import { dropDown, hideDropDown} from "./Home.js";
+import { dropDown, hideDropDown } from "./Home.js";
 import { showSignInModal } from "./Nav";
 import ReactTimeAgo from "react-time-ago";
 import Picker from "emoji-picker-react";
+import { hideUnFollowModal } from "./Modals";
 
 window.addEventListener("popstate", (e) => {
 	const likesModal = document.getElementById("likes-modal");
@@ -91,20 +92,6 @@ window.addEventListener("popstate", (e) => {
 	}
 });
 
-function options() {
-	const user = getAuth().currentUser;
-
-	if (user) {
-		const modal = document.getElementById("unfollow-modal");
-		if (!window.location.href.includes("optionsM")) {
-			window.history.pushState("optionsM", "Title", "optionsM");
-		}
-
-		modal.style.display = "flex";
-	} else {
-		showSignInModal();
-	}
-}
 
 function likeCommentIconClicked(users, username) {
 	if (users.includes(username)) {
@@ -568,7 +555,9 @@ function Comments(props) {
 													props.follow,
 													props.unFollow,
 													props.following,
-													props.addToFlag
+													props.addToFlag,
+													"comms"
+													
 												)
 											}
 											className="short-when-added-and-likes"
@@ -726,6 +715,7 @@ function PictureCardHeader(props) {
 										e,
 										"avaPic"
 									);
+									props.addToFlag();
 								}}
 								onMouseLeave={() => {
 									props.addToFlag();
@@ -754,6 +744,7 @@ function PictureCardHeader(props) {
 									props.unFollow,
 									e
 								);
+								props.addToFlag();	
 							}}
 							onMouseLeave={() => {
 								props.addToFlag();
@@ -766,7 +757,7 @@ function PictureCardHeader(props) {
 						</span>
 					</div>
 				</header>
-				<div onClick={() => options()} className="picture-card-header-options">
+				<div onClick={() => options(getUserDataFromUsersArray(props.users, props.username), props.following,  props.follow, props.unFollow)} className="picture-card-header-options">
 					<div className="picture-card-header-options-inner">
 						<svg
 							aria-label="More options"
@@ -785,6 +776,67 @@ function PictureCardHeader(props) {
 				</div>
 			</div>
 		</div>
+	);
+}
+
+function options(userData, following, follow, unFollow) {
+	const user = getAuth().currentUser;
+
+	if (user) {
+		const modal = document.getElementById("unfollow-modal");
+		if (!window.location.href.includes("optionsM")) {
+			window.history.pushState("optionsM", "Title", "optionsM");
+		}
+
+		ReactDOM.render(<Options userData={userData} following={following} follow={follow} unFollow={unFollow}/>, document.getElementById("unfollow-modal-content"))
+
+		modal.style.display = "flex";
+		
+	} else {
+		showSignInModal();
+	}
+}
+
+function Options(props) {
+
+	function buttons() {
+		const user = getAuth().currentUser;
+
+		if(user.uid === props.userData.uid) {
+			return (
+				<>
+					<span>Delete</span>
+					<span>Edit</span>
+				</>
+				
+			);
+
+		} else if(props.following.includes(props.userData.username)) {
+			return (
+				<>
+					<span onClick={() => {props.unFollow(props.userData.username); hideUnFollowModal()}}>Unfollow</span>
+				</>
+			);
+
+		} else if(!props.following.includes(props.userData.username)) {
+			return (
+				<>
+					<span onClick={() => {props.follow(props.userData.username); hideUnFollowModal()}}>Follow</span>
+				</>
+			);
+
+
+		}
+
+		
+		
+	}
+
+	return(
+		<>
+			{buttons()}
+			<span onClick={() => hideUnFollowModal()}>Cancel</span>	
+		</>
 	);
 }
 
@@ -950,7 +1002,8 @@ function PictureCardNumOfLikesSection(props) {
 						props.follow,
 						props.unFollow,
 						props.following,
-						props.addToFlag
+						props.addToFlag,
+						"pic"
 					)
 				}
 				className="likes-span"
@@ -961,7 +1014,7 @@ function PictureCardNumOfLikesSection(props) {
 	);
 }
 
-function showLikesModal(likes, users, follow, unFollow, following, addToFlag) {
+function showLikesModal(likes, users, follow, unFollow, following, addToFlag, info) {
 	const modal = document.getElementById("likes-modal");
 	const container = document.getElementById("list-of-likes-div-inner");
 	if (!window.location.href.includes("likesM")) {
@@ -978,6 +1031,7 @@ function showLikesModal(likes, users, follow, unFollow, following, addToFlag) {
 			following={following}
 			addToFlag={addToFlag}
 			likes={likes}
+			info={info}
 		/>,
 		container
 	);
@@ -985,8 +1039,43 @@ function showLikesModal(likes, users, follow, unFollow, following, addToFlag) {
 
 function Likes(props) {
 	const [signedIn, setSignedIn] = useState(false);
+	const test = useRef("");
+	const test2 = useRef("");
+	
+	const c = () => {
+		if(props.info === "comms") {
+			test2.current = "comms";
 
-	const likes = props.likes.users ? props.likes.users : props.likes.likes.users;
+		} else if(props.info === "pic") {
+			test2.current = "pic";
+		}
+	}
+
+	c();
+
+	const a = () => {
+		if(props.likes.users) {
+			return props.likes.users;
+
+		} else if(props.likes.likes.users) {
+			test.current = props.likes.id;
+			return props.likes.likes.users;
+		}
+	}
+
+	let likes = a();
+
+	const b = () => {
+		if(props.comments) {
+			props.comments.forEach((comment) => {
+				if(comment.id === test.current && test2.current === "comms") {
+					likes = comment.likes.users;
+				}
+			})
+		}
+	}
+
+	b();
 
 	onAuthStateChanged(getAuth(), (user) => {
 		if (user) {
@@ -999,15 +1088,31 @@ function Likes(props) {
 	function followButtonForLikes(user) {
 		const userR = getAuth().currentUser;
 
-		if (signedIn && !props.following.includes(user) && getUserDataFromUsersArray(props.users, user).uid !== userR.uid) {
+		if (
+			signedIn &&
+			!props.following.includes(user) &&
+			getUserDataFromUsersArray(props.users, user).uid !== userR.uid
+		) {
 			return (
-				<button onClick={() => {props.addToFlag(); props.follow(user)}} className="likes-modal-follow">
+				<button
+					onClick={() => {
+						props.addToFlag();
+						props.follow(user);
+					}}
+					className="likes-modal-follow"
+				>
 					Follow
 				</button>
 			);
 		} else if (signedIn && props.following.includes(user)) {
 			return (
-				<button onClick={() => {props.addToFlag(); props.unFollow(user)}} className="likes-modal-follow sug-box-left-follow-active">
+				<button
+					onClick={() => {
+						props.addToFlag();
+						props.unFollow(user);
+					}}
+					className="likes-modal-follow sug-box-left-follow-active"
+				>
 					Following
 				</button>
 			);
@@ -1077,6 +1182,8 @@ function PictureCard(props) {
 	const [flag, setFlag] = useState(0);
 	const [flag2, setFlag2] = useState(0);
 	const prev = useRef({ flag2, flag });
+	const didMount = useRef(false);
+
 
 	onAuthStateChanged(getAuth(), (user) => {
 		if (user) {
@@ -1088,6 +1195,7 @@ function PictureCard(props) {
 
 	function addToFlag() {
 		setFlag(flag + 1);
+		
 	}
 
 	function likePicture() {
@@ -1170,12 +1278,17 @@ function PictureCard(props) {
 				document.getElementById("icons-in-comments-section-modal")
 			);
 		}
-
-		
 	}, [likes]);
 
 	useEffect(() => {
 		setFlag2(flag2 + 1);
+	}, [props.following]);
+
+
+	useEffect(() => {
+		if (!didMount.current) {
+			return (didMount.current = true);
+		}
 
 		if (prev.current.flag2 !== flag2 && prev.current.flag !== flag) {
 			if (document.getElementById("comments-modal").style.display === "flex") {
@@ -1209,7 +1322,7 @@ function PictureCard(props) {
 				);
 			}
 
-			if(document.getElementById("likes-modal").style.display === "flex") {
+			if (document.getElementById("likes-modal").style.display === "flex") {
 				ReactDOM.render(
 					<Likes
 						users={props.users}
@@ -1218,15 +1331,15 @@ function PictureCard(props) {
 						following={props.following}
 						addToFlag={addToFlag}
 						likes={likes}
+						comments={comments}
 					/>,
 					document.getElementById("list-of-likes-div-inner")
 				);
 			}
-			prev.current = { flag2, flag };
+			// prev.current = { flag2, flag };
+			prev.current.flag2 = flag;
 		}
-
-		
-	}, [props.following]);
+	}, [flag2]);
 
 	useEffect(() => {
 		if (document.getElementById("comments-modal").style.display === "flex") {

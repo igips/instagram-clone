@@ -51,7 +51,6 @@
 	width: 400px;
 	border-radius: 5px;
 	border: 1px solid rgba(219, 219, 219);
-	color: rgba(237, 73, 86);
 	cursor: pointer;
 	display: flex;
 	flex-direction: column;
@@ -60,15 +59,22 @@
 	background-color: rgba(255, 255, 255);
 }
 
-.unfollow-modal-content span {
+.unfollow-modal-content span  {
 	height: 48px;
 	display: flex;
 	align-items: center;
 	justify-content: center;
+	border-top: 1px solid rgba(219, 219, 219);
 }
 
+.unfollow-modal-content span:first-child {
+	color: rgba(237, 73, 86);
+	border-top: none;
+}
+
+
 .unfollow-modal-content span:last-child {
-	border-top: 1px solid rgba(219, 219, 219);
+	
 	color: #222;
 	font-weight: 500;
 }
@@ -398,14 +404,14 @@
 	cursor: default;
 }
 
-.share-modal-single-result {
+.share-modal-single-result, .noti-modal-single-result {
 	height: 60px;
 	display: flex;
 	align-items: center;
 	padding: 8px 16px 8px 16px;
 }
 
-.share-modal-single-result img {
+.share-modal-single-result img, .noti-modal-single-result img {
 	cursor: pointer;
 	height: 44px;
 	width: 44px;
@@ -413,10 +419,14 @@
 	margin-right: 12px;
 }
 
+
+
 .share-modal-single-result span {
 	font-weight: bold;
 	cursor: pointer;
 }
+
+
 
 .div-for-checkbox-button {
 	width: 40px;
