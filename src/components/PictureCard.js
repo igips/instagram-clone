@@ -7,10 +7,12 @@ import ava from "../img/ava.jpeg";
 import testPic from "../img/test-img.jpg";
 import "../styles/PictureCard.css";
 import { dropDown, hideDropDown } from "./Home.js";
-import { showSignInModal } from "./Nav";
+import { homeIcon, showSignInModal } from "./Nav";
 import ReactTimeAgo from "react-time-ago";
 import Picker from "emoji-picker-react";
 import { hideUnFollowModal } from "./Modals";
+
+
 
 window.addEventListener("popstate", (e) => {
 	const likesModal = document.getElementById("likes-modal");
@@ -20,6 +22,7 @@ window.addEventListener("popstate", (e) => {
 	const signInModal = document.getElementById("login-modal");
 	const signUpModal = document.getElementById("register-modal");
 	const searchModal = document.getElementById("search-modal-container");
+	const notiModal = document.getElementById("notification-modal-container");
 	const user = getAuth().currentUser;
 
 	if (
@@ -51,6 +54,9 @@ window.addEventListener("popstate", (e) => {
 		commsModal.style.display = "none";
 	} else if (searchModal.style.display === "flex") {
 		searchModal.style.display = "none";
+
+	} else if(notiModal.style.display === "flex") {
+		notiModal.style.display = "none";
 	}
 
 	if (window.location.href.includes("signUpM") && user) {
@@ -79,6 +85,9 @@ window.addEventListener("popstate", (e) => {
 		optionsModal.style.display = "flex";
 	} else if (window.location.href.includes("searchM")) {
 		searchModal.style.display = "flex";
+
+	} else if(window.location.href.includes("notiM")) {
+		notiModal.style.display = "flex";
 	}
 
 	if (window.location.href === "http://localhost:3000/") {
@@ -89,6 +98,8 @@ window.addEventListener("popstate", (e) => {
 		signInModal.style.display = "none";
 		signUpModal.style.display = "none";
 		searchModal.style.display = "none";
+		notiModal.style.display = "none";
+		homeIcon();
 	}
 });
 
@@ -1448,4 +1459,4 @@ function PictureCard(props) {
 }
 
 export default PictureCard;
-export { options, PictureCardHeader, AddCommentSection, likeCommentIcon, shareIcon };
+export { options, PictureCardHeader, AddCommentSection, likeCommentIcon, shareIcon,  getUserDataFromUsersArray };
