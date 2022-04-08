@@ -4,11 +4,9 @@ import { getAuth, signOut, onAuthStateChanged } from "firebase/auth";
 import ava from "../img/ava.jpeg";
 import { homeIcon, showSignInModal } from "./Nav";
 import testPic from "../img/test-img.jpg";
-import { useEffect, useRef, useState } from "react";
-import { getDocId, getUserData, getUsers } from "..";
 import uniqid from "uniqid";
-import { arrayRemove, arrayUnion, doc, getFirestore, updateDoc } from "firebase/firestore";
 import ReactDOM from "react-dom";
+import { useState } from "react";
 
 function dropDown(userData, following, follow, unFollow, e, ele, right) {
 	if (window.innerWidth > 650) {
@@ -158,136 +156,11 @@ function DropDown(props) {
 	);
 }
 
-function Home() {
-	const [signedIn, setSignedIn] = useState(false);
-	const [username, setUsername] = useState("");
-	const [following, setFollowing] = useState([]);
-	const [users, setUsers] = useState([]);
-	const [firestoreDocId, setfirestoreDocId] = useState("");
-	const didMount = useRef(false);
-	const lastFollowEdit = useRef();
+function Home(props) {
 	let num = 0;
 	let num2 = 0;
 
-	function follow(who, right) {
-		setFollowing([...following, who]);
-		setUsers((oldUsers) => {
-			const newUsers = oldUsers.map((user) => {
-				if (user.username === who) {
-					return {
-						...user,
-						followers: [...user.followers, username],
-					};
-				} else if (user.username === username) {
-					return {
-						...user,
-						following: [...user.following, who],
-					};
-				} else {
-					return user;
-				}
-			});
-			return newUsers;
-		});
-		lastFollowEdit.current = who;
-
-		getDocId(who).then((id) =>
-			updateDoc(doc(getFirestore(), "usernames", id), { followers: arrayUnion(username) })
-		);
-		updateDoc(doc(getFirestore(), "usernames", firestoreDocId), { following: arrayUnion(who) });
-
-		if (right && document.getElementById("likes-modal").style.display !== "flex") {
-			hideDropDown();
-		}
-	}
-
-	function unFollow(who) {
-		setFollowing((oldFollowing) => {
-			const newFollowing = oldFollowing.filter((name) => name !== who);
-			return newFollowing;
-		});
-		setUsers((oldUsers) => {
-			const newUsers = oldUsers.map((user) => {
-				if(user.username === who) {
-					return {
-						...user,
-						followers: user.followers.filter((name) => name !== username),
-					}
-
-				} else if(user.username === username) {
-					return {
-						...user,
-						following: user.following.filter((name) => name !== who),
-					}
-
-				} else {
-					return user;
-				}
-				
-			});
-			return newUsers;
-		});
-		lastFollowEdit.current = who;
-		getDocId(who).then((id) =>
-			updateDoc(doc(getFirestore(), "usernames", id), { followers: arrayRemove(username) })
-		);
-		updateDoc(doc(getFirestore(), "usernames", firestoreDocId), { following: arrayRemove(who) });		
-	}
-
 	
-
-	useEffect(() => {
-		if (!didMount.current) {
-			return (didMount.current = true);
-		} else if (document.getElementById("drop-down").style.display === "flex") {
-			let userD;
-			users.forEach((user) => {
-				if (user.username === lastFollowEdit.current) {
-					userD = user;
-				}
-			});
-			
-			ReactDOM.render(
-				<DropDown
-					username={lastFollowEdit.current}
-					following={following}
-					follow={follow}
-					unFollow={unFollow}
-					userData={userD}
-				/>,
-				document.getElementById("drop-down")
-			);
-		}
-	}, [users]);
-
-	
-
-	useEffect(() => {
-		const user = getAuth().currentUser;
-
-		if (signedIn) {
-			getUserData(user.uid).then((user) => {
-				setfirestoreDocId(user.id);
-				setUsername(user.data().username);
-				setFollowing(user.data().following);
-			});
-		}
-
-		getUsers().then((users) => {
-			shuffleArray(users);
-			setUsers(users);
-		});
-	}, [signedIn]);
-
-	onAuthStateChanged(getAuth(), (user) => {
-		if (user) {
-			setSignedIn(true);
-		} else {
-			setSignedIn(false);
-			setUsername("");
-		}
-	});
-
 	function signOutFromAccount() {
 		signOut(getAuth())
 			.then(() => {
@@ -299,12 +172,6 @@ function Home() {
 	
 	return (
 		<main>
-			<div
-				onMouseOver={() => keepDropDown()}
-				onMouseLeave={() => hideDropDown()}
-				className="drop-down"
-				id="drop-down"
-			></div>
 			<section id="home-section">
 				<div id="home-left-div">
 					<div id="home-left-inner">
@@ -319,15 +186,15 @@ function Home() {
 						<div className="not-visible" id="suggestions-left-div">
 							<span id="for-you-sug-span-left">Suggestions For You</span>
 							<div id="suggestions-left-inner-div">
-								{users.map((user) => {
-									if (!following.includes(user.username) && num < 3 && user.username !== username) {
+								{props.users.map((user) => {
+									if (!props.following.includes(user.username) && num < 3 && user.username !== props.username) {
 										num++;
 										return (
 											<div key={uniqid()} className="sug-box-left">
 												<img className="sug-box-left-ava" src={ava} alt="" />
 												<span style={{ marginBottom: "10px" }}>{user.username}</span>
 												<button
-													onClick={(e) => follow(user.username)}
+													onClick={(e) => props.follow(user.username)}
 													className="sug-box-left-follow"
 												>
 													Follow
@@ -341,25 +208,25 @@ function Home() {
 						</div>
 
 						<PictureCard
-							users={users}
-							follow={follow}
-							unFollow={unFollow}
-							following={following}
-							username={username}
+							users={props.users}
+							follow={props.follow}
+							unFollow={props.unFollow}
+							following={props.following}
+							username={props.username}
 						></PictureCard>
 						<PictureCard
-							users={users}
-							follow={follow}
-							unFollow={unFollow}
-							following={following}
-							username={username}
+							users={props.users}
+							follow={props.follow}
+							unFollow={props.unFollow}
+							following={props.following}
+							username={props.username}
 						></PictureCard>
 						<PictureCard
-							users={users}
-							follow={follow}
-							unFollow={unFollow}
-							following={following}
-							username={username}
+							users={props.users}
+							follow={props.follow}
+							unFollow={props.unFollow}
+							following={props.following}
+							username={props.username}
 						></PictureCard>
 					</div>
 				</div>
@@ -389,14 +256,14 @@ function Home() {
 					<div className="not-visible" id="suggestions-div-right">
 						<span id="for-you-sug-span">Suggestions For You</span>
 						<div id="list-of-sug-div">
-							{users.map((user) => {
-								if (!following.includes(user.username) && num2 < 5 && user.username !== username) {
+							{props.users.map((user) => {
+								if (!props.following.includes(user.username) && num2 < 5 && user.username !== props.username) {
 									num2++;
 									return (
 										<div key={uniqid()} className="right-sug-div-list">
 											<div
 												onMouseEnter={(e) =>
-													dropDown(user, following, follow, unFollow, e, "avaPic", "right")
+													dropDown(user, props.following, props.follow, props.unFollow, e, "avaPic", "right")
 												}
 												onMouseLeave={() => hideDropDown()}
 												className="right-sug-ava-div"
@@ -405,14 +272,14 @@ function Home() {
 											</div>
 											<span
 												onMouseEnter={(e) =>
-													dropDown(user, following, follow, unFollow, e, "no", "right")
+													dropDown(user, props.following, props.follow, props.unFollow, e, "no", "right")
 												}
 												onMouseLeave={() => hideDropDown()}
 												className="sug-login-right"
 											>
 												{user.username}
 											</span>
-											<button onClick={(e) => follow(user.username)} className="sug-right-follow">
+											<button onClick={(e) => props.follow(user.username)} className="sug-right-follow">
 												Follow
 											</button>
 										</div>
@@ -428,4 +295,4 @@ function Home() {
 }
 
 export default Home;
-export { dropDown, hideDropDown, keepDropDown, followMobile, showSignUpModal };
+export { dropDown, hideDropDown, keepDropDown, followMobile, showSignUpModal, shuffleArray, DropDown };
