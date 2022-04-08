@@ -6,13 +6,13 @@ import ava from "../img/ava.jpeg";
 import { showSignUpModal } from "./Home";
 import testPic from "../img/test-img.jpg";
 import "../styles/Modals.css";
-import { shareIcon} from "./PictureCard";
+import { shareIcon } from "./PictureCard";
 import uniqid from "uniqid";
-import { homeIcon, searchFunction, showSignInModal } from "./Nav";
+import { followButtonForNoti, homeIcon, searchFunction, showSignInModal } from "./Nav";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faSpinner } from "@fortawesome/free-solid-svg-icons";
 import { faCircleXmark } from "@fortawesome/free-regular-svg-icons";
-
+import ReactTimeAgo from "react-time-ago";
 
 function closeModal(modal) {
 	return (
@@ -60,7 +60,7 @@ function SignUpModal() {
 				clearSignUpInputs();
 			}
 		});
-	},[]);
+	}, []);
 
 	function closeSignUpModal() {
 		const signUpModal = document.getElementById("register-modal");
@@ -126,6 +126,8 @@ function SignUpModal() {
 							following: [],
 							followers: [],
 							posts: [],
+							unReadNoti: 0,
+							notifications: [],
 						});
 
 						closeSignUpModal();
@@ -223,7 +225,7 @@ function SignInModal() {
 				clearSigInInputs();
 			}
 		});
-	},[]);
+	}, []);
 
 	function closeSignInModal() {
 		const signInModal = document.getElementById("login-modal");
@@ -325,7 +327,6 @@ function hideUnFollowModal() {
 	modal.style.display = "none";
 }
 
-
 function UnfollowModal() {
 	useEffect(() => {
 		const unfollowModal = document.getElementById("unfollow-modal");
@@ -335,7 +336,7 @@ function UnfollowModal() {
 				hideUnFollowModal();
 			}
 		});
-	},[]);
+	}, []);
 
 	return (
 		<div id="unfollow-modal" className="modal">
@@ -356,7 +357,7 @@ function LikesModal() {
 				hideLikesModal();
 			}
 		});
-	},[]);
+	}, []);
 
 	function hideLikesModal() {
 		const modal = document.getElementById("likes-modal");
@@ -388,7 +389,7 @@ function CommentsModal() {
 				hideCommentsModal();
 			}
 		});
-	},[]);
+	}, []);
 
 	function hideCommentsModal() {
 		const modal = document.getElementById("comments-modal");
@@ -440,8 +441,7 @@ function CommentsModal() {
 						{shareIcon()}
 					</div>
 					<div id="comments-modal-header-section"></div>
-					<div id="modal-comments-section">
-					</div>
+					<div id="modal-comments-section"></div>
 					<section id="icons-in-comments-section-modal" className="icons-in-comments-section"></section>
 					<section id="number-of-likes-section-modal" className="number-of-likes-section"></section>
 					<div id="when-added-div-modal" className="added-div"></div>
@@ -466,7 +466,7 @@ function ShareModal() {
 				hideShareModal();
 			}
 		});
-	},[]);
+	}, []);
 
 	function handleShareSearchUser(e) {
 		const div = document.getElementById("share-to-modal-search-results");
@@ -684,9 +684,7 @@ function SearchModal() {
 		const modal = document.getElementById("search-modal-container");
 		modal.style.display = "none";
 		window.history.back();
-		cancelSearch();	
-		homeIcon();	
-		
+		cancelSearch();
 	}
 
 	function handleSearch(e) {
@@ -699,7 +697,6 @@ function SearchModal() {
 			setSearchResults([]);
 			notFound.style.display = "none";
 			closeSearch.style.display = "none";
-			
 		}
 
 		setSearchValue(e.target.value);
@@ -724,7 +721,6 @@ function SearchModal() {
 
 				closeSearch.style.display = "flex";
 			});
-
 		} else if (e.target.value === "") {
 			hideSearchResultDiv();
 		}
@@ -736,9 +732,6 @@ function SearchModal() {
 		document.getElementById("not-found-modal").style.display = "none";
 		document.getElementById("close-search-result-div-modal").style.display = "none";
 	}
-
-
-
 
 	return (
 		<div id="search-modal-container">
@@ -783,7 +776,57 @@ function SearchModal() {
 	);
 }
 
-function Modals() {
+function NotificationModal(props) {
+
+	
+	useEffect(() => {
+		if (props.notifications.length === 0) {
+			document.getElementById("no-notifications-modal").style.display = "flex";
+		} else {
+			document.getElementById("no-notifications-modal").style.display = "none";
+		}
+	}, [props.notifications]);
+
+
+
+	function hideNotificationsModal() {
+		const modal = document.getElementById("notification-modal-container");
+		modal.style.display = "none";
+		window.history.back();
+	}
+
+	return (
+		<div id="notification-modal-container">
+			<div id="notification-modal-header">
+				<span>Notifications</span>
+				{closeModal(hideNotificationsModal)}
+			</div>
+			<div id="notifications-modal-noti">
+				<div id="no-notifications-modal">No notifications</div>
+				{props.notifications
+					.slice(0)
+					.reverse()
+					.map((result) => {
+						return (
+							<div key={uniqid()} className="noti-modal-single-result-mobile">
+								<img src={ava} alt="" />
+								<div><span className="noti-mobile-user-span">{result.username + " "}</span>{result.content + " "}<span className="noti-date-mobile">
+									<ReactTimeAgo
+										timeStyle="mini-minute-now"
+										date={new Date(result.date)}
+										locale="en-US"
+									/>
+								</span></div>
+								{followButtonForNoti(result.username, props.following, props.username, props.follow, props.unFollow)}
+							</div>
+						);
+					})}
+			</div>
+		</div>
+	);
+}
+
+function Modals(props) {
 	return (
 		<>
 			<SearchModal />
@@ -793,9 +836,10 @@ function Modals() {
 			<LikesModal />
 			<CommentsModal />
 			<ShareModal />
+			<NotificationModal notifications={props.notifications} following={props.following} username={props.username} follow={props.follow} unFollow={props.unFollow} />
 		</>
 	);
 }
 
 export default Modals;
-export { hideUnFollowModal}
+export { hideUnFollowModal };
