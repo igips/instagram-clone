@@ -21,6 +21,8 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig);
 
+
+
 async function getUserData(id) {
 	const data = await getDocs(collection(getFirestore(), "usernames"));
 	let userData;
