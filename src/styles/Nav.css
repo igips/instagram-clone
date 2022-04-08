@@ -150,14 +150,16 @@
 	background-color: rgba(255, 255, 255);
 	border: 1px solid rgba(255,255,255);
 	transform: rotate(45deg);
-	box-shadow: 0 0 5px 1px rgb(0 0 0 / 10%);
-	z-index: 1000;
+	/* box-shadow: 0 0 5px 1px rgb(0 0 0 / 10%); */
+	box-shadow: -7px -8px 13px 0px rgb(0 0 0 / 10%);
+	z-index: 9000000;
 }
 
 #notification-arrow-div {
 	top: 125%;
 	left: 24.5%;
 	cursor: default;
+	
 }
 
 .svg-div {
@@ -204,12 +206,47 @@
     color: #8e8e8e;
 }
 
-#no-notifications {
+#no-notifications, #no-notifications-modal {
 	align-self: center;
 	margin-top: auto;
 	margin-bottom: auto;
 	color: #8e8e8e;
 	
+}
+
+
+
+#noti-amount {
+	position: absolute;
+	justify-content: center;
+	align-items: center;
+	right: -8px;
+	top: -6px;
+	border-radius: 100px;
+	width: 18px;
+	height: 18px;
+	background-color: #ed4956;
+	color: rgba(255, 255, 255);
+	font-size: 11px;
+	padding: 0 3px;
+	display: none;
+}
+
+#noti-amount-mobile {
+	background: #ed4956;
+	border-radius: 2px;
+	bottom: 5px;
+	height: 4px;
+	left: 0;
+	margin: 0 auto;
+	position: absolute;
+	right: 0;
+	transform: translateX(-0.5px);
+	width: 4px;
+}
+
+#mobile-noti-icon {
+	position: relative;
 }
 
 #not-found, #spinner, #not-found-share-modal, #spinner-share-modal, #spinner-modal, #not-found-modal {
@@ -241,6 +278,8 @@
 #search-results-div .share-modal-single-result:hover {
 	background-color: #fafafa;
 }
+
+
 
 
 
