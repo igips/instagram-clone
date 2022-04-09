@@ -7,102 +7,10 @@ import ava from "../img/ava.jpeg";
 import testPic from "../img/test-img.jpg";
 import "../styles/PictureCard.css";
 import { dropDown, hideDropDown } from "./Home.js";
-import { homeIcon, showSignInModal } from "./Nav";
+import {showSignInModal } from "./Nav";
 import ReactTimeAgo from "react-time-ago";
 import Picker from "emoji-picker-react";
 import { hideUnFollowModal } from "./Modals";
-
-
-
-window.addEventListener("popstate", (e) => {
-	const likesModal = document.getElementById("likes-modal");
-	const commsModal = document.getElementById("comments-modal");
-	const shareModal = document.getElementById("share-modal");
-	const optionsModal = document.getElementById("unfollow-modal");
-	const signInModal = document.getElementById("login-modal");
-	const signUpModal = document.getElementById("register-modal");
-	const searchModal = document.getElementById("search-modal-container");
-	const notiModal = document.getElementById("notification-modal-container");
-	const user = getAuth().currentUser;
-
-	if (
-		(likesModal.style.display === "flex" && commsModal.style.display === "flex") ||
-		likesModal.style.display === "flex"
-	) {
-		likesModal.style.display = "none";
-	} else if (
-		(shareModal.style.display === "flex" && commsModal.style.display === "flex") ||
-		shareModal.style.display === "flex"
-	) {
-		shareModal.style.display = "none";
-	} else if (
-		(optionsModal.style.display === "flex" && commsModal.style.display === "flex") ||
-		optionsModal.style.display === "flex"
-	) {
-		optionsModal.style.display = "none";
-	} else if (
-		(signInModal.style.display === "flex" && commsModal.style.display === "flex") ||
-		signInModal.style.display === "flex"
-	) {
-		signInModal.style.display = "none";
-	} else if (
-		(signUpModal.style.display === "flex" && commsModal.style.display === "flex") ||
-		signUpModal.style.display === "flex"
-	) {
-		signUpModal.style.display = "none";
-	} else if (commsModal.style.display === "flex") {
-		commsModal.style.display = "none";
-	} else if (searchModal.style.display === "flex") {
-		searchModal.style.display = "none";
-
-	} else if(notiModal.style.display === "flex") {
-		notiModal.style.display = "none";
-	}
-
-	if (window.location.href.includes("signUpM") && user) {
-		signUpModal.style.display = "none";
-		window.history.pushState("/", "Title", "/");
-	} else if (window.location.href.includes("signInM") && user) {
-		signInModal.style.display = "none";
-		window.history.pushState("/", "Title", "/");
-	} else if (window.location.href.includes("signUpM") && !user) {
-		signUpModal.style.display = "flex";
-	} else if (window.location.href.includes("signInM") && !user) {
-		signInModal.style.display = "flex";
-	} else if (window.location.href.includes("shareM") && !user) {
-		shareModal.style.display = "none";
-		window.history.pushState("/", "Title", "/");
-	} else if (window.location.href.includes("shareM") && user) {
-		shareModal.style.display = "flex";
-	} else if (window.location.href.includes("commentsM")) {
-		commsModal.style.display = "flex";
-	} else if (window.location.href.includes("likesM")) {
-		likesModal.style.display = "flex";
-	} else if (window.location.href.includes("optionsM") && !user) {
-		optionsModal.style.display = "none";
-		window.history.pushState("/", "Title", "/");
-	} else if (window.location.href.includes("optionsM") && user) {
-		optionsModal.style.display = "flex";
-	} else if (window.location.href.includes("searchM")) {
-		searchModal.style.display = "flex";
-
-	} else if(window.location.href.includes("notiM")) {
-		notiModal.style.display = "flex";
-	}
-
-	if (window.location.href === "http://localhost:3000/") {
-		likesModal.style.display = "none";
-		shareModal.style.display = "none";
-		optionsModal.style.display = "none";
-		commsModal.style.display = "none";
-		signInModal.style.display = "none";
-		signUpModal.style.display = "none";
-		searchModal.style.display = "none";
-		notiModal.style.display = "none";
-		homeIcon();
-	}
-});
-
 
 function likeCommentIconClicked(users, username) {
 	if (users.includes(username)) {

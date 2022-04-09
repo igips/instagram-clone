@@ -1,6 +1,6 @@
 import "../styles/Nav.css";
 import ava from "../img/ava.jpeg";
-import { getAuth, onAuthStateChanged } from "firebase/auth";
+import { getAuth, onAuthStateChanged, signOut } from "firebase/auth";
 import { getFirestore, collection, getDocs } from "firebase/firestore";
 import { useEffect, useState } from "react";
 import uniqid from "uniqid";
@@ -8,7 +8,8 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faSpinner } from "@fortawesome/free-solid-svg-icons";
 import { faCircleXmark } from "@fortawesome/free-regular-svg-icons";
 import ReactTimeAgo from "react-time-ago";
-import { getUserDataFromUsersArray } from "./PictureCard";
+import { HomeIconSvg, ProfileIconDrop, SettingsIcon, ThemeIcon } from "./icons.js";
+
 
 function showSignInModal() {
 	const modal = document.getElementById("login-modal");
@@ -109,14 +110,6 @@ function searchIcon() {
 	if (!window.location.href.includes("searchM")) {
 		window.history.pushState("searchM", "Title", "searchM");
 	}
-
-	//const user = getAuth().currentUser;
-	// if (user) {
-	// messageIconNotClicked();
-	// notificationIconNotClicked();
-	// avatarIconNotClicked();
-	// } else {
-	// }
 }
 
 function mobileNotificationIcon(e) {
@@ -134,7 +127,6 @@ function mobileNotificationIcon(e) {
 		if (!window.location.href.includes("notiM")) {
 			window.history.pushState("notiM", "Title", "notiM");
 		}
-
 	} else {
 		showSignInModal();
 	}
@@ -156,6 +148,8 @@ function notificationIcon(e) {
 			searchIconNotClicked();
 			avatarIconNotClicked();
 
+			document.getElementById("profile-arrow-div").style.display = "none";
+			document.getElementById("profile-div").style.display = "none";
 			document.getElementById("notification-arrow-div").style.display = "flex";
 			document.getElementById("notification-div").style.display = "flex";
 		}
@@ -186,12 +180,35 @@ function messageIcon() {
 	}
 }
 
-function avatarIcon() {
-	avatarIconClicked();
-	messageIconNotClicked();
-	homeIconNotClicked();
-	notificationIconNotClicked();
-	searchIconNotClicked();
+function avatarIcon(e) {
+	if (document.getElementById("profile-arrow-div").style.display === "flex" && e.target.tagName === "IMG") {
+		closeAvatar();
+	} else {
+		avatarIconClicked();
+		messageIconNotClicked();
+		homeIconNotClicked();
+		notificationIconNotClicked();
+		searchIconNotClicked();
+
+		document.getElementById("notification-div").style.display = "none";
+		document.getElementById("notification-arrow-div").style.display = "none";
+		document.getElementById("profile-arrow-div").style.display = "flex";
+		document.getElementById("profile-div").style.display = "flex";
+	}
+}
+
+function closeAvatar() {
+	if (
+		window.location.href === "http://localhost:3000/" ||
+		window.location.href === "http://localhost:3000/commentsM" ||
+		window.location.href === "http://localhost:3000/optionsM" ||
+		window.location.href === "http://localhost:3000/likesM" ||
+		window.location.href === "http://localhost:3000/shareM"
+	) {
+		homeIcon();
+	}
+	document.getElementById("profile-arrow-div").style.display = "none";
+	document.getElementById("profile-div").style.display = "none";
 }
 
 function addPostIcon() {
@@ -261,6 +278,14 @@ function Nav(props) {
 	const [searchValue, setSearchValue] = useState("");
 	const [searchResults, setSearchResults] = useState([]);
 
+	function signOutFromAccount() {
+		signOut(getAuth())
+			.then(() => {
+				// homeIcon();
+			})
+			.catch((error) => {});
+	}
+
 	useEffect(() => {
 		window.addEventListener("click", (e) => {
 			let found = false;
@@ -282,8 +307,19 @@ function Nav(props) {
 					}
 				});
 
-				if (!found) {
+				if (!found && document.getElementById("profile-arrow-div").style.display !== "flex") {
 					closeNotification();
+				}
+
+			} else if (document.getElementById("profile-arrow-div").style.display === "flex") {
+				e.path.forEach((ele) => {
+					if (ele.id === "profile-drop-div") {
+						found = true;
+					}
+				});
+
+				if (!found) {
+					closeAvatar();
 				}
 			}
 		});
@@ -376,9 +412,11 @@ function Nav(props) {
 		if (user) {
 			return (
 				<>
-					<div className="border-for-avatar"> </div>
+					<div onClick={() => closeAvatar()} className="border-for-avatar">
+						{" "}
+					</div>
 					<span
-						onClick={() => avatarIcon()}
+						onClick={(e) => avatarIcon(e)}
 						role="link"
 						tabIndex="0"
 						style={{ width: "24px", height: "24px" }}
@@ -465,24 +503,7 @@ function Nav(props) {
 						</div>
 						<div id="icon-div">
 							<div onClick={() => homeIcon()} className="icon-inner-div icon-to-hide">
-								<svg
-									aria-label="Home"
-									color="#262626"
-									fill="#262626"
-									height="24"
-									role="img"
-									viewBox="0 0 24 24"
-									width="24"
-								>
-									<path
-										className="svh-path home-icon"
-										d="M9.005 16.545a2.997 2.997 0 012.997-2.997h0A2.997 2.997 0 0115 16.545V22h7V11.543L12 2 2 11.543V22h7.005z"
-										fill="black"
-										stroke="currentColor"
-										strokeLinejoin="round"
-										strokeWidth="2"
-									></path>
-								</svg>
+								{HomeIconSvg()}
 							</div>
 							<div onClick={() => messageIcon()} className="icon-inner-div">
 								<svg
@@ -586,7 +607,13 @@ function Nav(props) {
 															locale="en-US"
 														/>
 													</span>
-													{followButtonForNoti(result.username, props.following, props.username, props.follow, props.unFollow)}
+													{followButtonForNoti(
+														result.username,
+														props.following,
+														props.username,
+														props.follow,
+														props.unFollow
+													)}
 												</div>
 											);
 										})}
@@ -605,7 +632,33 @@ function Nav(props) {
 									</svg>
 								</div>
 							</div>
-							<div className="icon-inner-div icon-to-hide">{profileIcon()}</div>
+							<div id="profile-drop-div" className="icon-inner-div icon-to-hide">
+								<div id="profile-arrow-div"></div>
+								<div id="profile-div">
+									<div className="profile-drop-down-single-div">
+										<div className="profile-drop-icon">{ProfileIconDrop()}</div>
+										<div className="profile-drop-tex">Profile</div>
+									</div>
+									<div className="profile-drop-down-single-div">
+										<div className="profile-drop-icon">{SettingsIcon()}</div>
+										<div className="profile-drop-tex">Settings</div>
+									</div>
+									<div className="profile-drop-down-single-div">
+										<div className="profile-drop-icon">{ThemeIcon()}</div>
+										<div className="profile-drop-tex">Change Theme</div>
+									</div>
+									<div
+										onClick={() => {
+											signOutFromAccount();
+											closeAvatar();
+										}}
+										className="profile-drop-down-single-div"
+									>
+										<div className="profile-drop-tex">Log Out</div>
+									</div>
+								</div>
+								{profileIcon()}
+							</div>
 						</div>
 					</div>
 				</div>
@@ -613,24 +666,7 @@ function Nav(props) {
 			<nav id="bottom-nav">
 				<div className="nav-container-bottom">
 					<div onClick={() => homeIcon()} className="icon-inner-div inner-bottom">
-						<svg
-							aria-label="Home"
-							color="#262626"
-							fill="#262626"
-							height="24"
-							role="img"
-							viewBox="0 0 24 24"
-							width="24"
-						>
-							<path
-								className="svh-path home-icon"
-								d="M9.005 16.545a2.997 2.997 0 012.997-2.997h0A2.997 2.997 0 0115 16.545V22h7V11.543L12 2 2 11.543V22h7.005z"
-								fill="black"
-								stroke="currentColor"
-								strokeLinejoin="round"
-								strokeWidth="2"
-							></path>
-						</svg>
+						{HomeIconSvg()}
 					</div>
 					<div onClick={() => searchIcon()} id="search-icon-div" className="icon-inner-div inner-bottom">
 						<svg
@@ -706,7 +742,14 @@ function Nav(props) {
 						</svg>
 					</div>
 
-					<div id="mobile-noti-icon" onClick={(e) => {mobileNotificationIcon(e); props.clearNotifications()}} className="icon-inner-div inner-bottom">
+					<div
+						id="mobile-noti-icon"
+						onClick={(e) => {
+							mobileNotificationIcon(e);
+							props.clearNotifications();
+						}}
+						className="icon-inner-div inner-bottom"
+					>
 						<div id="noti-amount-mobile"></div>
 						<div className="notification-svg svg-div">
 							<svg

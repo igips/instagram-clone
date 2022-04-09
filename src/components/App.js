@@ -26,6 +26,7 @@ function App() {
 		} else {
 			setSignedIn(false);
 			setUsername("");
+      setUnReadNoti(0);
       if(unsubscribe) {
         unsubscribe();
       }

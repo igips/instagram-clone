@@ -161,15 +161,6 @@ function Home(props) {
 	let num2 = 0;
 
 	
-	function signOutFromAccount() {
-		signOut(getAuth())
-			.then(() => {
-				homeIcon();
-			})
-			.catch((error) => {});
-	}
-
-	
 	return (
 		<main>
 			<section id="home-section">
@@ -241,9 +232,6 @@ function Home(props) {
 								Sign In
 							</button>
 						</div>
-						<button onClick={() => signOutFromAccount()} className="sign-login-butt">
-							Sign Out
-						</button>
 						<div className="not-visible" id="home-right-profile-inner">
 							<div id="right-avatar-div">
 								<img className="right-ava" src={ava} alt="" />
