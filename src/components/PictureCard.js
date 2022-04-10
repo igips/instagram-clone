@@ -6,132 +6,12 @@ import { getUserData } from "..";
 import ava from "../img/ava.jpeg";
 import testPic from "../img/test-img.jpg";
 import "../styles/PictureCard.css";
-import { dropDown, hideDropDown } from "./Home.js";
-import {showSignInModal } from "./Nav";
 import ReactTimeAgo from "react-time-ago";
 import Picker from "emoji-picker-react";
-import { hideUnFollowModal } from "./Modals";
-
-function likeCommentIconClicked(users, username) {
-	if (users.includes(username)) {
-		return (
-			<svg
-				aria-label="Unlike"
-				color="#ed4956"
-				fill="#ed4956"
-				height="12"
-				role="img"
-				viewBox="0 0 48 48"
-				width="12"
-			>
-				<path d="M34.6 3.1c-4.5 0-7.9 1.8-10.6 5.6-2.7-3.7-6.1-5.5-10.6-5.5C6 3.1 0 9.6 0 17.6c0 7.3 5.4 12 10.6 16.5.6.5 1.3 1.1 1.9 1.7l2.3 2c4.4 3.9 6.6 5.9 7.6 6.5.5.3 1.1.5 1.6.5s1.1-.2 1.6-.5c1-.6 2.8-2.2 7.8-6.8l2-1.8c.7-.6 1.3-1.2 2-1.7C42.7 29.6 48 25 48 17.6c0-8-6-14.5-13.4-14.5z"></path>
-			</svg>
-		);
-	} else {
-		return (
-			<svg aria-label="Like" color="#262626" fill="#262626" height="12" role="img" viewBox="0 0 24 24" width="12">
-				<path d="M16.792 3.904A4.989 4.989 0 0121.5 9.122c0 3.072-2.652 4.959-5.197 7.222-2.512 2.243-3.865 3.469-4.303 3.752-.477-.309-2.143-1.823-4.303-3.752C5.141 14.072 2.5 12.167 2.5 9.122a4.989 4.989 0 014.708-5.218 4.21 4.21 0 013.675 1.941c.84 1.175.98 1.763 1.12 1.763s.278-.588 1.11-1.766a4.17 4.17 0 013.679-1.938m0-2a6.04 6.04 0 00-4.797 2.127 6.052 6.052 0 00-4.787-2.127A6.985 6.985 0 00.5 9.122c0 3.61 2.55 5.827 5.015 7.97.283.246.569.494.853.747l1.027.918a44.998 44.998 0 003.518 3.018 2 2 0 002.174 0 45.263 45.263 0 003.626-3.115l.922-.824c.293-.26.59-.519.885-.774 2.334-2.025 4.98-4.32 4.98-7.94a6.985 6.985 0 00-6.708-7.218z"></path>
-			</svg>
-		);
-	}
-}
-
-function likeCommentIcon(likeComment, id) {
-	const user = getAuth().currentUser;
-
-	if (user) {
-		likeComment(id);
-	} else {
-		showSignInModal();
-	}
-}
-
-function likeIconClicked(likes, username) {
-	if (likes.users.includes(username)) {
-		return (
-			<svg
-				aria-label="Activity Feed"
-				color="#ed4956"
-				fill="#ed4956"
-				height="24"
-				role="img"
-				viewBox="0 0 48 48"
-				width="24"
-			>
-				<path d="M34.6 3.1c-4.5 0-7.9 1.8-10.6 5.6-2.7-3.7-6.1-5.5-10.6-5.5C6 3.1 0 9.6 0 17.6c0 7.3 5.4 12 10.6 16.5.6.5 1.3 1.1 1.9 1.7l2.3 2c4.4 3.9 6.6 5.9 7.6 6.5.5.3 1.1.5 1.6.5s1.1-.2 1.6-.5c1-.6 2.8-2.2 7.8-6.8l2-1.8c.7-.6 1.3-1.2 2-1.7C42.7 29.6 48 25 48 17.6c0-8-6-14.5-13.4-14.5z"></path>
-			</svg>
-		);
-	} else {
-		return (
-			<svg aria-label="Like" color="#262626" fill="#262626" height="24" role="img" viewBox="0 0 24 24" width="24">
-				<path d="M16.792 3.904A4.989 4.989 0 0121.5 9.122c0 3.072-2.652 4.959-5.197 7.222-2.512 2.243-3.865 3.469-4.303 3.752-.477-.309-2.143-1.823-4.303-3.752C5.141 14.072 2.5 12.167 2.5 9.122a4.989 4.989 0 014.708-5.218 4.21 4.21 0 013.675 1.941c.84 1.175.98 1.763 1.12 1.763s.278-.588 1.11-1.766a4.17 4.17 0 013.679-1.938m0-2a6.04 6.04 0 00-4.797 2.127 6.052 6.052 0 00-4.787-2.127A6.985 6.985 0 00.5 9.122c0 3.61 2.55 5.827 5.015 7.97.283.246.569.494.853.747l1.027.918a44.998 44.998 0 003.518 3.018 2 2 0 002.174 0 45.263 45.263 0 003.626-3.115l.922-.824c.293-.26.59-.519.885-.774 2.334-2.025 4.98-4.32 4.98-7.94a6.985 6.985 0 00-6.708-7.218z"></path>
-			</svg>
-		);
-	}
-}
-
-function likeIcon(likePicture) {
-	const user = getAuth().currentUser;
-
-	if (user) {
-		likePicture();
-	} else {
-		showSignInModal();
-	}
-}
-
-function showShareModal() {
-	const modal = document.getElementById("share-modal");
-	if (!window.location.href.includes("shareM")) {
-		window.history.pushState("shareM", "Title", "shareM");
-	}
-
-	modal.style.display = "flex";
-}
-
-function shareIconClicked() {
-	const user = getAuth().currentUser;
-
-	if (user) {
-		showShareModal();
-	} else {
-		showSignInModal();
-	}
-}
-
-function shareIcon() {
-	return (
-		<span onClick={() => shareIconClicked()} className="comms-icon-span">
-			<svg
-				aria-label="Share Post"
-				color="#262626"
-				fill="#262626"
-				height="24"
-				role="img"
-				viewBox="0 0 24 24"
-				width="24"
-			>
-				<line
-					fill="none"
-					stroke="currentColor"
-					strokeLinejoin="round"
-					strokeWidth="2"
-					x1="22"
-					x2="9.218"
-					y1="3"
-					y2="10.083"
-				></line>
-				<polygon
-					fill="none"
-					points="11.698 20.334 22 3.001 2 3.001 9.218 10.084 11.698 20.334"
-					stroke="currentColor"
-					strokeLinejoin="round"
-					strokeWidth="2"
-				></polygon>
-			</svg>
-		</span>
-	);
-}
+import { hideUnFollowModal,  showSignInModal } from "./Modals";
+import { dropDown, hideDropDown } from "./DropDown";
+import { likeCommentIcon, likeCommentIconClicked,  likeIcon,  likeIconClicked} from "./Icons/LikeIcon";
+import { shareIcon } from "./Icons/ShareIcon";
 
 function showCommentsModal(
 	username,
@@ -293,9 +173,11 @@ function PictureCardIconsSection(props) {
 			</span>
 			{commentsIcon()}
 			{shareIcon()}
+			
 		</>
 	);
 }
+
 
 function Comments(props) {
 	const [signedIn, setSignedIn] = useState(false);
@@ -347,9 +229,6 @@ function Comments(props) {
 						onMouseEnter={(e) => {
 							dropDown(
 								getUserDataFromUsersArray(props.users, props.username),
-								props.following,
-								props.follow,
-								props.unFollow,
 								e,
 								"avaPic"
 							);
@@ -376,9 +255,6 @@ function Comments(props) {
 									onMouseEnter={(e) => {
 										dropDown(
 											getUserDataFromUsersArray(props.users, props.username),
-											props.following,
-											props.follow,
-											props.unFollow,
 											e
 										);
 									}}
@@ -414,9 +290,6 @@ function Comments(props) {
 								onMouseEnter={(e) => {
 									dropDown(
 										getUserDataFromUsersArray(props.users, comment.username),
-										props.following,
-										props.follow,
-										props.unFollow,
 										e,
 										"avaPic"
 									);
@@ -442,9 +315,6 @@ function Comments(props) {
 											onMouseEnter={(e) => {
 												dropDown(
 													getUserDataFromUsersArray(props.users, comment.username),
-													props.following,
-													props.follow,
-													props.unFollow,
 													e
 												);
 											}}
@@ -549,9 +419,7 @@ function PictureCardCommentsSection(props) {
 							onMouseEnter={(e) =>
 								dropDown(
 									getUserDataFromUsersArray(props.users, props.username),
-									props.following,
-									props.follow,
-									props.unFollow,
+									props.dropDownSetUserData,
 									e
 								)
 							}
@@ -580,9 +448,7 @@ function PictureCardCommentsSection(props) {
 									onMouseEnter={(e) =>
 										dropDown(
 											getUserDataFromUsersArray(props.users, comment.username),
-											props.following,
-											props.follow,
-											props.unFollow,
+											props.dropDownSetUserData,
 											e
 										)
 									}
@@ -628,9 +494,7 @@ function PictureCardHeader(props) {
 								onMouseEnter={(e) => {
 									dropDown(
 										getUserDataFromUsersArray(props.users, props.username),
-										props.following,
-										props.follow,
-										props.unFollow,
+										props.dropDownSetUserData,
 										e,
 										"avaPic"
 									);
@@ -658,9 +522,7 @@ function PictureCardHeader(props) {
 							onMouseEnter={(e) => {
 								dropDown(
 									getUserDataFromUsersArray(props.users, props.username),
-									props.following,
-									props.follow,
-									props.unFollow,
+									props.dropDownSetUserData,
 									e
 								);
 								props.addToFlag();	
@@ -1047,9 +909,6 @@ function Likes(props) {
 							onMouseEnter={(e) => {
 								dropDown(
 									getUserDataFromUsersArray(props.users, user),
-									props.following,
-									props.follow,
-									props.unFollow,
 									e,
 									"avaPic"
 								);
@@ -1066,9 +925,6 @@ function Likes(props) {
 							onMouseEnter={(e) =>
 								dropDown(
 									getUserDataFromUsersArray(props.users, user),
-									props.following,
-									props.follow,
-									props.unFollow,
 									e,
 									"no",
 									"right"
@@ -1297,6 +1153,7 @@ function PictureCard(props) {
 					username={username}
 					avatar={avatar}
 					addToFlag={addToFlag}
+					dropDownSetUserData={props.dropDownSetUserData}
 				/>
 			</div>
 			<div className="picture-div">
@@ -1323,6 +1180,7 @@ function PictureCard(props) {
 							unFollow={props.unFollow}
 							following={props.following}
 							addToFlag={addToFlag}
+							dropDownSetUserData={props.dropDownSetUserData}
 						/>
 					</section>
 
@@ -1334,6 +1192,7 @@ function PictureCard(props) {
 							following={props.following}
 							addToFlag={addToFlag}
 							likes={likes}
+							dropDownSetUserData={props.dropDownSetUserData}
 						/>
 					</section>
 
@@ -1355,6 +1214,7 @@ function PictureCard(props) {
 						unFollow={props.unFollow}
 						following={props.following}
 						addToFlag={addToFlag}
+						dropDownSetUserData={props.dropDownSetUserData}
 					/>
 					<div className="added-div">
 						<ReactTimeAgo date={date} locale="en-US" />
@@ -1367,4 +1227,4 @@ function PictureCard(props) {
 }
 
 export default PictureCard;
-export { options, PictureCardHeader, AddCommentSection, likeCommentIcon, shareIcon,  getUserDataFromUsersArray };
+export { options, PictureCardHeader, AddCommentSection,  getUserDataFromUsersArray };

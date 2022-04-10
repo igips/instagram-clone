@@ -7,7 +7,7 @@ import { getAuth, onAuthStateChanged } from "firebase/auth";
 import { getFirestore, collection, getDocs } from "firebase/firestore";
 import TimeAgo from "javascript-time-ago";
 import en from "javascript-time-ago/locale/en.json";
-import { homeIcon } from "./components/Nav.js";
+import { homeIcon } from "./components/Icons/HomeIcon.js";
 
 TimeAgo.addDefaultLocale(en);
 
@@ -164,6 +164,19 @@ async function getDocId(username) {
 	return docId;
 }
 
+async function searchFunction(value) {
+	const data = await getDocs(collection(getFirestore(), "usernames"));
+	const results = [];
+
+	data.forEach((doc) => {
+		if (doc.data().username.toLowerCase().includes(value.toLowerCase())) {
+			results.push(doc.data().username);
+		}
+	});
+
+	return results;
+}
+
 onAuthStateChanged(getAuth(), (user) => {
 	const rightButtons = document.getElementById("right-div-for-buttons");
 	const leftButtons = document.getElementById("home-left-button-div");
@@ -200,4 +213,4 @@ ReactDOM.render(
 	document.getElementById("root")
 );
 
-export { getUserData, getUsers, getDocId };
+export { getUserData, getUsers, getDocId, searchFunction };

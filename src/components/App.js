@@ -1,24 +1,35 @@
 import "../styles/App.css";
 import Nav from "./Nav.js";
-import Home, { DropDown, hideDropDown, keepDropDown, shuffleArray } from "./Home.js";
+import Home, { shuffleArray } from "./Home.js";
 import Modals from "./Modals.js";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { getDocId, getUserData, getUsers } from "..";
-import { arrayRemove, arrayUnion, collection, doc, getFirestore, increment, onSnapshot, query, updateDoc, where } from "firebase/firestore";
+import { arrayRemove, arrayUnion, doc, getFirestore, increment, onSnapshot, updateDoc } from "firebase/firestore";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
-import ReactDOM from "react-dom";
+import DropDown, { hideDropDown } from "./DropDown";
 
 function App() {
 	const [signedIn, setSignedIn] = useState(false);
 	const [following, setFollowing] = useState([]);
 	const [users, setUsers] = useState([]);
 	const [username, setUsername] = useState("");
-	const lastFollowEdit = useRef();
 	const [firestoreDocId, setfirestoreDocId] = useState("");
-  const [notifications, setNotifications] = useState([]);
-  const [unReadNoti, setUnReadNoti] = useState(0);
-	const didMount = useRef(false);
-  let unsubscribe;
+	const [notifications, setNotifications] = useState([]);
+	const [unReadNoti, setUnReadNoti] = useState(0);
+	let unsubscribe;
+
+
+  //DROPDOWN
+  const [userDataDropDown, setUserDataDropDown] = useState();
+
+  function dropDownSetUserData(data) {
+      setUserDataDropDown(data);
+  }
+
+  //DROPDWON
+
+
+
 
 	onAuthStateChanged(getAuth(), (user) => {
 		if (user) {
@@ -26,36 +37,13 @@ function App() {
 		} else {
 			setSignedIn(false);
 			setUsername("");
-      setUnReadNoti(0);
-      if(unsubscribe) {
-        unsubscribe();
-      }
+			setUnReadNoti(0);
+			if (unsubscribe) {
+				unsubscribe();
+			}
 		}
 	});
 
-	useEffect(() => {
-		if (!didMount.current) {
-			return (didMount.current = true);
-		} else if (document.getElementById("drop-down").style.display === "flex") {
-			let userD;
-			users.forEach((user) => {
-				if (user.username === lastFollowEdit.current) {
-					userD = user;
-				}
-			});
-
-			ReactDOM.render(
-				<DropDown
-					username={lastFollowEdit.current}
-					following={following}
-					follow={follow}
-					unFollow={unFollow}
-					userData={userD}
-				/>,
-				document.getElementById("drop-down")
-			);
-		}
-	}, [users]);
 
 	useEffect(() => {
 		const user = getAuth().currentUser;
@@ -65,20 +53,21 @@ function App() {
 				setfirestoreDocId(user.id);
 				setUsername(user.data().username);
 				setFollowing(user.data().following);
-        setNotifications(user.data().notifications);
-        setUnReadNoti(user.data().unReadNoti);
+				setNotifications(user.data().notifications);
+				setUnReadNoti(user.data().unReadNoti);
 
-       //eslint-disable-next-line react-hooks/exhaustive-deps
-        unsubscribe = onSnapshot(doc(getFirestore(), "usernames", user.id), (docu) => {
-          setNotifications(docu.data().notifications);
-          if(document.getElementById("notification-div").style.display === "flex" || document.getElementById("notification-modal-container").style.display === "flex") {
-            updateDoc(doc(getFirestore(), "usernames", user.id), {unReadNoti: 0});
-
-          } else {
-            setUnReadNoti(docu.data().unReadNoti);
-          }
-        });
-        
+				//eslint-disable-next-line react-hooks/exhaustive-deps
+				unsubscribe = onSnapshot(doc(getFirestore(), "usernames", user.id), (docu) => {
+					setNotifications(docu.data().notifications);
+					if (
+						document.getElementById("notification-div").style.display === "flex" ||
+						document.getElementById("notification-modal-container").style.display === "flex"
+					) {
+						updateDoc(doc(getFirestore(), "usernames", user.id), { unReadNoti: 0 });
+					} else {
+						setUnReadNoti(docu.data().unReadNoti);
+					}
+				});
 			});
 		} else {
 			setfirestoreDocId("");
@@ -90,10 +79,12 @@ function App() {
 		});
 	}, [signedIn]);
 
-  function clearNotifications() {
-    updateDoc(doc(getFirestore(), "usernames", firestoreDocId), {unReadNoti: 0});
-    setUnReadNoti(0);
-  }
+	function clearNotifications() {
+		if (unReadNoti !== 0) {
+			updateDoc(doc(getFirestore(), "usernames", firestoreDocId), { unReadNoti: 0 });
+			setUnReadNoti(0);
+		}
+	}
 
 	function follow(who, right) {
 		setFollowing([...following, who]);
@@ -115,10 +106,13 @@ function App() {
 			});
 			return newUsers;
 		});
-		lastFollowEdit.current = who;
 
 		getDocId(who).then((id) =>
-			updateDoc(doc(getFirestore(), "usernames", id), { followers: arrayUnion(username), notifications: arrayUnion({ username: username, content: "started following you.", date: Date.now()}), unReadNoti: increment(1)})
+			updateDoc(doc(getFirestore(), "usernames", id), {
+				followers: arrayUnion(username),
+				notifications: arrayUnion({ username: username, content: "started following you.", date: Date.now() }),
+				unReadNoti: increment(1),
+			})
 		);
 		updateDoc(doc(getFirestore(), "usernames", firestoreDocId), { following: arrayUnion(who) });
 
@@ -150,7 +144,6 @@ function App() {
 			});
 			return newUsers;
 		});
-		lastFollowEdit.current = who;
 		getDocId(who).then((id) =>
 			updateDoc(doc(getFirestore(), "usernames", id), { followers: arrayRemove(username) })
 		);
@@ -159,15 +152,31 @@ function App() {
 
 	return (
 		<section id="top-section">
-			<div
-				onMouseOver={() => keepDropDown()}
-				onMouseLeave={() => hideDropDown()}
-				className="drop-down"
-				id="drop-down"
-			></div>
-			<Modals notifications={notifications} following={following} username={username} follow={follow} unFollow={unFollow}></Modals>
-			<Nav clearNotifications={clearNotifications} unReadNoti={unReadNoti} notifications={notifications} users={users} following={following} username={username} follow={follow} unFollow={unFollow}></Nav>
-			<Home users={users} following={following} username={username} follow={follow} unFollow={unFollow}></Home>
+			<DropDown
+				following={following}
+				follow={follow}
+				unFollow={unFollow}
+				userData={userDataDropDown}
+        users={users}
+			/>
+			<Modals
+				notifications={notifications}
+				following={following}
+				username={username}
+				follow={follow}
+				unFollow={unFollow}
+			></Modals>
+			<Nav
+				clearNotifications={clearNotifications}
+				unReadNoti={unReadNoti}
+				notifications={notifications}
+				users={users}
+				following={following}
+				username={username}
+				follow={follow}
+				unFollow={unFollow}
+			></Nav>
+			<Home dropDownSetUserData={dropDownSetUserData} users={users} following={following} username={username} follow={follow} unFollow={unFollow}></Home>
 		</section>
 	);
 }

@@ -1,74 +1,10 @@
 import "../styles/Home.css";
 import PictureCard from "./PictureCard.js";
-import { getAuth, signOut, onAuthStateChanged } from "firebase/auth";
 import ava from "../img/ava.jpeg";
-import { homeIcon, showSignInModal } from "./Nav";
-import testPic from "../img/test-img.jpg";
 import uniqid from "uniqid";
-import ReactDOM from "react-dom";
-import { useState } from "react";
+import { showSignInModal, showSignUpModal } from "./Modals";
+import { dropDown, hideDropDown} from "./DropDown";
 
-function dropDown(userData, following, follow, unFollow, e, ele, right) {
-	if (window.innerWidth > 650) {
-		const user = getAuth().currentUser;
-		const dropDown = document.getElementById("drop-down");
-		const rect = e.target.getBoundingClientRect();
-
-		ReactDOM.render(
-			<DropDown
-				right={right}
-				username={userData.username}
-				following={following}
-				follow={follow}
-				unFollow={unFollow}
-				userData={userData}
-			/>,
-			document.getElementById("drop-down")
-		);
-
-		if (user) {
-			document.getElementById("drop-down-inner-fourth").style.display = "flex";
-		} else {
-			document.getElementById("drop-down-inner-fourth").style.display = "none";
-		}
-
-		dropDown.style.display = "flex";
-		dropDown.style.left = rect.left + "px";
-		dropDown.style.top = (right ? rect.top : window.scrollY + rect.top) + (ele === "avaPic" ? 25 : 18) + "px";
-		dropDown.style.position = right ? "fixed" : "absolute";
-
-		if (window.innerHeight - dropDown.getBoundingClientRect().bottom < 0) {
-			dropDown.style.top = (right ? rect.top : window.scrollY + rect.top) - (user ? 350 : 290) + "px";
-		}
-
-		if (window.innerWidth - dropDown.getBoundingClientRect().left <= 390) {
-			dropDown.style.left =
-				rect.left - (410 - (window.innerWidth - dropDown.getBoundingClientRect().left)) + "px";
-		}
-	}
-}
-
-function showSignUpModal() {
-	const modal = document.getElementById("register-modal");
-
-	if (!window.location.href.includes("signUpM")) {
-		window.history.pushState("signUpM", "Title", "signUpM");
-	}
-	modal.style.display = "flex";
-}
-
-function hideDropDown() {
-	const dropDown = document.getElementById("drop-down");
-
-	if (dropDown) {
-		dropDown.style.display = "none";
-	}
-}
-
-function keepDropDown() {
-	const dropDown = document.getElementById("drop-down");
-	dropDown.style.display = "flex";
-}
 
 function followMobile(e) {
 	if (e.currentTarget.textContent === "Follow") {
@@ -85,75 +21,6 @@ function shuffleArray(array) {
 		const j = Math.floor(Math.random() * (i + 1));
 		[array[i], array[j]] = [array[j], array[i]];
 	}
-}
-
-function DropDown(props) {
-	const [signedIn, setSignedIn] = useState(false);
-	const user = getAuth().currentUser;
-
-	onAuthStateChanged(getAuth(), (user) => {
-		if (user) {
-			setSignedIn(true);
-		} else {
-			setSignedIn(false);
-		}
-	});
-
-	function button() {
-		if (signedIn) {
-			if (props.userData.uid === user.uid) {
-				return <button className="drop-down-button">Edit Profile</button>;
-			} else if (!props.following.includes(props.username)) {
-				return (
-					<button onClick={() => props.follow(props.username, props.right)} id="drop-down-button">
-						Follow
-					</button>
-				);
-			} else {
-				return (
-					<>
-						<button className="drop-down-button">Message</button>{" "}
-						<button
-							onClick={() => props.unFollow(props.username)}
-							id="drop-down-following-button"
-							className="drop-down-button"
-						>
-							Unfollow
-						</button>
-					</>
-				);
-			}
-		}
-	}
-
-	return (
-		<>
-			<div className="drop-down-inner-first">
-				<img id="drop-down-ava" src={ava} alt="" />
-				<span id="drop-down-username">{props.userData.username}</span>
-			</div>
-			<div className="drop-down-inner-second">
-				<div className="drop-down-inner-second-inner">
-					<span id="drop-down-num-of-posts">{props.userData.posts.length}</span>
-					<span>posts</span>
-				</div>
-				<div className="drop-down-inner-second-inner">
-					<span id="drop-down-num-of-followers">{props.userData.followers.length}</span>
-					<span>followers</span>
-				</div>
-				<div className="drop-down-inner-second-inner">
-					<span id="drop-down-num-of-following">{props.userData.following.length}</span>
-					<span>following</span>
-				</div>
-			</div>
-			<div className="drop-down-inner-third">
-				<img src={testPic} alt="" />
-				<img src={testPic} alt="" />
-				<img src={testPic} alt="" />
-			</div>
-			<div id="drop-down-inner-fourth">{button()}</div>
-		</>
-	);
 }
 
 function Home(props) {
@@ -199,6 +66,7 @@ function Home(props) {
 						</div>
 
 						<PictureCard
+							dropDownSetUserData={props.dropDownSetUserData}
 							users={props.users}
 							follow={props.follow}
 							unFollow={props.unFollow}
@@ -206,6 +74,7 @@ function Home(props) {
 							username={props.username}
 						></PictureCard>
 						<PictureCard
+							dropDownSetUserData={props.dropDownSetUserData}
 							users={props.users}
 							follow={props.follow}
 							unFollow={props.unFollow}
@@ -213,6 +82,7 @@ function Home(props) {
 							username={props.username}
 						></PictureCard>
 						<PictureCard
+							dropDownSetUserData={props.dropDownSetUserData}
 							users={props.users}
 							follow={props.follow}
 							unFollow={props.unFollow}
@@ -251,7 +121,7 @@ function Home(props) {
 										<div key={uniqid()} className="right-sug-div-list">
 											<div
 												onMouseEnter={(e) =>
-													dropDown(user, props.following, props.follow, props.unFollow, e, "avaPic", "right")
+													{dropDown(user, props.dropDownSetUserData,  e, "avaPic", "right")}
 												}
 												onMouseLeave={() => hideDropDown()}
 												className="right-sug-ava-div"
@@ -260,7 +130,7 @@ function Home(props) {
 											</div>
 											<span
 												onMouseEnter={(e) =>
-													dropDown(user, props.following, props.follow, props.unFollow, e, "no", "right")
+													dropDown(user, props.dropDownSetUserData,  e, "no", "right")
 												}
 												onMouseLeave={() => hideDropDown()}
 												className="sug-login-right"
@@ -283,4 +153,4 @@ function Home(props) {
 }
 
 export default Home;
-export { dropDown, hideDropDown, keepDropDown, followMobile, showSignUpModal, shuffleArray, DropDown };
+export {followMobile, shuffleArray};

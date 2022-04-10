@@ -3,16 +3,18 @@ import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword } f
 import { getFirestore, addDoc, collection, getDocs } from "firebase/firestore";
 import React, { useState, useEffect } from "react";
 import ava from "../img/ava.jpeg";
-import { showSignUpModal } from "./Home";
 import testPic from "../img/test-img.jpg";
 import "../styles/Modals.css";
-import { shareIcon } from "./PictureCard";
 import uniqid from "uniqid";
-import { followButtonForNoti, homeIcon, searchFunction, showSignInModal } from "./Nav";
+import { followButtonForNoti} from "./Nav";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faSpinner } from "@fortawesome/free-solid-svg-icons";
 import { faCircleXmark } from "@fortawesome/free-regular-svg-icons";
 import ReactTimeAgo from "react-time-ago";
+import { searchFunction } from "..";
+import { shareIcon } from "./Icons/ShareIcon";
+
+
 
 function closeModal(modal) {
 	return (
@@ -215,6 +217,15 @@ function SignUpModal() {
 	);
 }
 
+function showSignUpModal() {
+	const modal = document.getElementById("register-modal");
+
+	if (!window.location.href.includes("signUpM")) {
+		window.history.pushState("signUpM", "Title", "signUpM");
+	}
+	modal.style.display = "flex";
+}
+
 function SignInModal() {
 	useEffect(() => {
 		const signInModal = document.getElementById("login-modal");
@@ -319,6 +330,15 @@ function SignInModal() {
 			</div>
 		</div>
 	);
+}
+
+function showSignInModal() {
+	const modal = document.getElementById("login-modal");
+	if (!window.location.href.includes("signInM")) {
+		window.history.pushState("signInM", "Title", "signInM");
+	}
+
+	modal.style.display = "flex";
 }
 
 function hideUnFollowModal() {
@@ -676,6 +696,15 @@ function ShareModal() {
 	);
 }
 
+function showShareModal() {
+	const modal = document.getElementById("share-modal");
+	if (!window.location.href.includes("shareM")) {
+		window.history.pushState("shareM", "Title", "shareM");
+	}
+
+	modal.style.display = "flex";
+}
+
 function SearchModal() {
 	const [searchValue, setSearchValue] = useState("");
 	const [searchResults, setSearchResults] = useState([]);
@@ -842,4 +871,4 @@ function Modals(props) {
 }
 
 export default Modals;
-export { hideUnFollowModal };
+export { hideUnFollowModal, showSignInModal, showSignUpModal, showShareModal};
