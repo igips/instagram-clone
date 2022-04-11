@@ -2,9 +2,9 @@ import "../styles/Home.css";
 import PictureCard from "./PictureCard.js";
 import ava from "../img/ava.jpeg";
 import uniqid from "uniqid";
-import { showSignInModal, showSignUpModal } from "./Modals";
-import { dropDown, hideDropDown} from "./DropDown";
-
+import { dropDown, hideDropDown } from "./DropDown";
+import { showSignUpModal } from "./Modals/SignUpModal";
+import { showSignInModal } from "./Modals/SignInModal";
 
 function followMobile(e) {
 	if (e.currentTarget.textContent === "Follow") {
@@ -14,6 +14,26 @@ function followMobile(e) {
 		e.currentTarget.classList.remove("sug-box-left-follow-active");
 		e.currentTarget.textContent = "Follow";
 	}
+}
+
+function getUserDataFromUsersArray(array, userName) {
+	let userData;
+	array.forEach((user) => {
+		if (user.username === userName) {
+			userData = user;
+		}
+	});
+	return userData;
+}
+
+function getPostDataFromPostsArray(array, postId) {
+	let postData;
+	array.forEach((post) => {
+		if (post.id === postId) {
+			postData = post;
+		}
+	});
+	return postData;
 }
 
 function shuffleArray(array) {
@@ -27,7 +47,6 @@ function Home(props) {
 	let num = 0;
 	let num2 = 0;
 
-	
 	return (
 		<main>
 			<section id="home-section">
@@ -45,7 +64,11 @@ function Home(props) {
 							<span id="for-you-sug-span-left">Suggestions For You</span>
 							<div id="suggestions-left-inner-div">
 								{props.users.map((user) => {
-									if (!props.following.includes(user.username) && num < 3 && user.username !== props.username) {
+									if (
+										!props.following.includes(user.username) &&
+										num < 3 &&
+										user.username !== props.username
+									) {
 										num++;
 										return (
 											<div key={uniqid()} className="sug-box-left">
@@ -61,34 +84,30 @@ function Home(props) {
 										);
 									}
 								})}
-								
 							</div>
 						</div>
+						{props.posts.map((post) => {
+							return (
+								<PictureCard key={uniqid()}
+									dropDownSetUserData={props.dropDownSetUserData}
+									users={props.users}
+									follow={props.follow}
+									unFollow={props.unFollow}
+									following={props.following}
+									yourUsername={props.username}
+									likesModalSetLikes={props.likesModalSetLikes}
+									optionsModalSetUserData={props.optionsModalSetUserData}
+									post={post}
+									likePicture={props.likePicture}
+									signedIn={props.signedIn}
+									addComment={props.addComment}
+									likeComment={props.likeComment}
+									commModalSetPostId={props.commModalSetPostId}
+								></PictureCard>
+							);
+						})}
 
-						<PictureCard
-							dropDownSetUserData={props.dropDownSetUserData}
-							users={props.users}
-							follow={props.follow}
-							unFollow={props.unFollow}
-							following={props.following}
-							username={props.username}
-						></PictureCard>
-						<PictureCard
-							dropDownSetUserData={props.dropDownSetUserData}
-							users={props.users}
-							follow={props.follow}
-							unFollow={props.unFollow}
-							following={props.following}
-							username={props.username}
-						></PictureCard>
-						<PictureCard
-							dropDownSetUserData={props.dropDownSetUserData}
-							users={props.users}
-							follow={props.follow}
-							unFollow={props.unFollow}
-							following={props.following}
-							username={props.username}
-						></PictureCard>
+						
 					</div>
 				</div>
 
@@ -115,14 +134,18 @@ function Home(props) {
 						<span id="for-you-sug-span">Suggestions For You</span>
 						<div id="list-of-sug-div">
 							{props.users.map((user) => {
-								if (!props.following.includes(user.username) && num2 < 5 && user.username !== props.username) {
+								if (
+									!props.following.includes(user.username) &&
+									num2 < 5 &&
+									user.username !== props.username
+								) {
 									num2++;
 									return (
 										<div key={uniqid()} className="right-sug-div-list">
 											<div
-												onMouseEnter={(e) =>
-													{dropDown(user, props.dropDownSetUserData,  e, "avaPic", "right")}
-												}
+												onMouseEnter={(e) => {
+													dropDown(user, props.dropDownSetUserData, e, "avaPic", "right");
+												}}
 												onMouseLeave={() => hideDropDown()}
 												className="right-sug-ava-div"
 											>
@@ -130,14 +153,17 @@ function Home(props) {
 											</div>
 											<span
 												onMouseEnter={(e) =>
-													dropDown(user, props.dropDownSetUserData,  e, "no", "right")
+													dropDown(user, props.dropDownSetUserData, e, "no", "right")
 												}
 												onMouseLeave={() => hideDropDown()}
 												className="sug-login-right"
 											>
 												{user.username}
 											</span>
-											<button onClick={(e) => props.follow(user.username)} className="sug-right-follow">
+											<button
+												onClick={(e) => props.follow(user.username)}
+												className="sug-right-follow"
+											>
 												Follow
 											</button>
 										</div>
@@ -153,4 +179,4 @@ function Home(props) {
 }
 
 export default Home;
-export {followMobile, shuffleArray};
+export { followMobile, shuffleArray, getUserDataFromUsersArray, getPostDataFromPostsArray};

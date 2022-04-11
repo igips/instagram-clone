@@ -2,19 +2,13 @@ import { getAuth, onAuthStateChanged } from "firebase/auth";
 import { useEffect, useState } from "react";
 import ava from "../img/ava.jpeg";
 import testPic from "../img/test-img.jpg";
-import { getUserDataFromUsersArray } from "./PictureCard";
+import { getUserDataFromUsersArray } from "./Home";
+
 
 function DropDown(props) {
 	const [signedIn, setSignedIn] = useState(false);
-    const [data, setData] = useState({username : "", posts: [], followers: [], following: []});
+	const [data, setData] = useState({ username: "", posts: [], followers: [], following: [] });
 	const user = getAuth().currentUser;
-
-    useEffect(() => {
-            if(props.userData) {
-                setData(getUserDataFromUsersArray(props.users, props.userData.username));
-            }
-    },[props.users, props.userData]);
-
 
 	onAuthStateChanged(getAuth(), (user) => {
 		if (user) {
@@ -23,6 +17,20 @@ function DropDown(props) {
 			setSignedIn(false);
 		}
 	});
+
+	useEffect(() => {
+		if (props.userData) {
+			setData(getUserDataFromUsersArray(props.users, props.userData.username));
+		}
+	}, [props.userData]);
+
+	useEffect(() => {
+		if(document.getElementById("drop-down").style.display === "flex") {
+			setData(getUserDataFromUsersArray(props.users, props.userData.username));
+		}
+	}, [props.users]);
+
+	
 
 	function button() {
 		if (signedIn) {
@@ -34,7 +42,7 @@ function DropDown(props) {
 						Follow
 					</button>
 				);
-			} else if(props.userData && user) {
+			} else if (props.userData && user) {
 				return (
 					<>
 						<button className="drop-down-button">Message</button>{" "}
@@ -51,44 +59,39 @@ function DropDown(props) {
 		}
 	}
 
-    
-        return (
-            <div
-                onMouseOver={() => keepDropDown()}
-                onMouseLeave={() => hideDropDown()}
-                className="drop-down"
-                id="drop-down"
-            >
-                <div className="drop-down-inner-first">
-                    <img id="drop-down-ava" src={ava} alt="" />
-                    <span id="drop-down-username">{data.username}</span>
-                </div>
-                <div className="drop-down-inner-second">
-                    <div className="drop-down-inner-second-inner">
-                        <span id="drop-down-num-of-posts">{data.posts.length}</span>
-                        <span>posts</span>
-                    </div>
-                    <div className="drop-down-inner-second-inner">
-                        <span id="drop-down-num-of-followers">{data.followers.length}</span>
-                        <span>followers</span>
-                    </div>
-                    <div className="drop-down-inner-second-inner">
-                        <span id="drop-down-num-of-following">{data.following.length}</span>
-                        <span>following</span>
-                    </div>
-                </div>
-                <div className="drop-down-inner-third">
-                    <img src={testPic} alt="" />
-                    <img src={testPic} alt="" />
-                    <img src={testPic} alt="" />
-                </div>
-                <div id="drop-down-inner-fourth">{button()}</div>
-            </div>
-        );
-
-    
-
-	
+	return (
+		<div
+			onMouseOver={() => keepDropDown()}
+			onMouseLeave={() => hideDropDown()}
+			className="drop-down"
+			id="drop-down"
+		>
+			<div className="drop-down-inner-first">
+				<img id="drop-down-ava" src={ava} alt="" />
+				<span id="drop-down-username">{data.username}</span>
+			</div>
+			<div className="drop-down-inner-second">
+				<div className="drop-down-inner-second-inner">
+					<span id="drop-down-num-of-posts">{data.posts.length}</span>
+					<span>posts</span>
+				</div>
+				<div className="drop-down-inner-second-inner">
+					<span id="drop-down-num-of-followers">{data.followers.length}</span>
+					<span>followers</span>
+				</div>
+				<div className="drop-down-inner-second-inner">
+					<span id="drop-down-num-of-following">{data.following.length}</span>
+					<span>following</span>
+				</div>
+			</div>
+			<div className="drop-down-inner-third">
+				<img src={testPic} alt="" />
+				<img src={testPic} alt="" />
+				<img src={testPic} alt="" />
+			</div>
+			<div id="drop-down-inner-fourth">{button()}</div>
+		</div>
+	);
 }
 
 function dropDown(userData, dropDownSetUserData, e, ele, right) {
@@ -97,8 +100,7 @@ function dropDown(userData, dropDownSetUserData, e, ele, right) {
 		const dropDown = document.getElementById("drop-down");
 		const rect = e.target.getBoundingClientRect();
 
-
-        dropDownSetUserData(userData);
+		dropDownSetUserData(userData);
 
 		if (user) {
 			document.getElementById("drop-down-inner-fourth").style.display = "flex";

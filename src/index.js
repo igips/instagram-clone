@@ -16,7 +16,7 @@ window.addEventListener("load", () => {
 		window.history.pushState("/", "Title", "/");
 		homeIcon();
 	}
-})
+});
 
 window.addEventListener("popstate", (e) => {
 	const likesModal = document.getElementById("likes-modal");
@@ -58,8 +58,7 @@ window.addEventListener("popstate", (e) => {
 		commsModal.style.display = "none";
 	} else if (searchModal.style.display === "flex") {
 		searchModal.style.display = "none";
-
-	} else if(notiModal.style.display === "flex") {
+	} else if (notiModal.style.display === "flex") {
 		notiModal.style.display = "none";
 	}
 
@@ -89,8 +88,7 @@ window.addEventListener("popstate", (e) => {
 		optionsModal.style.display = "flex";
 	} else if (window.location.href.includes("searchM")) {
 		searchModal.style.display = "flex";
-
-	} else if(window.location.href.includes("notiM")) {
+	} else if (window.location.href.includes("notiM")) {
 		notiModal.style.display = "flex";
 	}
 
@@ -107,7 +105,6 @@ window.addEventListener("popstate", (e) => {
 	}
 });
 
-
 const firebaseConfig = {
 	apiKey: "AIzaSyDft-ERJnOSLsjY01BIvYaXN3BSQFcVvos",
 	authDomain: "instagram-clone-33934.firebaseapp.com",
@@ -118,7 +115,6 @@ const firebaseConfig = {
 };
 
 const app = initializeApp(firebaseConfig);
-
 
 async function getUserData(id) {
 	const data = await getDocs(collection(getFirestore(), "usernames"));
