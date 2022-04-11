@@ -1,5 +1,5 @@
 import { getAuth } from "firebase/auth";
-import { showSignInModal } from "../Modals";
+import { showSignInModal } from "../Modals/SignInModal";
 
 function SmallRedLikeIcon() {
 	return (
@@ -25,11 +25,11 @@ function likeCommentIconClicked(users, username) {
 	}
 }
 
-function likeCommentIcon(likeComment, id) {
+function likeCommentIcon(likeComment, id, postId) {
 	const user = getAuth().currentUser;
 
 	if (user) {
-		likeComment(id);
+		likeComment(postId, id);
 	} else {
 		showSignInModal();
 	}
@@ -71,11 +71,11 @@ function likeIconClicked(likes, username) {
 	}
 }
 
-function likeIcon(likePicture) {
+function likeIcon(likePicture, id) {
 	const user = getAuth().currentUser;
 
 	if (user) {
-		likePicture();
+		likePicture(id);
 	} else {
 		showSignInModal();
 	}

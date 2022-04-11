@@ -1,5 +1,7 @@
 import { getAuth } from "firebase/auth";
-import { showSignInModal } from "../Modals";
+import { showSignInModal } from "../Modals/SignInModal";
+
+
 
 function AddPostIconSvg() {
 	return (

@@ -1,8 +1,9 @@
-import { showSignInModal } from "../Modals";
+import { showSignInModal } from "../Modals/SignInModal";
 import { homeIcon, homeIconNotClicked } from "./HomeIcon";
 import { messageIconNotClicked } from "./MessageIcon";
 import { notificationIconNotClicked } from "./NotificationIcon";
 import { searchIconNotClicked } from "./SearchIcon";
+
 
 function ProfileIconDrop() {
 	return (

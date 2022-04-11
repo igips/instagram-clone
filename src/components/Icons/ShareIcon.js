@@ -1,5 +1,7 @@
 import { getAuth } from "firebase/auth";
-import { showShareModal, showSignInModal } from "../Modals";
+import { showShareModal } from "../Modals/ShareModal";
+import { showSignInModal } from "../Modals/SignInModal";
+
 
 function ShareIcon() {
 	return (

@@ -1,9 +1,10 @@
 import { getAuth } from "firebase/auth";
-import { showSignInModal } from "../Modals";
+import { showSignInModal } from "../Modals/SignInModal";
 import { homeIconNotClicked } from "./HomeIcon";
 import { notificationIconNotClicked } from "./NotificationIcon";
 import { avatarIconNotClicked } from "./ProfileIcon";
 import { searchIconNotClicked } from "./SearchIcon";
+
 
 function MessageIconSvg() {
 	return (
