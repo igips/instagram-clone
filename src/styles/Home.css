@@ -413,9 +413,14 @@ main {
 }
 
 .drop-down-inner-third img {
-	width: 130px;
+	/* width: 130px;
 	height: 130px;
-	cursor: pointer;
+	cursor: pointer; */
+	width: 100%;
+    height: 130px;
+    cursor: pointer;
+    display: block;
+    object-fit: cover;
 }
 
 .drop-down-inner-third img:hover {
