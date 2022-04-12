@@ -102,16 +102,18 @@ function dropDown(userData, dropDownSetUserData, e, ele, right) {
 
 		dropDownSetUserData(userData);
 
+		dropDown.style.left = rect.left + "px";
+		dropDown.style.top = (right ? rect.top : window.scrollY + rect.top) + (ele === "avaPic" ? 25 : 18) + "px";
+		dropDown.style.position = right ? "fixed" : "absolute";
+
+		dropDown.style.display = "flex";
+
 		if (user) {
 			document.getElementById("drop-down-inner-fourth").style.display = "flex";
 		} else {
 			document.getElementById("drop-down-inner-fourth").style.display = "none";
 		}
 
-		dropDown.style.display = "flex";
-		dropDown.style.left = rect.left + "px";
-		dropDown.style.top = (right ? rect.top : window.scrollY + rect.top) + (ele === "avaPic" ? 25 : 18) + "px";
-		dropDown.style.position = right ? "fixed" : "absolute";
 
 		if (window.innerHeight - dropDown.getBoundingClientRect().bottom < 0) {
 			dropDown.style.top = (right ? rect.top : window.scrollY + rect.top) - (user ? 350 : 290) + "px";
@@ -121,6 +123,8 @@ function dropDown(userData, dropDownSetUserData, e, ele, right) {
 			dropDown.style.left =
 				rect.left - (410 - (window.innerWidth - dropDown.getBoundingClientRect().left)) + "px";
 		}
+
+		
 	}
 }
 
