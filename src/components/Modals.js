@@ -9,6 +9,7 @@ import ShareModal from "./Modals/ShareModal";
 import SignUpModal from "./Modals/SignUpModal";
 import SignInModal from "./Modals/SignInModal";
 import { CloseModalIcon } from "./Icons/CloseIcon";
+import AddPostModal from "./Modals/AddPostModal";
 
 function Modals(props) {
 	return (
@@ -55,6 +56,7 @@ function Modals(props) {
 				follow={props.follow}
 				unFollow={props.unFollow}
 			/>
+			<AddPostModal />
 		</>
 	);
 }
