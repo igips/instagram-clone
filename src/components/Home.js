@@ -26,6 +26,7 @@ function getUserDataFromUsersArray(array, userName) {
 	return userData;
 }
 
+
 function getPostDataFromPostsArray(array, postId) {
 	let postData;
 	array.forEach((post) => {
