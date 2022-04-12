@@ -27,6 +27,7 @@ window.addEventListener("popstate", (e) => {
 	const signUpModal = document.getElementById("register-modal");
 	const searchModal = document.getElementById("search-modal-container");
 	const notiModal = document.getElementById("notification-modal-container");
+	const addPostModal = document.getElementById("add-post-modal");
 	const user = getAuth().currentUser;
 
 	if (
@@ -60,6 +61,8 @@ window.addEventListener("popstate", (e) => {
 		searchModal.style.display = "none";
 	} else if (notiModal.style.display === "flex") {
 		notiModal.style.display = "none";
+	} else if (addPostModal.style.display === "flex") {
+		addPostModal.style.display = "none";
 	}
 
 	if (window.location.href.includes("signUpM") && user) {
@@ -77,6 +80,10 @@ window.addEventListener("popstate", (e) => {
 		window.history.pushState("/", "Title", "/");
 	} else if (window.location.href.includes("shareM") && user) {
 		shareModal.style.display = "flex";
+	} else if (window.location.href.includes("addPostM") && !user) {
+		addPostModal.style.display = "none";
+	} else if (window.location.href.includes("addPostM") && user) {
+		addPostModal.style.display = "flex";
 	} else if (window.location.href.includes("commentsM")) {
 		commsModal.style.display = "flex";
 	} else if (window.location.href.includes("likesM")) {
@@ -101,6 +108,7 @@ window.addEventListener("popstate", (e) => {
 		signUpModal.style.display = "none";
 		searchModal.style.display = "none";
 		notiModal.style.display = "none";
+		addPostModal.style.display = "none";
 		homeIcon();
 	}
 });
