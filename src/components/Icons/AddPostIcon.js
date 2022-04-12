@@ -1,4 +1,5 @@
 import { getAuth } from "firebase/auth";
+import { showAddPostModal } from "../Modals/AddPostModal";
 import { showSignInModal } from "../Modals/SignInModal";
 
 
@@ -44,6 +45,7 @@ function addPostIcon() {
 	const user = getAuth().currentUser;
 
 	if (user) {
+		showAddPostModal();
 	} else {
 		showSignInModal();
 	}
