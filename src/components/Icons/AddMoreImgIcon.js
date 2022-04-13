@@ -17,13 +17,19 @@ function AddMoreImgIcon() {
 
 		if (color === "#ffffff") {
 			div.style.background = "rgba(26,26,26,.8)";
-			popUp.style.display = "none";
+			popUp.style.opacity = "0";
+			setTimeout(() => popUp.style.display = "none", 185);
+
 			
 		} else if (color === "#262626") {
 			div.style.background = "rgba(255,255,255)";
 			popUp.style.display = "flex";
+			popUp.style.opacity = "1";
+
 		}
 	}, [color]);
+
+	
 
 	return (
 		<div onClick={() => changeColor()} id="add-multiple-img">
