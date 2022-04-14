@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useSwipeable } from "react-swipeable";
 import { CloseIcon, CloseModalIcon, SmallCloseIcon } from "../Icons/CloseIcon";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCloudArrowUp } from "@fortawesome/free-solid-svg-icons";
@@ -6,57 +7,107 @@ import { faSpinner } from "@fortawesome/free-solid-svg-icons";
 import { AddMoreImgIcon } from "../Icons/AddMoreImgIcon";
 import uniqid from "uniqid";
 import { PlusIcon } from "../Icons/PlusIcon";
-import { LeftArrow, RightArrow } from "../Icons/ArrowIcons";
+import { BackArrow, LeftArrow, RightArrow } from "../Icons/ArrowIcons";
+import ReactDOM, { render } from "react-dom";
+import Picker from "emoji-picker-react";
+import { EmojiiIcon } from "../Icons/EmojiiIcon";
+import { faCircleXmark } from "@fortawesome/free-regular-svg-icons";
+import ava from "../../img/ava.jpeg";
+import { searchFunction } from "../..";
 
 function AddPostModal() {
-	const [img, setImg] = useState([{ src: "" }]);
+	const [img, setImg] = useState([{ src: "", tags: [] }]);
 	const [imgIndex, setImgIndex] = useState(0);
+	const [searchValue, setSearchValue] = useState("");
+	const [searchResults, setSearchResults] = useState([]);
+	const [locX, setLocX] = useState();
+	const [locY, setLocY] = useState();
+
+	let nextButton;
+	let submitButton;
+	let captionArea;
+	let addMorePicbutton;
+	let popUp;
+	let modal;
+	let pic;
+	let newPostHeader;
+	let captionAndTags;
+	let goBackArrow;
+	let addPostModal;
+	let tagDropDownDiv;
+	let closeSearch;
+
+	const handlers = useSwipeable({
+		onSwipedLeft: () => {
+			if (img.length > 1 && imgIndex !== img.length - 1) {
+				nextPic();
+			}
+		},
+		onSwipedRight: () => {
+			if (img.length > 1 && imgIndex !== 0) {
+				prevPic();
+			}
+		},
+	});
+
+	useEffect(() => {}, [img.tags]);
 
 	useEffect(() => {
-		const addPostModal = document.getElementById("add-post-modal");
-        const addPostModalContent = document.getElementById("img-img");
-        const button = document.getElementById("add-multiple-img");
-        const popUp = document.getElementById("multiple-pic-pop-up");
+		nextButton = document.getElementById("add-post-next-span");
+		submitButton = document.getElementById("submit-span");
+		captionArea = document.getElementById("caption-input-div");
+		addMorePicbutton = document.getElementById("add-multiple-img");
+		popUp = document.getElementById("multiple-pic-pop-up");
+		modal = document.getElementById("add-post-modal-content");
+		pic = document.getElementById("img-img");
+		newPostHeader = document.getElementById("app-post-header-span");
+		captionAndTags = document.getElementById("caption-and-tag-span");
+		goBackArrow = document.getElementById("go-back-arrow");
+		addPostModal = document.getElementById("add-post-modal");
+		tagDropDownDiv = document.getElementById("tag-drop-down");
+		closeSearch = document.getElementById("close-tag-search-result");
+	});
 
+	useEffect(() => {
 		addPostModal.addEventListener("click", (e) => {
 			if (e.target === addPostModal) {
 				closeAddPostModal();
 			}
 		});
 
-        addPostModalContent.addEventListener("click", (e) => {
-            if(e.target === addPostModalContent) {
-                if (popUp.style.display === "flex") {
-                    button.click();
-                }
-            }
-        })
+		pic.addEventListener("click", (e) => {
+			if (e.target === pic) {
+				if (popUp.style.display === "flex") {
+					addMorePicbutton.click();
+				}
+			}
+		});
 	}, []);
 
-    useEffect(() => {
-        handleDots();
-        handlePopUpPic();
-    })
+	useEffect(() => {
+		handleDots();
+		handlePopUpPic();
+	});
 
 	useEffect(() => {
 		const label = document.getElementById("add-post-label");
 		const imgDiv = document.getElementById("add-post-img-div");
-		const next = document.getElementById("add-post-next-span");
 		const spinner = document.getElementById("spinner-add-photo");
 		const addPicPopUp = document.getElementById("add-pic-pop-up");
 
-		
 		handleArrows();
 
 		if (img[0].src === "") {
 			spinner.style.display = "none";
 			imgDiv.style.display = "none";
-			next.style.display = "none";
+			nextButton.style.display = "none";
 			label.style.display = "flex";
 		} else if (img[0].src !== "") {
 			spinner.style.display = "none";
 			label.style.display = "none";
-			next.style.display = "flex";
+			if (submitButton.style.display !== "flex") {
+				nextButton.style.display = "flex";
+			}
 			imgDiv.style.display = "flex";
 		}
 
@@ -115,10 +166,10 @@ function AddPostModal() {
 		}
 	}
 
-    function handlePopUpPic() {
-        const pics = document.querySelectorAll(".pop-up-img-div");
+	function handlePopUpPic() {
+		const pics = document.querySelectorAll(".pop-up-img-div");
 
-        if (imgIndex === 0) {
+		if (imgIndex === 0) {
 			if (pics[1]) {
 				pics[1].classList.add("pop-up-pic-not-active");
 			}
@@ -137,24 +188,19 @@ function AddPostModal() {
 			pics[1].classList.add("pop-up-pic-not-active");
 			pics[2].classList.remove("pop-up-pic-not-active");
 		}
-    }
+	}
 
 	function nextPic() {
-		const button = document.getElementById("add-multiple-img");
-		const popUp = document.getElementById("multiple-pic-pop-up");
 		setImgIndex(imgIndex + 1);
 		if (popUp.style.display === "flex") {
-			button.click();
+			addMorePicbutton.click();
 		}
 	}
 
 	function prevPic() {
-		const button = document.getElementById("add-multiple-img");
-		const popUp = document.getElementById("multiple-pic-pop-up");
-
 		setImgIndex(imgIndex - 1);
 		if (popUp.style.display === "flex") {
-			button.click();
+			addMorePicbutton.click();
 		}
 	}
 
@@ -169,21 +215,20 @@ function AddPostModal() {
 			const reader = new FileReader();
 			reader.onload = () => {
 				if (img[0].src === "") {
-					setImg([{ id: uniqid(), src: reader.result }]);
+					setImg([{ id: uniqid(), src: reader.result, tags: [] }]);
 				} else {
-					setImg([...img, { id: uniqid(), src: reader.result }]);
+					setImg([...img, { id: uniqid(), src: reader.result, tags: [] }]);
 				}
 			};
 			reader.readAsDataURL(img2);
-            e.target.value = "";
-
+			e.target.value = "";
 		}
 	}
 
 	function removeImageFromModal(id) {
 		if (img.length === 1) {
-			setImg([{ src: "" }]);
-			document.getElementById("add-multiple-img").click();
+			setImg([{ src: "", tags: [] }]);
+			addMorePicbutton.click();
 		} else {
 			if (imgIndex !== 0) {
 				setImgIndex(imgIndex - 1);
@@ -195,31 +240,138 @@ function AddPostModal() {
 		}
 	}
 
-    function changePic(id) {
-        let index;
-        
-        img.forEach((pic) => {
-            if(pic.id === id) {
-                index = img.indexOf(pic);
-            }
-        });
-        setImgIndex(index);
-    }
+	function changePic(id) {
+		let index;
 
-	function closeAddPostModal() {
-		const addPostModal = document.getElementById("add-post-modal");
-        const button = document.getElementById("add-multiple-img");
-		const popUp = document.getElementById("multiple-pic-pop-up");
-		window.history.back();
-		addPostModal.style.display = "none";
-        if (popUp.style.display === "flex") {
-			button.click();
-		}
-        setImgIndex(0);
-		setImg([{ src: "" }]);        
+		img.forEach((pic) => {
+			if (pic.id === id) {
+				index = img.indexOf(pic);
+			}
+		});
+		setImgIndex(index);
 	}
 
+	function closeAddPostModal() {
+		window.history.back();
+		addPostModal.style.display = "none";
+		if (popUp.style.display === "flex") {
+			addMorePicbutton.click();
+		}
+		addMorePicbutton.style.display = "flex";
+		submitButton.style.display = "none";
+		captionArea.style.display = "none";
+		newPostHeader.style.display = "flex";
+		captionAndTags.style.display = "none";
+		pic.style.cursor = "default";
+		goBackArrow.style.display = "none";
+		setSearchResults([]);
+		setSearchValue("");
+		if (window.innerWidth > 650) {
+			modal.style.height = "490px";
+			pic.style.borderBottomLeftRadius = "12px";
+			pic.style.borderBottomRightRadius = "12px";
+		}
+		setImgIndex(0);
+		setImg([{ src: "", tags: [] }]);
+	}
 
+	function goToCaptionAndTag() {
+		if (popUp.style.display === "flex") {
+			addMorePicbutton.click();
+		}
+		addMorePicbutton.style.display = "none";
+		nextButton.style.display = "none";
+		submitButton.style.display = "flex";
+		captionArea.style.display = "flex";
+		newPostHeader.style.display = "none";
+		captionAndTags.style.display = "flex";
+		goBackArrow.style.display = "flex";
+		pic.style.cursor = "crosshair";
+		if (window.innerWidth > 650) {
+			modal.style.height = "531px";
+			pic.style.borderBottomLeftRadius = "0px";
+			pic.style.borderBottomRightRadius = "0px";
+		}
+	}
+
+	function backToAddPicture() {
+		addMorePicbutton.style.display = "flex";
+		submitButton.style.display = "none";
+		nextButton.style.display = "flex";
+		captionArea.style.display = "none";
+		captionAndTags.style.display = "none";
+		newPostHeader.style.display = "flex";
+		goBackArrow.style.display = "none";
+		pic.style.cursor = "default";
+		closeTagDropDown();
+		if (window.innerWidth > 650) {
+			modal.style.height = "490px";
+			pic.style.borderBottomLeftRadius = "12px";
+			pic.style.borderBottomRightRadius = "12px";
+		}
+	}
+
+	function tagDropDown(e) {
+		if (pic.style.cursor === "crosshair" && e.target.id === "img-img" && tagDropDownDiv.style.display === "flex") {
+			closeTagDropDown();
+		} else if (pic.style.cursor === "crosshair" && e.target.id === "img-img") {
+			const x = Math.round(((e.nativeEvent.offsetX - 25) / e.nativeEvent.target.offsetWidth) * 100);
+			const y = Math.round(((e.nativeEvent.offsetY + 5) / e.nativeEvent.target.offsetHeight) * 100);
+			const tagArrow = document.getElementById("tag-arrow");
+
+			setLocX(Math.round((e.nativeEvent.offsetX / e.nativeEvent.target.offsetWidth) * 100));
+
+			if (e.nativeEvent.offsetY > 415) {
+				setLocY(Math.round(((e.nativeEvent.offsetY - 33) / e.nativeEvent.target.offsetHeight) * 100));
+			} else {
+				setLocY(Math.round((e.nativeEvent.offsetY / e.nativeEvent.target.offsetHeight) * 100));
+			}
+			tagArrow.style.top = -6 + "px";
+			tagDropDownDiv.style.left = x + "%";
+			tagDropDownDiv.style.top = y + "%";
+			tagDropDownDiv.style.display = "flex";
+
+			if (window.innerHeight - tagDropDownDiv.getBoundingClientRect().bottom < 0) {
+				tagDropDownDiv.style.top = e.nativeEvent.offsetY - 240 + "px";
+				tagArrow.style.top = 96.5 + "%";
+			}
+		}
+	}
+
+	function closeTagDropDown() {
+		if (tagDropDownDiv.style.display === "flex") {
+			tagDropDownDiv.style.display = "none";
+			setSearchResults([]);
+			setSearchValue("");
+			closeSearch.style.display = "none";
+		}
+	}
+
+	function removeTag(name) {
+		setImg((prevImg) => {
+			const newImg = prevImg.map((im) => {
+				if (im.id === img[imgIndex].id) {
+					return { ...im, tags: im.tags.filter((i) => i.username !== name) };
+				}
+				return im;
+			});
+			return newImg;
+		});
+	}
+
+	function tagPosition(info) {
+		let position;
+
+		if (info.locX > 60) {
+			position = {
+				right: 100 - info.locX + "%",
+				top: info.locY + "%",
+			};
+		} else {
+			position = { left: info.locX + "%", top: info.locY + "%" };
+		}
+		return position;
+	}
 
 	return (
 		<div id="add-post-modal" className="modal">
@@ -232,10 +384,17 @@ function AddPostModal() {
 					<span onClick={() => closeAddPostModal()} id="add-post-close-mobile">
 						{CloseModalIcon(() => {})}
 					</span>
+					<span onClick={() => backToAddPicture()} id="go-back-arrow">
+						{BackArrow()}
+					</span>
 					<span id="app-post-header-span">Create new post</span>
-					<span id="add-post-next-span">Next</span>
+					<span id="caption-and-tag-span">Add caption and tags</span>
+					<span onClick={() => goToCaptionAndTag()} id="add-post-next-span">
+						Next
+					</span>
+					<span id="submit-span">Submit</span>
 				</div>
-				<div id="add-post-input-div">
+				<div id="add-post-input-div" onClick={(e) => tagDropDown(e)}>
 					<div id="spinner-add-photo">
 						<FontAwesomeIcon
 							style={{ height: "40px", width: "40px" }}
@@ -243,8 +402,32 @@ function AddPostModal() {
 							className="fa-spin"
 						/>
 					</div>
-					<div id="add-post-img-div">
+					<div {...handlers} id="add-post-img-div">
+						<div id="tag-drop-down">
+							<TagSearch
+								searchResults={searchResults}
+								searchValue={searchValue}
+								setSearchValue={setSearchValue}
+								setSearchResults={setSearchResults}
+								locX={locX}
+								locY={locY}
+								img={img}
+								setImg={setImg}
+								imgIndex={imgIndex}
+								closeTagDropDown={closeTagDropDown}
+							/>
+						</div>
 						<img id="img-img" src={img[imgIndex].src} alt="" />
+						{img[imgIndex].tags.map((tag) => {
+							return (
+								<div key={uniqid()} style={tagPosition(tag)} className="tag-div">
+									<span>{tag.username}</span>
+									<div onClick={() => removeTag(tag.username)} className="remove-tag-div">
+										{SmallCloseIcon()}
+									</div>
+								</div>
+							);
+						})}
 						<div className="slider-dots-div" id="slider-dots-div-modal">
 							{img.map((img) => {
 								return <div className="slider-dot-modal" key={uniqid()}></div>;
@@ -266,7 +449,12 @@ function AddPostModal() {
 										>
 											{SmallCloseIcon()}
 										</div>
-										<img onClick={() => changePic(img.id)} className="pop-up-img" src={img.src} alt="" />
+										<img
+											onClick={() => changePic(img.id)}
+											className="pop-up-img"
+											src={img.src}
+											alt=""
+										/>
 									</div>
 								);
 							})}
@@ -281,8 +469,175 @@ function AddPostModal() {
 						<input onChange={(e) => handleImage(e)} id="img-input" type="file" accept="image/*" />
 					</label>
 				</div>
+				<div
+					onClick={() => {
+						closeTagDropDown();
+					}}
+					id="caption-input-div"
+				>
+					<CaptionArea />
+				</div>
 			</div>
 		</div>
+	);
+}
+
+function TagSearch(props) {
+	let closeSearch;
+
+	useEffect(() => {
+		closeSearch = document.getElementById("close-tag-search-result");
+	});
+
+	function cancelSearch() {
+		props.setSearchResults([]);
+		props.setSearchValue("");
+		closeSearch.style.display = "none";
+	}
+
+	function handleSearch(e) {
+		const spinner = document.getElementById("spinner-tag");
+		const smallSpinner = document.getElementById("small-spinner-tag");
+
+		props.setSearchValue(e.target.value);
+
+		if (e.target.value !== "") {
+			if (props.searchResults.length === 0) {
+				spinner.style.display = "flex";
+			}
+
+			closeSearch.style.display = "none";
+			smallSpinner.style.display = "flex";
+
+			searchFunction(e.target.value).then((result) => {
+				smallSpinner.style.display = "none";
+				spinner.style.display = "none";
+
+				props.setSearchResults(result);
+				closeSearch.style.display = "flex";
+			});
+		} else if (e.target.value === "") {
+			props.setSearchResults([]);
+			closeSearch.style.display = "none";
+		}
+	}
+
+	function addTag(name) {
+		props.setImg((prevImg) => {
+			const newImg = prevImg.map((img) => {
+				if (img.id === props.img[props.imgIndex].id) {
+					if (img.tags.some((e) => e.username === name)) {
+						const updatedTags = img.tags.filter((tag) => tag.username !== name);
+						return {
+							...img,
+							tags: [...updatedTags, { username: name, locY: props.locY, locX: props.locX }],
+						};
+					}
+					return { ...img, tags: [...img.tags, { username: name, locY: props.locY, locX: props.locX }] };
+				}
+				return img;
+			});
+			return newImg;
+		});
+		props.closeTagDropDown();
+	}
+
+	return (
+		<>
+			<div id="tag-arrow"></div>
+			<div id="tag-input-div">
+				<span>Tag:</span>
+				<input
+					type="text"
+					value={props.searchValue}
+					onChange={(e) => handleSearch(e)}
+					autoComplete="off"
+					placeholder="Search"
+				/>
+				<div onClick={() => cancelSearch()} id="close-tag-search-result">
+					<FontAwesomeIcon icon={faCircleXmark} />
+				</div>
+				<div id="small-spinner-tag">
+					<FontAwesomeIcon icon={faSpinner} className="fa-spin" />
+				</div>
+			</div>
+			<div id="tag-search-results-div">
+				{props.searchResults.map((result) => {
+					return (
+						<div onClick={() => addTag(result)} key={uniqid()} className="share-modal-single-result">
+							<img src={ava} alt="" />
+							<span>{result}</span>
+						</div>
+					);
+				})}
+				<div id="spinner-tag">
+					<FontAwesomeIcon icon={faSpinner} className="fa-spin" />
+				</div>
+			</div>
+		</>
+	);
+}
+
+function CaptionArea() {
+	const [commentValue, setCaptionValue] = useState("");
+
+	function handleCaptionTextAreaChange(e) {
+		setCaptionValue(e.target.value);
+	}
+
+	function handleCaptionEmoji(e, emojiObject) {
+		const textarea = document.getElementById("caption-textarea");
+		setCaptionValue(textarea.value + emojiObject.emoji);
+	}
+
+	function showEmojiiPicker(e) {
+		function hideEmojiiPicker(e) {
+			let found = false;
+
+			e.path.forEach((ele) => {
+				if (ele.id === "caption-emoji" || ele.id === "idsvg" || ele.id === "idpath") {
+					found = true;
+				}
+			});
+
+			if (!found) {
+				ReactDOM.unmountComponentAtNode(document.getElementById("caption-emoji"));
+				window.removeEventListener("click", hideEmojiiPicker);
+			}
+		}
+
+		if (!document.getElementById("caption-emoji").firstChild) {
+			render(
+				<Picker
+					natvie={true}
+					disableSearchBar={true}
+					pickerStyle={{ position: "absolute", bottom: "35px", left: "0px" }}
+					onEmojiClick={(e, emojiObject) => handleCaptionEmoji(e, emojiObject)}
+				/>,
+				document.getElementById("caption-emoji")
+			);
+
+			window.addEventListener("click", hideEmojiiPicker);
+		} else if (e.target.tagName === "svg" || e.target.tagName === "path") {
+			ReactDOM.unmountComponentAtNode(document.getElementById("caption-emoji"));
+		}
+	}
+
+	return (
+		<>
+			<div onClick={(e) => showEmojiiPicker(e)} id="caption-emoji-icon-div" className="emoji-div">
+				<div id="caption-emoji"></div>
+				{EmojiiIcon("id")}
+			</div>
+			<textarea
+				id="caption-textarea"
+				value={commentValue}
+				onChange={(e) => handleCaptionTextAreaChange(e)}
+				placeholder="Write a caption..."
+				className="add-comment-text-area"
+				autoComplete="off"
+			></textarea>
+		</>
 	);
 }
 
