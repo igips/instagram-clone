@@ -22,6 +22,9 @@ function Modals(props) {
 				unFollow={props.unFollow}
 				following={props.following}
 				userData={props.userDataOptionsModal}
+				removePost={props.removePost}
+				postIdOptionsModal={props.postIdOptionsModal}
+				commModalSetPostId={props.commModalSetPostId}
 			/>
 			<LikesModal
 				users={props.users}
@@ -38,6 +41,7 @@ function Modals(props) {
 				following={props.following}
 				dropDownSetUserData={props.dropDownSetUserData}
 				optionsModalSetUserData={props.optionsModalSetUserData}
+				setpostIdOptionsModal={props.setpostIdOptionsModal}
 				posts={props.posts}
 				commModalPostId={props.commModalPostId}
 				signedIn={props.signedIn}
@@ -56,7 +60,7 @@ function Modals(props) {
 				follow={props.follow}
 				unFollow={props.unFollow}
 			/>
-			<AddPostModal />
+			<AddPostModal yourUsername={props.username} addPost={props.addPost} firestoreDocId={props.firestoreDocId} />
 		</>
 	);
 }
