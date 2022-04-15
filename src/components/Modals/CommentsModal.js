@@ -50,11 +50,6 @@ function CommentsModal(props) {
 		});
 	}, []);
 
-	function hideCommentsModal() {
-		const modal = document.getElementById("comments-modal");
-		window.history.back();
-		modal.style.display = "none";
-	}
 
 	return (
 		<div id="comments-modal" className="modal">
@@ -81,6 +76,8 @@ function CommentsModal(props) {
 							avatar={postData.avatar}
 							dropDownSetUserData={props.dropDownSetUserData}
 							optionsModalSetUserData={props.optionsModalSetUserData}
+							setpostIdOptionsModal={props.setpostIdOptionsModal}
+							postId={postData.id}
 						/>
 					</div>
 					<div id="modal-comments-section">
@@ -130,6 +127,12 @@ function CommentsModal(props) {
 			</div>
 		</div>
 	);
+}
+
+function hideCommentsModal() {
+	const modal = document.getElementById("comments-modal");
+	window.history.back();
+	modal.style.display = "none";
 }
 
 function Comments(props) {
@@ -314,4 +317,4 @@ function showCommentsModal(postId, commModalSetPostId) {
 }
 
 export default CommentsModal;
-export {showCommentsModal}
+export {showCommentsModal, hideCommentsModal}
