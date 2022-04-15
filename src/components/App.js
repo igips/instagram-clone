@@ -7,9 +7,7 @@ import { getDocId, getUserData, getUsers } from "..";
 import { arrayRemove, arrayUnion, doc, getFirestore, increment, onSnapshot, updateDoc } from "firebase/firestore";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 import DropDown, { hideDropDown } from "./DropDown";
-import uniqid from "uniqid";
-import ava from "../img/ava.jpeg";
-import testPic from "../img/test-img.jpg";
+import { deleteObject, getStorage, ref } from "firebase/storage";
 
 function App() {
 	const [signedIn, setSignedIn] = useState(false);
@@ -19,40 +17,32 @@ function App() {
 	const [firestoreDocId, setfirestoreDocId] = useState("");
 	const [notifications, setNotifications] = useState([]);
 	const [unReadNoti, setUnReadNoti] = useState(0);
+	const [posts, setPosts] = useState([]);
+
 	let unsubscribe;
 
-	const [posts, setPosts] = useState([
-		{
-			id: uniqid(),
-			likes: { num: 0, users: [] },
-			comments: [],
-			username: "igips",
-			description: "aabbcc",
-			avatar: ava,
-			pic: testPic,
-			date: new Date(),
-		},
-		{
-			id: uniqid(),
-			likes: { num: 0, users: [] },
-			comments: [],
-			username: "John12",
-			description: "23123",
-			avatar: ava,
-			pic: testPic,
-			date: new Date(),
-		},
-		{
-			id: uniqid(),
-			likes: { num: 0, users: [] },
-			comments: [],
-			username: "Max33",
-			description: "dsadsd",
-			avatar: ava,
-			pic: testPic,
-			date: new Date(),
-		},
-	]);
+	function addPost(post) {
+		setPosts([...posts, post]);
+	}
+
+	function removePost(id) {
+		const storage = getStorage();
+
+		for (let p of posts) {
+			if (p.id === id) {
+				p.pic.forEach((picture) => {
+					deleteObject(ref(storage, "images/" + picture.id));
+				});
+				updateDoc(doc(getFirestore(), "usernames", firestoreDocId), { posts: arrayRemove(p) });
+				break;
+			}
+		}
+
+		setPosts((oldPosts) => {
+			const newPosts = oldPosts.filter((post) => post.id !== id);
+			return newPosts;
+		});
+	}
 
 	//DROPDOWN//
 	const [userDataDropDown, setUserDataDropDown] = useState();
@@ -72,10 +62,12 @@ function App() {
 
 	//OPTIONSMODAL//
 	const [userDataOptionsModal, setUserDataOptionsModal] = useState();
+	const [postIdOptionsModal, setpostIdOptionsModal] = useState();
 
 	function optionsModalSetUserData(data) {
 		setUserDataOptionsModal(data);
 	}
+
 	//OPTIONSMODAL//
 
 	//COMMENTSMODAL//
@@ -126,12 +118,24 @@ function App() {
 		} else {
 			setfirestoreDocId("");
 		}
-
 		getUsers().then((users) => {
 			shuffleArray(users);
 			setUsers(users);
+			initialSetPosts(users);
 		});
 	}, [signedIn]);
+
+	function initialSetPosts(data) {
+		const posts2 = [];
+
+		data.forEach((u) => {
+			u.posts.forEach((p) => {
+				posts2.push(p);
+			});
+		});
+
+		setPosts(posts2);
+	}
 
 	function removeComment(postId, commentId) {
 		setPosts((prevPosts) => {
@@ -306,14 +310,20 @@ function App() {
 				likesForLikesModal={likesForLikesModal}
 				userDataOptionsModal={userDataOptionsModal}
 				optionsModalSetUserData={optionsModalSetUserData}
+				setpostIdOptionsModal={setpostIdOptionsModal}
 				posts={posts}
 				commModalPostId={commModalPostId}
 				signedIn={signedIn}
 				likesModalSetLikes={likesModalSetLikes}
 				likeComment={likeComment}
 				removeComment={removeComment}
-        likePicture={likePicture}
-        addComment={addComment}
+				likePicture={likePicture}
+				addComment={addComment}
+				addPost={addPost}
+				firestoreDocId={firestoreDocId}
+				removePost={removePost}
+				postIdOptionsModal={postIdOptionsModal}
+				commModalSetPostId={commModalSetPostId}
 			></Modals>
 			<Nav
 				clearNotifications={clearNotifications}
@@ -326,6 +336,7 @@ function App() {
 				unFollow={unFollow}
 			></Nav>
 			<Home
+				setpostIdOptionsModal={setpostIdOptionsModal}
 				optionsModalSetUserData={optionsModalSetUserData}
 				likesModalSetLikes={likesModalSetLikes}
 				dropDownSetUserData={dropDownSetUserData}
