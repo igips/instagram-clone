@@ -1,5 +1,6 @@
 import { getAuth } from "firebase/auth";
 import { useEffect } from "react";
+import { hideCommentsModal } from "./CommentsModal";
 import { showSignInModal } from "./SignInModal";
 
 
@@ -13,6 +14,17 @@ function OptionsModal(props) {
 			}
 		});
 	}, []);
+
+	function deletePost() {
+		props.commModalSetPostId(); 
+		props.removePost(props.postIdOptionsModal); 
+		hideOptionsModal(); 
+
+		if(document.getElementById("comments-modal").style.display === "flex") {
+			hideCommentsModal();
+		}
+		
+	}
    
 	function buttons() {
 		const user = getAuth().currentUser;
@@ -20,7 +32,7 @@ function OptionsModal(props) {
 		if (props.userData &&  user && user.uid === props.userData.uid) {
 			return (
 				<>
-					<span>Delete</span>
+					<span onClick={() => deletePost()}>Delete</span>
 					<span>Edit</span>
 				</>
 			);
