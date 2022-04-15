@@ -98,6 +98,7 @@ function Home(props) {
 									yourUsername={props.username}
 									likesModalSetLikes={props.likesModalSetLikes}
 									optionsModalSetUserData={props.optionsModalSetUserData}
+									setpostIdOptionsModal={props.setpostIdOptionsModal}
 									post={post}
 									likePicture={props.likePicture}
 									signedIn={props.signedIn}
