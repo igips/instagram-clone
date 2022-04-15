@@ -13,13 +13,16 @@ import Picker from "emoji-picker-react";
 import { EmojiiIcon } from "../Icons/EmojiiIcon";
 import { faCircleXmark } from "@fortawesome/free-regular-svg-icons";
 import ava from "../../img/ava.jpeg";
-import { searchFunction } from "../..";
+import { getDocId, searchFunction } from "../..";
+import { arrayUnion, doc, getFirestore, updateDoc, increment } from "firebase/firestore";
+import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
 
-function AddPostModal() {
+function AddPostModal(props) {
 	const [img, setImg] = useState([{ src: "", tags: [] }]);
 	const [imgIndex, setImgIndex] = useState(0);
 	const [searchValue, setSearchValue] = useState("");
 	const [searchResults, setSearchResults] = useState([]);
+	const [captionValue, setCaptionValue] = useState("");
 	const [locX, setLocX] = useState();
 	const [locY, setLocY] = useState();
 
@@ -36,6 +39,9 @@ function AddPostModal() {
 	let addPostModal;
 	let tagDropDownDiv;
 	let closeSearch;
+	let tagDiv;
+	let spinner;
+	let imgDiv;
 
 	const handlers = useSwipeable({
 		onSwipedLeft: () => {
@@ -49,8 +55,6 @@ function AddPostModal() {
 			}
 		},
 	});
-
-	useEffect(() => {}, [img.tags]);
 
 	useEffect(() => {
 		nextButton = document.getElementById("add-post-next-span");
@@ -66,6 +70,9 @@ function AddPostModal() {
 		addPostModal = document.getElementById("add-post-modal");
 		tagDropDownDiv = document.getElementById("tag-drop-down");
 		closeSearch = document.getElementById("close-tag-search-result");
+		tagDiv = document.getElementById("tag-div-modal");
+		spinner = document.getElementById("spinner-add-photo");
+		imgDiv = document.getElementById("add-post-img-div");
 	});
 
 	useEffect(() => {
@@ -91,7 +98,6 @@ function AddPostModal() {
 
 	useEffect(() => {
 		const label = document.getElementById("add-post-label");
-		const imgDiv = document.getElementById("add-post-img-div");
 		const spinner = document.getElementById("spinner-add-photo");
 		const addPicPopUp = document.getElementById("add-pic-pop-up");
 
@@ -117,6 +123,69 @@ function AddPostModal() {
 			addPicPopUp.style.display = "flex";
 		}
 	}, [img, imgIndex]);
+
+	function dataURLtoBlob(dataurl) {
+		let arr = dataurl.split(","),
+			mime = arr[0].match(/:(.*?);/)[1],
+			bstr = atob(arr[1]),
+			n = bstr.length,
+			u8arr = new Uint8Array(n);
+		while (n--) {
+			u8arr[n] = bstr.charCodeAt(n);
+		}
+		return new Blob([u8arr], { type: mime });
+	}
+
+	function submitPost() {
+		imgDiv.style.display = "none";
+		spinner.style.display = "flex";
+		const storage = getStorage();
+
+		const promises = img.map(async (i) => {
+			const picImagesRef = ref(storage, "images/" + i.id);
+			const snapshot = await uploadBytes(picImagesRef, dataURLtoBlob(i.src));
+			return getDownloadURL(snapshot.ref);
+		});
+
+		Promise.all(promises).then((d) => {
+			const post = {
+				id: uniqid(),
+				likes: { num: 0, users: [] },
+				comments: [],
+				username: props.yourUsername,
+				description: captionValue,
+				avatar: ava,
+				pic: img.map((oldImg, index) => {
+					return { ...oldImg, src: d[index] };
+				}),
+				date: Date.now(),
+			};
+
+			props.addPost(post);
+			updateDoc(doc(getFirestore(), "usernames", props.firestoreDocId), { posts: arrayUnion(post) });
+
+			img.forEach((i) => {
+				i.tags.forEach((t) => {
+					getDocId(t.username).then((id) => {
+						if (t.username !== props.yourUsername) {
+							updateDoc(doc(getFirestore(), "usernames", id), {
+								notifications: arrayUnion({
+									username: props.yourUsername,
+									content: "tagged you in a post.",
+									postID: post.id,
+									date: Date.now(),
+								}),
+								unReadNoti: increment(1),
+							});
+						}
+					});
+				});
+			});
+
+			spinner.style.display = "none";
+			closeAddPostModal();
+		});
+	}
 
 	function handleDots() {
 		const dots = document.querySelectorAll(".slider-dot-modal");
@@ -264,6 +333,7 @@ function AddPostModal() {
 		captionAndTags.style.display = "none";
 		pic.style.cursor = "default";
 		goBackArrow.style.display = "none";
+		tagDropDownDiv.style.display = "none";
 		setSearchResults([]);
 		setSearchValue("");
 		if (window.innerWidth > 650) {
@@ -286,6 +356,7 @@ function AddPostModal() {
 		newPostHeader.style.display = "none";
 		captionAndTags.style.display = "flex";
 		goBackArrow.style.display = "flex";
+		tagDiv.style.display = "flex";
 		pic.style.cursor = "crosshair";
 		if (window.innerWidth > 650) {
 			modal.style.height = "531px";
@@ -302,6 +373,7 @@ function AddPostModal() {
 		captionAndTags.style.display = "none";
 		newPostHeader.style.display = "flex";
 		goBackArrow.style.display = "none";
+		tagDiv.style.display = "none";
 		pic.style.cursor = "default";
 		closeTagDropDown();
 		if (window.innerWidth > 650) {
@@ -326,15 +398,22 @@ function AddPostModal() {
 			} else {
 				setLocY(Math.round((e.nativeEvent.offsetY / e.nativeEvent.target.offsetHeight) * 100));
 			}
-			tagArrow.style.top = -6 + "px";
-			tagDropDownDiv.style.left = x + "%";
-			tagDropDownDiv.style.top = y + "%";
-			tagDropDownDiv.style.display = "flex";
+			if (window.innerWidth > 650) {
+				tagArrow.style.top = -6 + "px";
+				tagDropDownDiv.style.left = x + "%";
+				tagDropDownDiv.style.top = y + "%";
 
-			if (window.innerHeight - tagDropDownDiv.getBoundingClientRect().bottom < 0) {
-				tagDropDownDiv.style.top = e.nativeEvent.offsetY - 240 + "px";
-				tagArrow.style.top = 96.5 + "%";
+				if (window.innerHeight - tagDropDownDiv.getBoundingClientRect().bottom < 0) {
+					tagDropDownDiv.style.top = e.nativeEvent.offsetY - 240 + "px";
+					tagArrow.style.top = 96.5 + "%";
+				}
+			} else {
+				tagDropDownDiv.style.left = 0;
+				tagDropDownDiv.style.top = "-42px";
+				tagDropDownDiv.style.width = "100%";
+				tagDropDownDiv.style.height = "100vh";
 			}
+			tagDropDownDiv.style.display = "flex";
 		}
 	}
 
@@ -392,7 +471,9 @@ function AddPostModal() {
 					<span onClick={() => goToCaptionAndTag()} id="add-post-next-span">
 						Next
 					</span>
-					<span id="submit-span">Submit</span>
+					<span onClick={() => submitPost()} id="submit-span">
+						Submit
+					</span>
 				</div>
 				<div id="add-post-input-div" onClick={(e) => tagDropDown(e)}>
 					<div id="spinner-add-photo">
@@ -418,16 +499,19 @@ function AddPostModal() {
 							/>
 						</div>
 						<img id="img-img" src={img[imgIndex].src} alt="" />
-						{img[imgIndex].tags.map((tag) => {
-							return (
-								<div key={uniqid()} style={tagPosition(tag)} className="tag-div">
-									<span>{tag.username}</span>
-									<div onClick={() => removeTag(tag.username)} className="remove-tag-div">
-										{SmallCloseIcon()}
+						<div id="tag-div-modal">
+							{img[imgIndex].tags.map((tag) => {
+								return (
+									<div key={uniqid()} style={tagPosition(tag)} className="tag-div">
+										<span>{tag.username}</span>
+										<div onClick={() => removeTag(tag.username)} className="remove-tag-div">
+											{SmallCloseIcon()}
+										</div>
 									</div>
-								</div>
-							);
-						})}
+								);
+							})}
+						</div>
+
 						<div className="slider-dots-div" id="slider-dots-div-modal">
 							{img.map((img) => {
 								return <div className="slider-dot-modal" key={uniqid()}></div>;
@@ -475,7 +559,7 @@ function AddPostModal() {
 					}}
 					id="caption-input-div"
 				>
-					<CaptionArea />
+					<CaptionArea captionValue={captionValue} setCaptionValue={setCaptionValue} />
 				</div>
 			</div>
 		</div>
@@ -546,6 +630,9 @@ function TagSearch(props) {
 		<>
 			<div id="tag-arrow"></div>
 			<div id="tag-input-div">
+				<span id="close-tag-drop-down-mobile" onClick={() => props.closeTagDropDown()}>
+					{CloseModalIcon(() => {})}
+				</span>
 				<span>Tag:</span>
 				<input
 					type="text"
@@ -578,16 +665,14 @@ function TagSearch(props) {
 	);
 }
 
-function CaptionArea() {
-	const [commentValue, setCaptionValue] = useState("");
-
+function CaptionArea(props) {
 	function handleCaptionTextAreaChange(e) {
-		setCaptionValue(e.target.value);
+		props.setCaptionValue(e.target.value);
 	}
 
 	function handleCaptionEmoji(e, emojiObject) {
 		const textarea = document.getElementById("caption-textarea");
-		setCaptionValue(textarea.value + emojiObject.emoji);
+		props.setCaptionValue(textarea.value + emojiObject.emoji);
 	}
 
 	function showEmojiiPicker(e) {
@@ -609,7 +694,8 @@ function CaptionArea() {
 		if (!document.getElementById("caption-emoji").firstChild) {
 			render(
 				<Picker
-					natvie={true}
+					preload={false}
+					natvie={false}
 					disableSearchBar={true}
 					pickerStyle={{ position: "absolute", bottom: "35px", left: "0px" }}
 					onEmojiClick={(e, emojiObject) => handleCaptionEmoji(e, emojiObject)}
@@ -631,7 +717,7 @@ function CaptionArea() {
 			</div>
 			<textarea
 				id="caption-textarea"
-				value={commentValue}
+				value={props.captionValue}
 				onChange={(e) => handleCaptionTextAreaChange(e)}
 				placeholder="Write a caption..."
 				className="add-comment-text-area"
