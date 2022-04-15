@@ -29,6 +29,8 @@ function PictureCard(props) {
 					avatar={props.post.avatar}
 					dropDownSetUserData={props.dropDownSetUserData}
 					optionsModalSetUserData={props.optionsModalSetUserData}
+					setpostIdOptionsModal={props.setpostIdOptionsModal}
+					postId={props.post.id}
 				/>
 			</div>
 			<div className="picture-div">
@@ -116,7 +118,7 @@ function AddCommentSection(props) {
 					comment: commentValue,
 					id: uniqid(),
 					likes: { num: 0, users: [] },
-					date: new Date(),
+					date: Date.now(),
 				},
 				props.postId
 			);
@@ -274,7 +276,9 @@ function PictureCardHeader(props) {
 				</header>
 				<div
 					onClick={() =>
-						options(getUserDataFromUsersArray(props.users, props.username), props.optionsModalSetUserData)
+						{options(getUserDataFromUsersArray(props.users, props.username), props.optionsModalSetUserData);
+						props.setpostIdOptionsModal(props.postId);
+						}
 					}
 					className="picture-card-header-options"
 				>
