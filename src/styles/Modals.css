@@ -835,6 +835,11 @@ input[type="file"] {
 	cursor: pointer;
 }
 
+#close-tag-drop-down-mobile {
+	display: none;
+	padding-top: 2px;
+}
+
 
 
 @media (max-width: 650px) {
@@ -964,6 +969,18 @@ input[type="file"] {
 		min-height: 40px !important;
 		padding-left: 10px;
 
+	}
+
+	#tag-arrow {
+		opacity: 0;
+	}
+
+	#tag-drop-down  {
+		border-radius: 0px;
+	}
+
+	#close-tag-drop-down-mobile {
+		display: flex;
 	}
 
 	
