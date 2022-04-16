@@ -712,7 +712,7 @@ input[type="file"] {
 	gap: 3px;
 }
 
-.slider-dot-modal {
+.slider-dot-modal, .slider-dot-pc {
 	width: 6px;
 	height: 6px;
 	border-radius: 50%;
@@ -816,7 +816,7 @@ input[type="file"] {
 	width: 14px;
 }
 
-.tag-div {
+.tag-div, .tag-div-picture-card {
 	display: flex;
 	position: absolute;
 	background-color: rgba(0,0,0);

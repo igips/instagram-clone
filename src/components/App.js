@@ -18,31 +18,9 @@ function App() {
 	const [notifications, setNotifications] = useState([]);
 	const [unReadNoti, setUnReadNoti] = useState(0);
 	const [posts, setPosts] = useState([]);
+  const [index, setIndex] = useState({num: 0, id: ""});
 
 	let unsubscribe;
-
-	function addPost(post) {
-		setPosts([...posts, post]);
-	}
-
-	function removePost(id) {
-		const storage = getStorage();
-
-		for (let p of posts) {
-			if (p.id === id) {
-				p.pic.forEach((picture) => {
-					deleteObject(ref(storage, "images/" + picture.id));
-				});
-				updateDoc(doc(getFirestore(), "usernames", firestoreDocId), { posts: arrayRemove(p) });
-				break;
-			}
-		}
-
-		setPosts((oldPosts) => {
-			const newPosts = oldPosts.filter((post) => post.id !== id);
-			return newPosts;
-		});
-	}
 
 	//DROPDOWN//
 	const [userDataDropDown, setUserDataDropDown] = useState();
@@ -134,14 +112,46 @@ function App() {
 			});
 		});
 
+    posts2.sort((a,b) => {
+      return new Date(b.date) - new Date(a.date);
+    });
+
 		setPosts(posts2);
+	}
+
+	function addPost(post) {
+		setPosts([post, ...posts]);
+	}
+
+	function removePost(id) {
+		const storage = getStorage();
+
+		for (let p of posts) {
+			if (p.id === id) {
+				p.pic.forEach((picture) => {
+					deleteObject(ref(storage, "images/" + picture.id));
+				});
+				updateDoc(doc(getFirestore(), "usernames", firestoreDocId), { posts: arrayRemove(p) });
+				break;
+			}
+		}
+
+		setPosts((oldPosts) => {
+			const newPosts = oldPosts.filter((post) => post.id !== id);
+			return newPosts;
+		});
 	}
 
 	function removeComment(postId, commentId) {
 		setPosts((prevPosts) => {
 			const newPosts = prevPosts.map((post) => {
 				if (post.id === postId) {
-					return { ...post, comments: post.comments.filter((comment) => comment.id !== commentId) };
+					const newP = { ...post, comments: post.comments.filter((comment) => comment.id !== commentId) };
+					getDocId(post.username).then(async (id) => {
+						await updateDoc(doc(getFirestore(), "usernames", id), { posts: arrayRemove(post) });
+						updateDoc(doc(getFirestore(), "usernames", id), { posts: arrayUnion(newP) });
+					});
+					return newP;
 				}
 				return post;
 			});
@@ -153,10 +163,27 @@ function App() {
 		setPosts((prevPosts) => {
 			const newPosts = prevPosts.map((post) => {
 				if (post.id === id) {
-					return { ...post, comments: [...post.comments, comment] };
+					const newP = { ...post, comments: [...post.comments, comment] };
+					getDocId(post.username).then(async (id) => {
+						await updateDoc(doc(getFirestore(), "usernames", id), { posts: arrayRemove(post) });
+						updateDoc(doc(getFirestore(), "usernames", id), { posts: arrayUnion(newP) });
+						if (post.username !== username) {
+							updateDoc(doc(getFirestore(), "usernames", id), {
+								notifications: arrayUnion({
+									username: username,
+									content: "commented your post.",
+									postID: post.id,
+									date: Date.now(),
+								}),
+								unReadNoti: increment(1),
+							});
+						}
+					});
+					return newP;
 				}
 				return post;
 			});
+
 			return newPosts;
 		});
 	}
@@ -165,11 +192,15 @@ function App() {
 		setPosts((prevPosts) => {
 			const newPosts = prevPosts.map((post) => {
 				if (post.id === postId) {
-					return {
+          let newLike = false;
+          let commentUsername;
+					const newP = {
 						...post,
 						comments: post.comments.map((comment) => {
 							if (comment.id === commentId) {
 								if (!comment.likes.users.includes(username)) {
+                  commentUsername = comment.username;
+                  newLike = true;
 									return {
 										...comment,
 										likes: {
@@ -190,6 +221,24 @@ function App() {
 							return comment;
 						}),
 					};
+
+          getDocId(post.username).then(async (id) => {
+						await updateDoc(doc(getFirestore(), "usernames", id), { posts: arrayRemove(post) });
+						updateDoc(doc(getFirestore(), "usernames", id), { posts: arrayUnion(newP) });
+						if (newLike && commentUsername !== username) {
+							updateDoc(doc(getFirestore(), "usernames", id), {
+								notifications: arrayUnion({
+									username: username,
+									content: "liked your comment.",
+									postID: post.id,
+									date: Date.now(),
+								}),
+								unReadNoti: increment(1),
+							});
+						}
+					});
+
+					return newP;
 				}
 				return post;
 			});
@@ -201,10 +250,13 @@ function App() {
 		setPosts((prevPosts) => {
 			const newPosts = prevPosts.map((post) => {
 				if (post.id === id) {
+					let newP;
+					let newLike = false;
 					if (!post.likes.users.includes(username)) {
-						return { ...post, likes: { num: post.likes.num + 1, users: [...post.likes.users, username] } };
+						newP = { ...post, likes: { num: post.likes.num + 1, users: [...post.likes.users, username] } };
+						newLike = true;
 					} else {
-						return {
+						newP = {
 							...post,
 							likes: {
 								num: post.likes.num - 1,
@@ -212,7 +264,24 @@ function App() {
 							},
 						};
 					}
+					getDocId(post.username).then(async (id) => {
+						await updateDoc(doc(getFirestore(), "usernames", id), { posts: arrayRemove(post) });
+						updateDoc(doc(getFirestore(), "usernames", id), { posts: arrayUnion(newP) });
+						if (newLike && post.username !== username) {
+							updateDoc(doc(getFirestore(), "usernames", id), {
+								notifications: arrayUnion({
+									username: username,
+									content: "liked your post.",
+									postID: post.id,
+									date: Date.now(),
+								}),
+								unReadNoti: increment(1),
+							});
+						}
+					});
+					return newP;
 				}
+
 				return post;
 			});
 			return newPosts;
@@ -351,6 +420,8 @@ function App() {
 				addComment={addComment}
 				likeComment={likeComment}
 				commModalSetPostId={commModalSetPostId}
+        index={index}
+        setIndex={setIndex}
 			></Home>
 		</section>
 	);

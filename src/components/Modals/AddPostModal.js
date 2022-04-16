@@ -336,6 +336,7 @@ function AddPostModal(props) {
 		tagDropDownDiv.style.display = "none";
 		setSearchResults([]);
 		setSearchValue("");
+		setCaptionValue("");
 		if (window.innerWidth > 650) {
 			modal.style.height = "490px";
 			pic.style.borderBottomLeftRadius = "12px";
@@ -398,22 +399,25 @@ function AddPostModal(props) {
 			} else {
 				setLocY(Math.round((e.nativeEvent.offsetY / e.nativeEvent.target.offsetHeight) * 100));
 			}
+
 			if (window.innerWidth > 650) {
 				tagArrow.style.top = -6 + "px";
 				tagDropDownDiv.style.left = x + "%";
 				tagDropDownDiv.style.top = y + "%";
 
-				if (window.innerHeight - tagDropDownDiv.getBoundingClientRect().bottom < 0) {
-					tagDropDownDiv.style.top = e.nativeEvent.offsetY - 240 + "px";
-					tagArrow.style.top = 96.5 + "%";
-				}
 			} else {
 				tagDropDownDiv.style.left = 0;
 				tagDropDownDiv.style.top = "-42px";
 				tagDropDownDiv.style.width = "100%";
 				tagDropDownDiv.style.height = "100vh";
 			}
-			tagDropDownDiv.style.display = "flex";
+            tagDropDownDiv.style.display = "flex";
+
+            if (window.innerHeight - tagDropDownDiv.getBoundingClientRect().bottom < 0) {
+                tagDropDownDiv.style.top = e.nativeEvent.offsetY - 240 + "px";
+                tagArrow.style.top = 96.5 + "%";
+            }
+			
 		}
 	}
 
@@ -436,20 +440,6 @@ function AddPostModal(props) {
 			});
 			return newImg;
 		});
-	}
-
-	function tagPosition(info) {
-		let position;
-
-		if (info.locX > 60) {
-			position = {
-				right: 100 - info.locX + "%",
-				top: info.locY + "%",
-			};
-		} else {
-			position = { left: info.locX + "%", top: info.locY + "%" };
-		}
-		return position;
 	}
 
 	return (
@@ -735,5 +725,23 @@ function showAddPostModal() {
 	addPostModal.style.display = "flex";
 }
 
+function tagPosition(info) {
+	let position;
+
+
+	if (info.locX > 60) {
+		position = {
+			right: 100 - info.locX + "%",
+			top: info.locY + "%"
+		};
+        
+	} else {
+		position = { left: info.locX + "%", top: info.locY + "%"};
+	}
+
+
+	return position;
+}
+
 export default AddPostModal;
-export { showAddPostModal };
+export { showAddPostModal, tagPosition };
