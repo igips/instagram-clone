@@ -547,7 +547,7 @@
 	position: relative;
 }
 
-#caption-and-tag-span {
+#caption-and-tag-span, #edit-span {
 	display: none;
 }
 

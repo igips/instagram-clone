@@ -407,23 +407,20 @@ main {
 	color: rgba(142, 142, 142);
 }
 
-.drop-down-inner-third {
+.drop-down-inner-third, #mini-pic-div {
 	border-bottom: 1px solid rgba(219, 219, 219);
 	display: flex;
 }
 
-.drop-down-inner-third img {
-	/* width: 130px;
+#mini-pic-div img {
+	width: 130px;
 	height: 130px;
-	cursor: pointer; */
-	width: 100%;
-    height: 130px;
     cursor: pointer;
     display: block;
     object-fit: cover;
 }
 
-.drop-down-inner-third img:hover {
+#mini-pic-div img:hover {
 	opacity: 0.8;
 }
 
@@ -451,6 +448,17 @@ main {
 	color: rgb(38, 38, 38);
 	border: 1px solid rgb(219, 219, 219);
 }
+
+#no-posts-drop-down {
+	display: none;
+	height: 130px;
+	width: 100%;
+	align-items: center;
+	justify-content: center;
+	color: rgba(142, 142, 142);
+}
+
+
 
 
 
