@@ -1,5 +1,6 @@
 import { getAuth } from "firebase/auth";
 import { useEffect } from "react";
+import { showAddPostModal } from "./AddPostModal";
 import { hideCommentsModal } from "./CommentsModal";
 import { showSignInModal } from "./SignInModal";
 
@@ -25,6 +26,16 @@ function OptionsModal(props) {
 		}
 		
 	}
+
+	function editPost() {
+		props.setOptionsEdit(true);
+		hideOptionsModal();
+
+		if(document.getElementById("comments-modal").style.display === "flex") {
+			hideCommentsModal();
+		}
+		
+	}
    
 	function buttons() {
 		const user = getAuth().currentUser;
@@ -33,7 +44,7 @@ function OptionsModal(props) {
 			return (
 				<>
 					<span onClick={() => deletePost()}>Delete</span>
-					<span>Edit</span>
+					<span onClick={() => editPost()}>Edit</span>
 				</>
 			);
 		} else if (props.userData && props.following.includes(props.userData.username)) {
