@@ -25,6 +25,7 @@ function CommentsModal(props) {
 		description: "",
 		id: "",
 		likes: { num: 0, users: [] },
+		pic: {src: ""},
 		date: new Date(),
 	});
 
@@ -58,7 +59,7 @@ function CommentsModal(props) {
 			</div>
 			<div id="comments-modal-content">
 				<div id="comments-div-img">
-					<img src={testPic} alt="" />
+					<img src={postData.pic.src} alt="" />
 				</div>
 				<div id="comments-div-modal">
 					<div id="comms-modal-header-mobile">
