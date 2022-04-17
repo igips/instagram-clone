@@ -18,7 +18,6 @@ function App() {
 	const [notifications, setNotifications] = useState([]);
 	const [unReadNoti, setUnReadNoti] = useState(0);
 	const [posts, setPosts] = useState([]);
-  const [index, setIndex] = useState({num: 0, id: ""});
 
 	let unsubscribe;
 
@@ -41,6 +40,8 @@ function App() {
 	//OPTIONSMODAL//
 	const [userDataOptionsModal, setUserDataOptionsModal] = useState();
 	const [postIdOptionsModal, setpostIdOptionsModal] = useState();
+  const [optionsEdit, setOptionsEdit] = useState(false);
+
 
 	function optionsModalSetUserData(data) {
 		setUserDataOptionsModal(data);
@@ -128,9 +129,7 @@ function App() {
 
 		for (let p of posts) {
 			if (p.id === id) {
-				p.pic.forEach((picture) => {
-					deleteObject(ref(storage, "images/" + picture.id));
-				});
+				deleteObject(ref(storage, "images/" + p.id));
 				updateDoc(doc(getFirestore(), "usernames", firestoreDocId), { posts: arrayRemove(p) });
 				break;
 			}
@@ -367,6 +366,8 @@ function App() {
 				unFollow={unFollow}
 				userData={userDataDropDown}
 				users={users}
+        posts={posts}
+        setPostId={commModalSetPostId} 
 			/>
 			<Modals
 				notifications={notifications}
@@ -393,6 +394,9 @@ function App() {
 				removePost={removePost}
 				postIdOptionsModal={postIdOptionsModal}
 				commModalSetPostId={commModalSetPostId}
+        optionsEdit={optionsEdit} 
+        setOptionsEdit={setOptionsEdit}
+        setPosts={setPosts}
 			></Modals>
 			<Nav
 				clearNotifications={clearNotifications}
@@ -420,8 +424,6 @@ function App() {
 				addComment={addComment}
 				likeComment={likeComment}
 				commModalSetPostId={commModalSetPostId}
-        index={index}
-        setIndex={setIndex}
 			></Home>
 		</section>
 	);
