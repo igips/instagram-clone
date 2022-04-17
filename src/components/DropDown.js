@@ -1,14 +1,15 @@
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 import { useEffect, useState } from "react";
 import ava from "../img/ava.jpeg";
-import testPic from "../img/test-img.jpg";
 import { getUserDataFromUsersArray } from "./Home";
-
+import { showCommentsModal } from "./Modals/CommentsModal";
+import uniqid from "uniqid";
 
 function DropDown(props) {
 	const [signedIn, setSignedIn] = useState(false);
 	const [data, setData] = useState({ username: "", posts: [], followers: [], following: [] });
 	const user = getAuth().currentUser;
+	const [posts, setPosts] = useState([{ pic: { src: "" } }]);
 
 	onAuthStateChanged(getAuth(), (user) => {
 		if (user) {
@@ -25,12 +26,39 @@ function DropDown(props) {
 	}, [props.userData]);
 
 	useEffect(() => {
-		if(document.getElementById("drop-down").style.display === "flex") {
+		const miniPic = document.getElementById("mini-pic-div");
+		const noPost = document.getElementById("no-posts-drop-down");
+
+
+		if (posts[0].pic.src === "") {
+			miniPic.style.display = "none";
+			noPost.style.display = "flex";
+
+		} else {
+			noPost.style.display = "none";
+			miniPic.style.display = "flex";
+		}
+	}, [posts]);
+
+	useEffect(() => {
+		if (data.username !== "") {
+			setPosts(() => {
+				const newPosts = props.posts.filter((post) => post.username === data.username);
+
+				if (newPosts.length < 1) {
+					return [{ pic: { src: "" } }];
+				} else {
+					return newPosts;
+				}
+			});
+		}
+	}, [data]);
+
+	useEffect(() => {
+		if (document.getElementById("drop-down").style.display === "flex") {
 			setData(getUserDataFromUsersArray(props.users, props.userData.username));
 		}
 	}, [props.users]);
-
-	
 
 	function button() {
 		if (signedIn) {
@@ -85,9 +113,23 @@ function DropDown(props) {
 				</div>
 			</div>
 			<div className="drop-down-inner-third">
-				<img src={testPic} alt="" />
-				<img src={testPic} alt="" />
-				<img src={testPic} alt="" />
+				<div id="no-posts-drop-down">No posts yet</div>
+				<div id="mini-pic-div">
+					{posts.map((post) => {
+						return (
+							<img
+								key={uniqid()}
+								onClick={() => {
+									showCommentsModal(post.id, props.setPostId);
+									hideDropDown();
+								}}
+								src={post.pic.src}
+								alt=""
+								className="min-pic"
+							/>
+						);
+					})}
+				</div>
 			</div>
 			<div id="drop-down-inner-fourth">{button()}</div>
 		</div>
@@ -114,7 +156,6 @@ function dropDown(userData, dropDownSetUserData, e, ele, right) {
 			document.getElementById("drop-down-inner-fourth").style.display = "none";
 		}
 
-
 		if (window.innerHeight - dropDown.getBoundingClientRect().bottom < 0) {
 			dropDown.style.top = (right ? rect.top : window.scrollY + rect.top) - (user ? 350 : 290) + "px";
 		}
@@ -123,8 +164,6 @@ function dropDown(userData, dropDownSetUserData, e, ele, right) {
 			dropDown.style.left =
 				rect.left - (410 - (window.innerWidth - dropDown.getBoundingClientRect().left)) + "px";
 		}
-
-		
 	}
 }
 
