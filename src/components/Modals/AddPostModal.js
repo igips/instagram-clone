@@ -1,25 +1,22 @@
 import { useEffect, useState } from "react";
-import { useSwipeable } from "react-swipeable";
 import { CloseIcon, CloseModalIcon, SmallCloseIcon } from "../Icons/CloseIcon";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCloudArrowUp } from "@fortawesome/free-solid-svg-icons";
 import { faSpinner } from "@fortawesome/free-solid-svg-icons";
-import { AddMoreImgIcon } from "../Icons/AddMoreImgIcon";
 import uniqid from "uniqid";
-import { PlusIcon } from "../Icons/PlusIcon";
-import { BackArrow, LeftArrow, RightArrow } from "../Icons/ArrowIcons";
+import { BackArrow } from "../Icons/ArrowIcons";
 import ReactDOM, { render } from "react-dom";
 import Picker from "emoji-picker-react";
 import { EmojiiIcon } from "../Icons/EmojiiIcon";
 import { faCircleXmark } from "@fortawesome/free-regular-svg-icons";
 import ava from "../../img/ava.jpeg";
 import { getDocId, searchFunction } from "../..";
-import { arrayUnion, doc, getFirestore, updateDoc, increment } from "firebase/firestore";
+import { arrayUnion, doc, getFirestore, updateDoc, increment, arrayRemove } from "firebase/firestore";
 import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import { getPostDataFromPostsArray } from "../Home";
 
 function AddPostModal(props) {
-	const [img, setImg] = useState([{ src: "", tags: [] }]);
-	const [imgIndex, setImgIndex] = useState(0);
+	const [img, setImg] = useState({ src: "", tags: [] });
 	const [searchValue, setSearchValue] = useState("");
 	const [searchResults, setSearchResults] = useState([]);
 	const [captionValue, setCaptionValue] = useState("");
@@ -29,8 +26,6 @@ function AddPostModal(props) {
 	let nextButton;
 	let submitButton;
 	let captionArea;
-	let addMorePicbutton;
-	let popUp;
 	let modal;
 	let pic;
 	let newPostHeader;
@@ -42,26 +37,13 @@ function AddPostModal(props) {
 	let tagDiv;
 	let spinner;
 	let imgDiv;
-
-	const handlers = useSwipeable({
-		onSwipedLeft: () => {
-			if (img.length > 1 && imgIndex !== img.length - 1) {
-				nextPic();
-			}
-		},
-		onSwipedRight: () => {
-			if (img.length > 1 && imgIndex !== 0) {
-				prevPic();
-			}
-		},
-	});
+	let label;
+	let editSpan;
 
 	useEffect(() => {
 		nextButton = document.getElementById("add-post-next-span");
 		submitButton = document.getElementById("submit-span");
 		captionArea = document.getElementById("caption-input-div");
-		addMorePicbutton = document.getElementById("add-multiple-img");
-		popUp = document.getElementById("multiple-pic-pop-up");
 		modal = document.getElementById("add-post-modal-content");
 		pic = document.getElementById("img-img");
 		newPostHeader = document.getElementById("app-post-header-span");
@@ -73,42 +55,28 @@ function AddPostModal(props) {
 		tagDiv = document.getElementById("tag-div-modal");
 		spinner = document.getElementById("spinner-add-photo");
 		imgDiv = document.getElementById("add-post-img-div");
+		label = document.getElementById("add-post-label");
+		editSpan = document.getElementById("edit-span");
 	});
 
 	useEffect(() => {
 		addPostModal.addEventListener("click", (e) => {
 			if (e.target === addPostModal) {
+				props.setOptionsEdit(false);
 				closeAddPostModal();
-			}
-		});
-
-		pic.addEventListener("click", (e) => {
-			if (e.target === pic) {
-				if (popUp.style.display === "flex") {
-					addMorePicbutton.click();
-				}
 			}
 		});
 	}, []);
 
 	useEffect(() => {
-		handleDots();
-		handlePopUpPic();
-	});
-
-	useEffect(() => {
-		const label = document.getElementById("add-post-label");
 		const spinner = document.getElementById("spinner-add-photo");
-		const addPicPopUp = document.getElementById("add-pic-pop-up");
 
-		handleArrows();
-
-		if (img[0].src === "") {
+		if (img.src === "") {
 			spinner.style.display = "none";
 			imgDiv.style.display = "none";
 			nextButton.style.display = "none";
 			label.style.display = "flex";
-		} else if (img[0].src !== "") {
+		} else if (img.src !== "") {
 			spinner.style.display = "none";
 			label.style.display = "none";
 			if (submitButton.style.display !== "flex") {
@@ -117,12 +85,21 @@ function AddPostModal(props) {
 			imgDiv.style.display = "flex";
 		}
 
-		if (img.length >= 3) {
-			addPicPopUp.style.display = "none";
-		} else if (img.length < 3) {
-			addPicPopUp.style.display = "flex";
+		if (props.optionsEdit) {
+			goToCaptionAndTag();
+			captionAndTags.style.display = "none";
+			editSpan.style.display = "flex";
 		}
-	}, [img, imgIndex]);
+	}, [img]);
+
+	useEffect(() => {
+		if (props.optionsEdit) {
+			const post = getPostDataFromPostsArray(props.posts, props.postIdOptionsModal);
+			setImg({ src: post.pic.src, tags: post.pic.tags });
+			setCaptionValue(post.description);
+			setTimeout(showAddPostModal, 50);
+		}
+	}, [props.optionsEdit]);
 
 	function dataURLtoBlob(dataurl) {
 		let arr = dataurl.split(","),
@@ -136,145 +113,113 @@ function AddPostModal(props) {
 		return new Blob([u8arr], { type: mime });
 	}
 
-	function submitPost() {
+	async function submitPost() {
 		imgDiv.style.display = "none";
 		spinner.style.display = "flex";
-		const storage = getStorage();
 
-		const promises = img.map(async (i) => {
-			const picImagesRef = ref(storage, "images/" + i.id);
-			const snapshot = await uploadBytes(picImagesRef, dataURLtoBlob(i.src));
-			return getDownloadURL(snapshot.ref);
-		});
+		if (!props.optionsEdit) {
+			const id = uniqid();
+			const storage = getStorage();
 
-		Promise.all(promises).then((d) => {
+			const picImagesRef = ref(storage, "images/" + id);
+			const snapshot = await uploadBytes(picImagesRef, dataURLtoBlob(img.src));
+			const url = await getDownloadURL(snapshot.ref);
+
+			img.src = url;
+
 			const post = {
-				id: uniqid(),
+				id: id,
 				likes: { num: 0, users: [] },
 				comments: [],
 				username: props.yourUsername,
 				description: captionValue,
 				avatar: ava,
-				pic: img.map((oldImg, index) => {
-					return { ...oldImg, src: d[index] };
-				}),
+				pic: img,
 				date: Date.now(),
 			};
 
 			props.addPost(post);
 			updateDoc(doc(getFirestore(), "usernames", props.firestoreDocId), { posts: arrayUnion(post) });
 
-			img.forEach((i) => {
-				i.tags.forEach((t) => {
-					getDocId(t.username).then((id) => {
-						if (t.username !== props.yourUsername) {
-							updateDoc(doc(getFirestore(), "usernames", id), {
-								notifications: arrayUnion({
-									username: props.yourUsername,
-									content: "tagged you in a post.",
-									postID: post.id,
-									date: Date.now(),
-								}),
-								unReadNoti: increment(1),
-							});
-						}
-					});
+			img.tags.forEach((t) => {
+				getDocId(t.username).then((id) => {
+					if (t.username !== props.yourUsername) {
+						updateDoc(doc(getFirestore(), "usernames", id), {
+							notifications: arrayUnion({
+								username: props.yourUsername,
+								content: "tagged you in a post.",
+								postID: post.id,
+								date: Date.now(),
+							}),
+							unReadNoti: increment(1),
+						});
+					}
 				});
 			});
+		} else {
+			editPost();
+		}
 
-			spinner.style.display = "none";
-			closeAddPostModal();
+		spinner.style.display = "none";
+		closeAddPostModal();
+	}
+
+	function editPost() {
+		editSpan.style.display = "none";
+		const post = getPostDataFromPostsArray(props.posts, props.postIdOptionsModal);
+
+		props.setPosts((oldPosts) => {
+			const newPosts = oldPosts.map((post) => {
+				if (post.id === props.postIdOptionsModal) {
+					return { ...post, pic: img, description: captionValue };
+				}
+				return post;
+			});
+
+			return newPosts;
 		});
-	}
 
-	function handleDots() {
-		const dots = document.querySelectorAll(".slider-dot-modal");
-		const dotDiv = document.getElementById("slider-dots-div-modal");
+		const oldTags = [];
 
-		if (imgIndex === 0) {
-			if (dots[1]) {
-				dots[1].style.background = "#a8a8a8";
+		post.pic.tags.forEach((tag) => {
+			oldTags.push(tag.username);
+		});
+
+		updateDoc(doc(getFirestore(), "usernames", props.firestoreDocId), { posts: arrayRemove(post) });
+
+		const newPost = {
+			id: post.id,
+			likes: post.likes,
+			comments: post.comments,
+			username: props.yourUsername,
+			description: captionValue,
+			avatar: ava,
+			pic: img,
+			date: post.date,
+		};
+
+		updateDoc(doc(getFirestore(), "usernames", props.firestoreDocId), { posts: arrayUnion(newPost) });
+
+		img.tags.forEach((tag) => {
+			if (!oldTags.includes(tag.username) && tag.username !== props.yourUsername) {
+				getDocId(tag.username).then((id) => {
+					updateDoc(doc(getFirestore(), "usernames", id), {
+						notifications: arrayUnion({
+							username: props.yourUsername,
+							content: "tagged you in a post.",
+							postID: post.id,
+							date: Date.now(),
+						}),
+						unReadNoti: increment(1),
+					});
+				});
 			}
-			if (dots[2]) {
-				dots[2].style.background = "#a8a8a8";
-			}
-			dots[0].style.background = "#0095f6";
-		} else if (imgIndex === 1) {
-			dots[0].style.background = "#a8a8a8";
-			if (dots[2]) {
-				dots[2].style.background = "#a8a8a8";
-			}
-			dots[1].style.background = "#0095f6";
-		} else if (imgIndex === 2) {
-			dots[0].style.background = "#a8a8a8";
-			dots[1].style.background = "#a8a8a8";
-			dots[2].style.background = "#0095f6";
-		}
-
-		if (img.length > 1) {
-			dotDiv.style.display = "flex";
-		} else if (img.length === 1) {
-			dotDiv.style.display = "none";
-		}
-	}
-
-	function handleArrows() {
-		const leftArrow = document.getElementById("modal-left-arrow");
-		const rightArrow = document.getElementById("modal-right-arrow");
-
-		if (img.length > 1 && imgIndex !== 0) {
-			leftArrow.style.display = "flex";
-		} else {
-			leftArrow.style.display = "none";
-		}
-
-		if (img.length > 1 && imgIndex !== img.length - 1) {
-			rightArrow.style.display = "flex";
-		} else {
-			rightArrow.style.display = "none";
-		}
-	}
-
-	function handlePopUpPic() {
-		const pics = document.querySelectorAll(".pop-up-img-div");
-
-		if (imgIndex === 0) {
-			if (pics[1]) {
-				pics[1].classList.add("pop-up-pic-not-active");
-			}
-			if (pics[2]) {
-				pics[2].classList.add("pop-up-pic-not-active");
-			}
-			pics[0].classList.remove("pop-up-pic-not-active");
-		} else if (imgIndex === 1) {
-			pics[0].classList.add("pop-up-pic-not-active");
-			if (pics[2]) {
-				pics[2].classList.add("pop-up-pic-not-active");
-			}
-			pics[1].classList.remove("pop-up-pic-not-active");
-		} else if (imgIndex === 2) {
-			pics[0].classList.add("pop-up-pic-not-active");
-			pics[1].classList.add("pop-up-pic-not-active");
-			pics[2].classList.remove("pop-up-pic-not-active");
-		}
-	}
-
-	function nextPic() {
-		setImgIndex(imgIndex + 1);
-		if (popUp.style.display === "flex") {
-			addMorePicbutton.click();
-		}
-	}
-
-	function prevPic() {
-		setImgIndex(imgIndex - 1);
-		if (popUp.style.display === "flex") {
-			addMorePicbutton.click();
-		}
+		});
+		props.setOptionsEdit(false);
 	}
 
 	function handleImage(e) {
-		if (img[0].src === "") {
+		if (img.src === "") {
 			document.getElementById("add-post-label").style.display = "none";
 			document.getElementById("spinner-add-photo").style.display = "flex";
 		}
@@ -283,10 +228,10 @@ function AddPostModal(props) {
 			const img2 = e.target.files[0];
 			const reader = new FileReader();
 			reader.onload = () => {
-				if (img[0].src === "") {
-					setImg([{ id: uniqid(), src: reader.result, tags: [] }]);
+				if (img.src === "") {
+					setImg({ src: reader.result, tags: [] });
 				} else {
-					setImg([...img, { id: uniqid(), src: reader.result, tags: [] }]);
+					setImg({ src: reader.result, tags: [] });
 				}
 			};
 			reader.readAsDataURL(img2);
@@ -294,39 +239,9 @@ function AddPostModal(props) {
 		}
 	}
 
-	function removeImageFromModal(id) {
-		if (img.length === 1) {
-			setImg([{ src: "", tags: [] }]);
-			addMorePicbutton.click();
-		} else {
-			if (imgIndex !== 0) {
-				setImgIndex(imgIndex - 1);
-			}
-			setImg((oldImg) => {
-				const newImg = oldImg.filter((old) => old.id !== id);
-				return newImg;
-			});
-		}
-	}
-
-	function changePic(id) {
-		let index;
-
-		img.forEach((pic) => {
-			if (pic.id === id) {
-				index = img.indexOf(pic);
-			}
-		});
-		setImgIndex(index);
-	}
-
 	function closeAddPostModal() {
 		window.history.back();
 		addPostModal.style.display = "none";
-		if (popUp.style.display === "flex") {
-			addMorePicbutton.click();
-		}
-		addMorePicbutton.style.display = "flex";
 		submitButton.style.display = "none";
 		captionArea.style.display = "none";
 		newPostHeader.style.display = "flex";
@@ -334,6 +249,7 @@ function AddPostModal(props) {
 		pic.style.cursor = "default";
 		goBackArrow.style.display = "none";
 		tagDropDownDiv.style.display = "none";
+		editSpan.style.display = "none";
 		setSearchResults([]);
 		setSearchValue("");
 		setCaptionValue("");
@@ -342,21 +258,18 @@ function AddPostModal(props) {
 			pic.style.borderBottomLeftRadius = "12px";
 			pic.style.borderBottomRightRadius = "12px";
 		}
-		setImgIndex(0);
-		setImg([{ src: "", tags: [] }]);
+		setImg({ src: "", tags: [] });
 	}
 
 	function goToCaptionAndTag() {
-		if (popUp.style.display === "flex") {
-			addMorePicbutton.click();
-		}
-		addMorePicbutton.style.display = "none";
 		nextButton.style.display = "none";
 		submitButton.style.display = "flex";
 		captionArea.style.display = "flex";
 		newPostHeader.style.display = "none";
 		captionAndTags.style.display = "flex";
-		goBackArrow.style.display = "flex";
+		if (!props.optionsEdit) {
+			goBackArrow.style.display = "flex";
+		}
 		tagDiv.style.display = "flex";
 		pic.style.cursor = "crosshair";
 		if (window.innerWidth > 650) {
@@ -367,7 +280,6 @@ function AddPostModal(props) {
 	}
 
 	function backToAddPicture() {
-		addMorePicbutton.style.display = "flex";
 		submitButton.style.display = "none";
 		nextButton.style.display = "flex";
 		captionArea.style.display = "none";
@@ -404,20 +316,18 @@ function AddPostModal(props) {
 				tagArrow.style.top = -6 + "px";
 				tagDropDownDiv.style.left = x + "%";
 				tagDropDownDiv.style.top = y + "%";
-
 			} else {
 				tagDropDownDiv.style.left = 0;
 				tagDropDownDiv.style.top = "-42px";
 				tagDropDownDiv.style.width = "100%";
 				tagDropDownDiv.style.height = "100vh";
 			}
-            tagDropDownDiv.style.display = "flex";
+			tagDropDownDiv.style.display = "flex";
 
-            if (window.innerHeight - tagDropDownDiv.getBoundingClientRect().bottom < 0) {
-                tagDropDownDiv.style.top = e.nativeEvent.offsetY - 240 + "px";
-                tagArrow.style.top = 96.5 + "%";
-            }
-			
+			if (window.innerHeight - tagDropDownDiv.getBoundingClientRect().bottom < 0) {
+				tagDropDownDiv.style.top = e.nativeEvent.offsetY - 240 + "px";
+				tagArrow.style.top = 96.5 + "%";
+			}
 		}
 	}
 
@@ -432,12 +342,7 @@ function AddPostModal(props) {
 
 	function removeTag(name) {
 		setImg((prevImg) => {
-			const newImg = prevImg.map((im) => {
-				if (im.id === img[imgIndex].id) {
-					return { ...im, tags: im.tags.filter((i) => i.username !== name) };
-				}
-				return im;
-			});
+			const newImg = { ...prevImg, tags: prevImg.tags.filter((i) => i.username !== name) };
 			return newImg;
 		});
 	}
@@ -450,7 +355,13 @@ function AddPostModal(props) {
 
 			<div id="add-post-modal-content">
 				<div id="add-post-header">
-					<span onClick={() => closeAddPostModal()} id="add-post-close-mobile">
+					<span
+						onClick={() => {
+							props.setOptionsEdit(false);
+							closeAddPostModal();
+						}}
+						id="add-post-close-mobile"
+					>
 						{CloseModalIcon(() => {})}
 					</span>
 					<span onClick={() => backToAddPicture()} id="go-back-arrow">
@@ -458,6 +369,7 @@ function AddPostModal(props) {
 					</span>
 					<span id="app-post-header-span">Create new post</span>
 					<span id="caption-and-tag-span">Add caption and tags</span>
+					<span id="edit-span">Edit</span>
 					<span onClick={() => goToCaptionAndTag()} id="add-post-next-span">
 						Next
 					</span>
@@ -473,7 +385,7 @@ function AddPostModal(props) {
 							className="fa-spin"
 						/>
 					</div>
-					<div {...handlers} id="add-post-img-div">
+					<div id="add-post-img-div">
 						<div id="tag-drop-down">
 							<TagSearch
 								searchResults={searchResults}
@@ -484,13 +396,12 @@ function AddPostModal(props) {
 								locY={locY}
 								img={img}
 								setImg={setImg}
-								imgIndex={imgIndex}
 								closeTagDropDown={closeTagDropDown}
 							/>
 						</div>
-						<img id="img-img" src={img[imgIndex].src} alt="" />
+						<img id="img-img" src={img.src} alt="" />
 						<div id="tag-div-modal">
-							{img[imgIndex].tags.map((tag) => {
+							{img.tags.map((tag) => {
 								return (
 									<div key={uniqid()} style={tagPosition(tag)} className="tag-div">
 										<span>{tag.username}</span>
@@ -501,42 +412,6 @@ function AddPostModal(props) {
 								);
 							})}
 						</div>
-
-						<div className="slider-dots-div" id="slider-dots-div-modal">
-							{img.map((img) => {
-								return <div className="slider-dot-modal" key={uniqid()}></div>;
-							})}
-						</div>
-						<div onClick={() => prevPic()} id="modal-left-arrow" className="left-arrow">
-							{LeftArrow()}
-						</div>
-						<div onClick={() => nextPic()} id="modal-right-arrow" className="right-arrow">
-							{RightArrow()}
-						</div>
-						<div id="multiple-pic-pop-up">
-							{img.map((img) => {
-								return (
-									<div key={uniqid()} className="pop-up-img-div">
-										<div
-											onClick={() => removeImageFromModal(img.id)}
-											className="pop-up-delete-icon"
-										>
-											{SmallCloseIcon()}
-										</div>
-										<img
-											onClick={() => changePic(img.id)}
-											className="pop-up-img"
-											src={img.src}
-											alt=""
-										/>
-									</div>
-								);
-							})}
-							<div onClick={() => document.getElementById("img-input").click()} id="add-pic-pop-up">
-								{PlusIcon()}
-							</div>
-						</div>
-						{AddMoreImgIcon()}
 					</div>
 					<label id="add-post-label">
 						<FontAwesomeIcon icon={faCloudArrowUp} />
@@ -598,20 +473,12 @@ function TagSearch(props) {
 
 	function addTag(name) {
 		props.setImg((prevImg) => {
-			const newImg = prevImg.map((img) => {
-				if (img.id === props.img[props.imgIndex].id) {
-					if (img.tags.some((e) => e.username === name)) {
-						const updatedTags = img.tags.filter((tag) => tag.username !== name);
-						return {
-							...img,
-							tags: [...updatedTags, { username: name, locY: props.locY, locX: props.locX }],
-						};
-					}
-					return { ...img, tags: [...img.tags, { username: name, locY: props.locY, locX: props.locX }] };
-				}
-				return img;
-			});
-			return newImg;
+			if (prevImg.tags.some((e) => e.username === name)) {
+				const updatedTags = prevImg.tags.filter((tag) => tag.username !== name);
+				return { ...prevImg, tags: [...updatedTags, { username: name, locY: props.locY, locX: props.locX }] };
+			} else {
+				return { ...prevImg, tags: [...prevImg.tags, { username: name, locY: props.locY, locX: props.locX }] };
+			}
 		});
 		props.closeTagDropDown();
 	}
@@ -728,17 +595,14 @@ function showAddPostModal() {
 function tagPosition(info) {
 	let position;
 
-
 	if (info.locX > 60) {
 		position = {
 			right: 100 - info.locX + "%",
-			top: info.locY + "%"
+			top: info.locY + "%",
 		};
-        
 	} else {
-		position = { left: info.locX + "%", top: info.locY + "%"};
+		position = { left: info.locX + "%", top: info.locY + "%" };
 	}
-
 
 	return position;
 }
