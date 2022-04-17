@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect } from "react";
 import ReactDOM, { render } from "react-dom";
 import uniqid from "uniqid";
 import "../styles/PictureCard.css";
@@ -16,116 +16,23 @@ import { CommentIcon } from "./Icons/CommentIcon";
 import { showCommentsModal } from "./Modals/CommentsModal";
 import { tagPosition } from "./Modals/AddPostModal";
 import { TagIcon } from "./Icons/TagIcon";
-import { useSwipeable } from "react-swipeable";
-import { LeftArrow, RightArrow } from "./Icons/ArrowIcons";
 
 function PictureCard(props) {
 	const [img, setImg] = useState(props.post.pic);
-	const [imgIndex, setImgIndex] = useState(0);
 	const [id, setId] = useState(uniqid());
 
-	const handlers = useSwipeable({
-		onSwipedLeft: () => {
-			if (img.length > 1 && imgIndex !== img.length - 1) {
-				nextPic();
-			}
-		},
-		onSwipedRight: () => {
-			if (img.length > 1 && imgIndex !== 0) {
-				prevPic();
-			}
-		},
-	});
+	const [didLoad, setLoad] = React.useState(false);
+
+	const style = didLoad ? {} : {visibility: 'hidden'};
+  
 
 	useEffect(() => {
-		const container = document.getElementById("pc-pic-container" + id);
-		const pics = Array.from(container.childNodes);
-
-		if(imgIndex === 0) {
-			pics[0].style.display = "flex";
-
-		} else if(imgIndex === 1) {
-			pics[1].style.display = "flex";
-
-		} else if (imgIndex === 2) {
-			pics[2].style.display = "flex";
-		}
-
-	},[imgIndex])
-
-	useEffect(() => {
-		handleArrows();
-	}, [img,imgIndex]);
-
-	useEffect(() => {
-		if (img[imgIndex].tags.length > 0) {
+		if (img.tags.length > 0) {
 			document.getElementById("tag-ico" + id).style.display = "flex";
-
 		} else {
 			document.getElementById("tag-ico" + id).style.display = "none";
 		}
-	}, [imgIndex]);
-
-	useEffect(() => {
-		handleDots();
-		
-	});
-
-	function handleDots() {
-		const dotDiv = document.getElementById("slider-dots-div-pc" + id);
-		const dots = Array.from(dotDiv.childNodes);
-
-		if (imgIndex === 0) {
-			if (dots[1]) {
-				dots[1].style.background = "#a8a8a8";
-			}
-			if (dots[2]) {
-				dots[2].style.background = "#a8a8a8";
-			}
-			dots[0].style.background = "#0095f6";
-		} else if (imgIndex === 1) {
-			dots[0].style.background = "#a8a8a8";
-			if (dots[2]) {
-				dots[2].style.background = "#a8a8a8";
-			}
-			dots[1].style.background = "#0095f6";
-		} else if (imgIndex === 2) {
-			dots[0].style.background = "#a8a8a8";
-			dots[1].style.background = "#a8a8a8";
-			dots[2].style.background = "#0095f6";
-		}
-
-		if (img.length > 1) {
-			dotDiv.style.display = "flex";
-		} else if (img.length === 1) {
-			dotDiv.style.display = "none";
-		}
-	}
-
-	function handleArrows() {
-		const leftArrow = document.getElementById("pc-left-arrow" + id);
-		const rightArrow = document.getElementById("pc-right-arrow" + id);
-
-		if (img.length > 1 && imgIndex !== 0) {
-			leftArrow.style.display = "flex";
-		} else {
-			leftArrow.style.display = "none";
-		}
-
-		if (img.length > 1 && imgIndex !== img.length - 1) {
-			rightArrow.style.display = "flex";
-		} else {
-			rightArrow.style.display = "none";
-		}
-	}
-
-	function nextPic() {
-		setImgIndex(imgIndex + 1);
-	}
-
-	function prevPic() {
-		setImgIndex(imgIndex - 1);
-	}
+	}, [img]);
 
 	function showTags() {
 		const tagContainer = document.getElementById("tag-cont" + id);
@@ -154,18 +61,11 @@ function PictureCard(props) {
 				/>
 			</div>
 			<div className="picture-div">
-				<div {...handlers} className="picture-div-inner">
-					<div id={"pc-pic-container" + id}>
-						{img.map((i) => {
-							return (
-								<img key={uniqid()} className="main-picture" src={i.src} alt="" />
-							)
-							
-						})}
-					</div>
-					<img className="main-picture" src={img[imgIndex].src} alt="" />
+				<div className="picture-div-inner">
+					<img  className="main-picture" src={img.src} alt="" />
+
 					<div id={"tag-cont" + id} className="tag-container-picture-card">
-						{img[imgIndex].tags.map((tag) => {
+						{img.tags.map((tag) => {
 							return (
 								<div key={uniqid()} style={tagPosition(tag)} className="tag-div-picture-card">
 									<span>{tag.username}</span>
@@ -173,20 +73,9 @@ function PictureCard(props) {
 							);
 						})}
 					</div>
-					<div style={{ left: "50%" }} className="slider-dots-div" id={"slider-dots-div-pc" + id}>
-						{img.map((img) => {
-							return <div className={"slider-dot-pc"} key={uniqid()}></div>;
-						})}
-					</div>
-					<div style={{top: "50%"}} onClick={() => prevPic()} id={"pc-left-arrow" + id} className="left-arrow">
-						{LeftArrow()}
-					</div>
-					<div style={{top: "50%"}} onClick={() => nextPic()} id={"pc-right-arrow" + id} className="right-arrow">
-						{RightArrow()}
-					</div>
-					<div onClick={() => showTags()} id={"tag-ico" + id} className="tag-icon-container">
+				</div>
+				<div onClick={() => showTags()} id={"tag-ico" + id} className="tag-icon-container">
 						{TagIcon()}
-					</div>
 				</div>
 			</div>
 			<div className="comments-div">
