@@ -105,8 +105,6 @@ function Home(props) {
 									addComment={props.addComment}
 									likeComment={props.likeComment}
 									commModalSetPostId={props.commModalSetPostId}
-									index={props.index}
-        							setIndex={props.setIndex}
 								></PictureCard>
 							);
 						})}
