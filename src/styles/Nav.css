@@ -7,6 +7,7 @@
 	position: relative;
 }
 
+
 #bottom-nav {
 	left: 0;
 	right: 0;
@@ -354,6 +355,11 @@
 
 #search-results-div .share-modal-single-result:hover {
 	background-color: #fafafa;
+}
+
+.noti-link {
+	display: flex;
+	align-items: center;
 }
 
 @media (max-width: 650px) {

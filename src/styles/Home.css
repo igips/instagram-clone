@@ -6,6 +6,16 @@ main {
 	font-family: helvetica;
 }
 
+a {
+	text-decoration: none;
+	color: inherit;
+}
+
+a:visited {
+	text-decoration: none;
+	color: inherit;
+}
+
 #home-section {
 	padding-top: 30px;
 	display: flex;
