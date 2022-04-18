@@ -8,6 +8,7 @@ import { getFirestore, collection, getDocs } from "firebase/firestore";
 import TimeAgo from "javascript-time-ago";
 import en from "javascript-time-ago/locale/en.json";
 import { homeIcon } from "./components/Icons/HomeIcon.js";
+import { closeNotification } from "./components/Icons/NotificationIcon.js";
 
 TimeAgo.addDefaultLocale(en);
 
@@ -99,7 +100,8 @@ window.addEventListener("popstate", (e) => {
 		notiModal.style.display = "flex";
 	}
 
-	if (window.location.href === "http://localhost:3000/") {
+	
+	if (window.location.href === "http://localhost:3000/" || window.location.href === "http://localhost:3000/#/") {
 		likesModal.style.display = "none";
 		shareModal.style.display = "none";
 		optionsModal.style.display = "none";
@@ -110,7 +112,9 @@ window.addEventListener("popstate", (e) => {
 		notiModal.style.display = "none";
 		addPostModal.style.display = "none";
 		homeIcon();
+
 	}
+
 });
 
 const firebaseConfig = {
@@ -181,34 +185,6 @@ async function searchFunction(value) {
 	return results;
 }
 
-onAuthStateChanged(getAuth(), (user) => {
-	const rightButtons = document.getElementById("right-div-for-buttons");
-	const leftButtons = document.getElementById("home-left-button-div");
-	const suggestionsLeft = document.getElementById("suggestions-left-div");
-	const profileInfoRight = document.getElementById("home-right-profile-inner");
-	const suggestionsRight = document.getElementById("suggestions-div-right");
-	const rightUserName = document.getElementById("right-login-div-top-span");
-
-	if (user) {
-		const uid = user.uid;
-
-		getUserData(uid).then((user) => {
-			leftButtons.classList.add("mobile-not-vissible");
-			rightButtons.classList.add("buttons-not-vissible");
-			suggestionsLeft.classList.add("mobile");
-			profileInfoRight.classList.add("visible");
-			suggestionsRight.classList.add("visible");
-			rightUserName.textContent = user.data().username;
-		});
-	} else {
-		leftButtons.classList.remove("mobile-not-vissible");
-		rightButtons.classList.remove("buttons-not-vissible");
-		suggestionsLeft.classList.remove("mobile");
-		profileInfoRight.classList.remove("visible");
-		suggestionsRight.classList.remove("visible");
-		// User is signed out
-	}
-});
 
 ReactDOM.render(
 	<React.StrictMode>
