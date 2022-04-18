@@ -4,6 +4,7 @@ import ava from "../img/ava.jpeg";
 import { getUserDataFromUsersArray } from "./Home";
 import { showCommentsModal } from "./Modals/CommentsModal";
 import uniqid from "uniqid";
+import { Link } from "react-router-dom";
 
 function DropDown(props) {
 	const [signedIn, setSignedIn] = useState(false);
@@ -94,9 +95,11 @@ function DropDown(props) {
 			className="drop-down"
 			id="drop-down"
 		>
+		
 			<div className="drop-down-inner-first">
-				<img id="drop-down-ava" src={ava} alt="" />
-				<span id="drop-down-username">{data.username}</span>
+				<Link to={`/profile/${data.username}`}><img onClick={() => hideDropDown()} id="drop-down-ava" src={ava} alt="" /></Link>
+				<Link to={`/profile/${data.username}`}><span onClick={() => hideDropDown()} id="drop-down-username">{data.username}</span></Link>
+				
 			</div>
 			<div className="drop-down-inner-second">
 				<div className="drop-down-inner-second-inner">

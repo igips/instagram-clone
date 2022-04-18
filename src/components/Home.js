@@ -5,6 +5,8 @@ import uniqid from "uniqid";
 import { dropDown, hideDropDown } from "./DropDown";
 import { showSignUpModal } from "./Modals/SignUpModal";
 import { showSignInModal } from "./Modals/SignInModal";
+import { useEffect } from "react";
+import { Link } from "react-router-dom";
 
 function followMobile(e) {
 	if (e.currentTarget.textContent === "Follow") {
@@ -26,7 +28,6 @@ function getUserDataFromUsersArray(array, userName) {
 	return userData;
 }
 
-
 function getPostDataFromPostsArray(array, postId) {
 	let postData;
 	array.forEach((post) => {
@@ -47,6 +48,29 @@ function shuffleArray(array) {
 function Home(props) {
 	let num = 0;
 	let num2 = 0;
+
+	useEffect(() => {
+		const rightButtons = document.getElementById("right-div-for-buttons");
+		const leftButtons = document.getElementById("home-left-button-div");
+		const suggestionsLeft = document.getElementById("suggestions-left-div");
+		const profileInfoRight = document.getElementById("home-right-profile-inner");
+		const suggestionsRight = document.getElementById("suggestions-div-right");
+
+		if (props.signedIn && props.username) {
+			leftButtons.classList.add("mobile-not-vissible");
+			rightButtons.classList.add("buttons-not-vissible");
+			suggestionsLeft.classList.add("mobile");
+			profileInfoRight.classList.add("visible");
+			suggestionsRight.classList.add("visible");
+		} else {
+			leftButtons.classList.remove("mobile-not-vissible");
+			rightButtons.classList.remove("buttons-not-vissible");
+			suggestionsLeft.classList.remove("mobile");
+			profileInfoRight.classList.remove("visible");
+			suggestionsRight.classList.remove("visible");
+			// User is signed out
+		}
+	});
 
 	return (
 		<main>
@@ -73,8 +97,12 @@ function Home(props) {
 										num++;
 										return (
 											<div key={uniqid()} className="sug-box-left">
-												<img className="sug-box-left-ava" src={ava} alt="" />
-												<span style={{ marginBottom: "10px" }}>{user.username}</span>
+												<Link to={`/profile/${user.username}`}>
+													<img className="sug-box-left-ava" src={ava} alt="" />
+												</Link>
+												<Link to={`/profile/${user.username}`}>
+													<span style={{ marginBottom: "10px" }}>{user.username}</span>
+												</Link>
 												<button
 													onClick={(e) => props.follow(user.username)}
 													className="sug-box-left-follow"
@@ -89,7 +117,8 @@ function Home(props) {
 						</div>
 						{props.posts.map((post) => {
 							return (
-								<PictureCard key={uniqid()}
+								<PictureCard
+									key={uniqid()}
 									dropDownSetUserData={props.dropDownSetUserData}
 									users={props.users}
 									follow={props.follow}
@@ -108,8 +137,6 @@ function Home(props) {
 								></PictureCard>
 							);
 						})}
-
-						
 					</div>
 				</div>
 
@@ -123,13 +150,18 @@ function Home(props) {
 								Sign In
 							</button>
 						</div>
+
 						<div className="not-visible" id="home-right-profile-inner">
-							<div id="right-avatar-div">
-								<img className="right-ava" src={ava} alt="" />
-							</div>
-							<div id="right-login-div">
-								<span id="right-login-div-top-span"></span>
-							</div>
+							<Link to={`/profile/${props.username}`}>
+								<div id="right-avatar-div">
+									<img className="right-ava" src={ava} alt="" />
+								</div>
+							</Link>
+							<Link to={`/profile/${props.username}`}>
+								<div id="right-login-div">
+									<span id="right-login-div-top-span">{props.username}</span>
+								</div>
+							</Link>
 						</div>
 					</div>
 					<div className="not-visible" id="suggestions-div-right">
@@ -144,24 +176,29 @@ function Home(props) {
 									num2++;
 									return (
 										<div key={uniqid()} className="right-sug-div-list">
-											<div
-												onMouseEnter={(e) => {
-													dropDown(user, props.dropDownSetUserData, e, "avaPic", "right");
-												}}
-												onMouseLeave={() => hideDropDown()}
-												className="right-sug-ava-div"
-											>
-												<img className="ava-img-sug" src={ava} alt="" />
-											</div>
-											<span
-												onMouseEnter={(e) =>
-													dropDown(user, props.dropDownSetUserData, e, "no", "right")
-												}
-												onMouseLeave={() => hideDropDown()}
-												className="sug-login-right"
-											>
-												{user.username}
-											</span>
+											<Link to={`/profile/${user.username}`}>
+												<div
+													onMouseEnter={(e) => {
+														dropDown(user, props.dropDownSetUserData, e, "avaPic", "right");
+													}}
+													onMouseLeave={() => hideDropDown()}
+													className="right-sug-ava-div"
+												>
+													<img onClick={() => hideDropDown()} className="ava-img-sug" src={ava} alt="" />
+												</div>
+											</Link>
+											<Link to={`/profile/${user.username}`}>
+												<span
+													onClick={() => hideDropDown()}
+													onMouseEnter={(e) =>
+														dropDown(user, props.dropDownSetUserData, e, "no", "right")
+													}
+													onMouseLeave={() => hideDropDown()}
+													className="sug-login-right"
+												>
+													{user.username}
+												</span>
+											</Link>
 											<button
 												onClick={(e) => props.follow(user.username)}
 												className="sug-right-follow"
@@ -181,4 +218,4 @@ function Home(props) {
 }
 
 export default Home;
-export { followMobile, shuffleArray, getUserDataFromUsersArray, getPostDataFromPostsArray};
+export { followMobile, shuffleArray, getUserDataFromUsersArray, getPostDataFromPostsArray };

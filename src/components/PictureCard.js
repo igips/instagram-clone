@@ -16,15 +16,11 @@ import { CommentIcon } from "./Icons/CommentIcon";
 import { showCommentsModal } from "./Modals/CommentsModal";
 import { tagPosition } from "./Modals/AddPostModal";
 import { TagIcon } from "./Icons/TagIcon";
+import { Link } from "react-router-dom";
 
 function PictureCard(props) {
 	const [img, setImg] = useState(props.post.pic);
 	const [id, setId] = useState(uniqid());
-
-	const [didLoad, setLoad] = React.useState(false);
-
-	const style = didLoad ? {} : {visibility: 'hidden'};
-  
 
 	useEffect(() => {
 		if (img.tags.length > 0) {
@@ -62,20 +58,22 @@ function PictureCard(props) {
 			</div>
 			<div className="picture-div">
 				<div className="picture-div-inner">
-					<img  className="main-picture" src={img.src} alt="" />
+					<img className="main-picture" src={img.src} alt="" />
 
 					<div id={"tag-cont" + id} className="tag-container-picture-card">
 						{img.tags.map((tag) => {
 							return (
-								<div key={uniqid()} style={tagPosition(tag)} className="tag-div-picture-card">
-									<span>{tag.username}</span>
-								</div>
+								<Link key={uniqid()} to={`/profile/${tag.username}`}>
+									<div style={tagPosition(tag)} className="tag-div-picture-card">
+										<span>{tag.username}</span>
+									</div>
+								</Link>
 							);
 						})}
 					</div>
 				</div>
 				<div onClick={() => showTags()} id={"tag-ico" + id} className="tag-icon-container">
-						{TagIcon()}
+					{TagIcon()}
 				</div>
 			</div>
 			<div className="comments-div">
@@ -270,48 +268,55 @@ function PictureCardHeader(props) {
 				<header className="picture-card-header">
 					<div className="picture-card-avatar-div">
 						<div className="picture-card-avatar-div-inner">
+							<Link to={`/profile/${props.username}`}>
+								<span
+									onClick={() => hideDropDown()}
+									onMouseEnter={(e) => {
+										dropDown(
+											getUserDataFromUsersArray(props.users, props.username),
+											props.dropDownSetUserData,
+											e,
+											"avaPic"
+										);
+									}}
+									onMouseLeave={() => {
+										hideDropDown();
+									}}
+									className="avatar-span"
+								>
+									<img
+										id={props.username ? "" : "comments-modal-ava-header"}
+										alt=""
+										className="card-avatar-img"
+										data-testid="user-avatar"
+										draggable="false"
+										src={props.avatar}
+									/>
+								</span>
+							</Link>
+						</div>
+					</div>
+
+					<div className="picture-card-name-div">
+						<Link to={`/profile/${props.username}`}>
 							<span
+								onClick={() => hideDropDown()}
 								onMouseEnter={(e) => {
 									dropDown(
 										getUserDataFromUsersArray(props.users, props.username),
 										props.dropDownSetUserData,
-										e,
-										"avaPic"
+										e
 									);
 								}}
 								onMouseLeave={() => {
 									hideDropDown();
 								}}
-								className="avatar-span"
+								className="name-span"
+								id={props.username ? "" : "comments-modal-id-div"}
 							>
-								<img
-									id={props.username ? "" : "comments-modal-ava-header"}
-									alt=""
-									className="card-avatar-img"
-									data-testid="user-avatar"
-									draggable="false"
-									src={props.avatar}
-								/>
+								{props.username}
 							</span>
-						</div>
-					</div>
-					<div className="picture-card-name-div">
-						<span
-							onMouseEnter={(e) => {
-								dropDown(
-									getUserDataFromUsersArray(props.users, props.username),
-									props.dropDownSetUserData,
-									e
-								);
-							}}
-							onMouseLeave={() => {
-								hideDropDown();
-							}}
-							className="name-span"
-							id={props.username ? "" : "comments-modal-id-div"}
-						>
-							{props.username}
-						</span>
+						</Link>
 					</div>
 				</header>
 				<div
@@ -349,19 +354,22 @@ function PictureCardCommentsSection(props) {
 			return (
 				<div className="comment-line-div">
 					<div>
-						<span
-							onMouseEnter={(e) =>
-								dropDown(
-									getUserDataFromUsersArray(props.users, props.username),
-									props.dropDownSetUserData,
-									e
-								)
-							}
-							onMouseLeave={() => hideDropDown()}
-							className="name-span in-coms"
-						>
-							{props.username}
-						</span>
+						<Link to={`/profile/${props.username}`}>
+							<span
+								onClick={() => hideDropDown()}
+								onMouseEnter={(e) =>
+									dropDown(
+										getUserDataFromUsersArray(props.users, props.username),
+										props.dropDownSetUserData,
+										e
+									)
+								}
+								onMouseLeave={() => hideDropDown()}
+								className="name-span in-coms"
+							>
+								{props.username}
+							</span>
+						</Link>
 						<span className="comment-span">{props.description}</span>
 					</div>
 				</div>
@@ -378,19 +386,22 @@ function PictureCardCommentsSection(props) {
 					return (
 						<div key={uniqid()} className="comment-line-div">
 							<div className="comment-line-inner-div">
-								<span
-									onMouseEnter={(e) =>
-										dropDown(
-											getUserDataFromUsersArray(props.users, comment.username),
-											props.dropDownSetUserData,
-											e
-										)
-									}
-									onMouseLeave={() => hideDropDown()}
-									className="name-span in-coms"
-								>
-									{comment.username}
-								</span>
+								<Link to={`/profile/${comment.username}`}>
+									<span
+										onClick={() => hideDropDown()}
+										onMouseEnter={(e) =>
+											dropDown(
+												getUserDataFromUsersArray(props.users, comment.username),
+												props.dropDownSetUserData,
+												e
+											)
+										}
+										onMouseLeave={() => hideDropDown()}
+										className="name-span in-coms"
+									>
+										{comment.username}
+									</span>
+								</Link>
 								<span className="comment-span">{comment.comment}</span>
 							</div>
 							<div

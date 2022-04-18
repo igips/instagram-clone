@@ -21,6 +21,8 @@ import { addPostIcon, AddPostIconSvg } from "./Icons/AddPostIcon";
 import { searchIcon, SearchIconSvg } from "./Icons/SearchIcon";
 import { ThemeIcon } from "./Icons/ThemeIcon";
 import { SettingsIcon } from "./Icons/SettingsIcon";
+import { Link } from "react-router-dom";
+import { showCommentsModal } from "./Modals/CommentsModal";
 
 function followButtonForNoti(user, following, username, follow, unFollow) {
 	if (!following.includes(user) && user !== username) {
@@ -204,14 +206,66 @@ function Nav(props) {
 		}
 	}
 
+	function displayNotfications(data) {
+		if (data.postID) {
+			return (
+				<div  className="noti-modal-single-result">
+					<div className="noti-link"
+						onClick={() => {
+							showCommentsModal(data.postID, props.commModalSetPostId);
+							closeNotification()
+						}}
+					>
+						<img src={ava} alt="" />
+						<span>{data.username}</span>
+						<span>&nbsp;</span>
+						<span className="noti-content">{data.content}</span>
+						<span>&nbsp;</span>
+						<span className="noti-date">
+							<ReactTimeAgo timeStyle="mini-minute-now" date={new Date(data.date)} locale="en-US" />
+						</span>
+					</div>
+
+					{followButtonForNoti(data.username, props.following, props.username, props.follow, props.unFollow)}
+				</div>
+			);
+		} else {
+			return (
+				<>
+					<div className="noti-modal-single-result">
+						<Link  className="noti-link" to={`/profile/${data.username}`}>
+							<img src={ava} alt="" />
+							<span>{data.username}</span>
+							<span>&nbsp;</span>
+							<span className="noti-content">{data.content}</span>
+							<span>&nbsp;</span>
+							<span className="noti-date">
+								<ReactTimeAgo timeStyle="mini-minute-now" date={new Date(data.date)} locale="en-US" />
+							</span>
+						</Link>
+						{followButtonForNoti(
+							data.username,
+							props.following,
+							props.username,
+							props.follow,
+							props.unFollow
+						)}
+					</div>
+				</>
+			);
+		}
+	}
+
 	return (
 		<>
 			<nav id="top-nav">
 				<div className="nav-container">
 					<div className="nav-inner-container">
-						<div onClick={() => homeIcon()} id="logo">
-							<span id="logo-span">Fakegram</span>
-						</div>
+						<Link id="logo" to="/">
+							<div onClick={() => homeIcon()}>
+								<span id="logo-span">Fakegram</span>
+							</div>
+						</Link>
 						<div id="search-div">
 							<input
 								value={searchValue}
@@ -251,9 +305,12 @@ function Nav(props) {
 							</div>
 						</div>
 						<div id="icon-div">
-							<div onClick={() => homeIcon()} className="icon-inner-div icon-to-hide">
-								{HomeIconSvg()}
-							</div>
+							<Link to="/">
+								<div onClick={() => homeIcon()} className="icon-inner-div icon-to-hide">
+									{HomeIconSvg()}
+								</div>
+							</Link>
+
 							<div id="message-icon-div" onClick={() => messageIcon()} className="icon-inner-div">
 								{MessageIconSvg()}
 							</div>
@@ -276,29 +333,7 @@ function Nav(props) {
 										.slice(0)
 										.reverse()
 										.map((result) => {
-											return (
-												<div key={uniqid()} className="noti-modal-single-result">
-													<img src={ava} alt="" />
-													<span>{result.username}</span>
-													<span>&nbsp;</span>
-													<span className="noti-content">{result.content}</span>
-													<span>&nbsp;</span>
-													<span className="noti-date">
-														<ReactTimeAgo
-															timeStyle="mini-minute-now"
-															date={new Date(result.date)}
-															locale="en-US"
-														/>
-													</span>
-													{followButtonForNoti(
-														result.username,
-														props.following,
-														props.username,
-														props.follow,
-														props.unFollow
-													)}
-												</div>
-											);
+											return <div key={uniqid()}>{displayNotfications(result)}</div> 
 										})}
 								</div>
 								<div className="notification-svg svg-div">{NotificationIconSvg()}</div>
@@ -306,10 +341,13 @@ function Nav(props) {
 							<div id="profile-drop-div" className="icon-inner-div icon-to-hide">
 								<div id="profile-arrow-div"></div>
 								<div id="profile-div">
-									<div className="profile-drop-down-single-div">
-										<div className="profile-drop-icon">{ProfileIconDrop()}</div>
-										<div className="profile-drop-tex">Profile</div>
-									</div>
+									<Link to={`/profile/${props.username}`}>
+										<div onClick={() => closeAvatar()} className="profile-drop-down-single-div">
+											<div className="profile-drop-icon">{ProfileIconDrop()}</div>
+											<div className="profile-drop-tex">Profile</div>
+										</div>
+									</Link>
+
 									<div className="profile-drop-down-single-div">
 										<div className="profile-drop-icon">{SettingsIcon()}</div>
 										<div className="profile-drop-tex">Settings</div>
