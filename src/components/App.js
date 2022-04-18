@@ -8,6 +8,8 @@ import { arrayRemove, arrayUnion, doc, getFirestore, increment, onSnapshot, upda
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 import DropDown, { hideDropDown } from "./DropDown";
 import { deleteObject, getStorage, ref } from "firebase/storage";
+import { HashRouter, Routes, Route } from "react-router-dom";
+import ProfilePage from "./ProfilePage";
 
 function App() {
 	const [signedIn, setSignedIn] = useState(false);
@@ -40,8 +42,7 @@ function App() {
 	//OPTIONSMODAL//
 	const [userDataOptionsModal, setUserDataOptionsModal] = useState();
 	const [postIdOptionsModal, setpostIdOptionsModal] = useState();
-  const [optionsEdit, setOptionsEdit] = useState(false);
-
+	const [optionsEdit, setOptionsEdit] = useState(false);
 
 	function optionsModalSetUserData(data) {
 		setUserDataOptionsModal(data);
@@ -113,9 +114,9 @@ function App() {
 			});
 		});
 
-    posts2.sort((a,b) => {
-      return new Date(b.date) - new Date(a.date);
-    });
+		posts2.sort((a, b) => {
+			return new Date(b.date) - new Date(a.date);
+		});
 
 		setPosts(posts2);
 	}
@@ -191,15 +192,15 @@ function App() {
 		setPosts((prevPosts) => {
 			const newPosts = prevPosts.map((post) => {
 				if (post.id === postId) {
-          let newLike = false;
-          let commentUsername;
+					let newLike = false;
+					let commentUsername;
 					const newP = {
 						...post,
 						comments: post.comments.map((comment) => {
 							if (comment.id === commentId) {
 								if (!comment.likes.users.includes(username)) {
-                  commentUsername = comment.username;
-                  newLike = true;
+									commentUsername = comment.username;
+									newLike = true;
 									return {
 										...comment,
 										likes: {
@@ -221,7 +222,7 @@ function App() {
 						}),
 					};
 
-          getDocId(post.username).then(async (id) => {
+					getDocId(post.username).then(async (id) => {
 						await updateDoc(doc(getFirestore(), "usernames", id), { posts: arrayRemove(post) });
 						updateDoc(doc(getFirestore(), "usernames", id), { posts: arrayUnion(newP) });
 						if (newLike && commentUsername !== username) {
@@ -360,71 +361,82 @@ function App() {
 
 	return (
 		<section id="top-section">
-			<DropDown
-				following={following}
-				follow={follow}
-				unFollow={unFollow}
-				userData={userDataDropDown}
-				users={users}
-        posts={posts}
-        setPostId={commModalSetPostId} 
-			/>
-			<Modals
-				notifications={notifications}
-				following={following}
-				username={username}
-				follow={follow}
-				unFollow={unFollow}
-				users={users}
-				dropDownSetUserData={dropDownSetUserData}
-				likesForLikesModal={likesForLikesModal}
-				userDataOptionsModal={userDataOptionsModal}
-				optionsModalSetUserData={optionsModalSetUserData}
-				setpostIdOptionsModal={setpostIdOptionsModal}
-				posts={posts}
-				commModalPostId={commModalPostId}
-				signedIn={signedIn}
-				likesModalSetLikes={likesModalSetLikes}
-				likeComment={likeComment}
-				removeComment={removeComment}
-				likePicture={likePicture}
-				addComment={addComment}
-				addPost={addPost}
-				firestoreDocId={firestoreDocId}
-				removePost={removePost}
-				postIdOptionsModal={postIdOptionsModal}
-				commModalSetPostId={commModalSetPostId}
-        optionsEdit={optionsEdit} 
-        setOptionsEdit={setOptionsEdit}
-        setPosts={setPosts}
-			></Modals>
-			<Nav
-				clearNotifications={clearNotifications}
-				unReadNoti={unReadNoti}
-				notifications={notifications}
-				users={users}
-				following={following}
-				username={username}
-				follow={follow}
-				unFollow={unFollow}
-			></Nav>
-			<Home
-				setpostIdOptionsModal={setpostIdOptionsModal}
-				optionsModalSetUserData={optionsModalSetUserData}
-				likesModalSetLikes={likesModalSetLikes}
-				dropDownSetUserData={dropDownSetUserData}
-				users={users}
-				following={following}
-				username={username}
-				follow={follow}
-				unFollow={unFollow}
-				posts={posts}
-				likePicture={likePicture}
-				signedIn={signedIn}
-				addComment={addComment}
-				likeComment={likeComment}
-				commModalSetPostId={commModalSetPostId}
-			></Home>
+			<HashRouter>
+				<DropDown
+					following={following}
+					follow={follow}
+					unFollow={unFollow}
+					userData={userDataDropDown}
+					users={users}
+					posts={posts}
+					setPostId={commModalSetPostId}
+				/>
+				<Modals
+					notifications={notifications}
+					following={following}
+					username={username}
+					follow={follow}
+					unFollow={unFollow}
+					users={users}
+					dropDownSetUserData={dropDownSetUserData}
+					likesForLikesModal={likesForLikesModal}
+					userDataOptionsModal={userDataOptionsModal}
+					optionsModalSetUserData={optionsModalSetUserData}
+					setpostIdOptionsModal={setpostIdOptionsModal}
+					posts={posts}
+					commModalPostId={commModalPostId}
+					signedIn={signedIn}
+					likesModalSetLikes={likesModalSetLikes}
+					likeComment={likeComment}
+					removeComment={removeComment}
+					likePicture={likePicture}
+					addComment={addComment}
+					addPost={addPost}
+					firestoreDocId={firestoreDocId}
+					removePost={removePost}
+					postIdOptionsModal={postIdOptionsModal}
+					commModalSetPostId={commModalSetPostId}
+					optionsEdit={optionsEdit}
+					setOptionsEdit={setOptionsEdit}
+					setPosts={setPosts}
+				></Modals>
+				<Nav
+					clearNotifications={clearNotifications}
+					unReadNoti={unReadNoti}
+					notifications={notifications}
+					users={users}
+					following={following}
+					username={username}
+					follow={follow}
+					unFollow={unFollow}
+					commModalSetPostId={commModalSetPostId}
+				></Nav>
+				<Routes>
+					<Route
+						path="/"
+						element={
+							<Home
+								setpostIdOptionsModal={setpostIdOptionsModal}
+								optionsModalSetUserData={optionsModalSetUserData}
+								likesModalSetLikes={likesModalSetLikes}
+								dropDownSetUserData={dropDownSetUserData}
+								users={users}
+								following={following}
+								username={username}
+								follow={follow}
+								unFollow={unFollow}
+								posts={posts}
+								likePicture={likePicture}
+								signedIn={signedIn}
+								addComment={addComment}
+								likeComment={likeComment}
+								commModalSetPostId={commModalSetPostId}
+							/>
+						}
+					/>
+					<Route path="/profile/:username" element={<ProfilePage />} />
+				</Routes>
+			</HashRouter>
 		</section>
 	);
 }
