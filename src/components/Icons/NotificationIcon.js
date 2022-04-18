@@ -5,8 +5,6 @@ import { messageIconNotClicked } from "./MessageIcon";
 import { avatarIconNotClicked } from "./ProfileIcon";
 import { searchIconNotClicked } from "./SearchIcon";
 
-
-
 function NotificationIconSvg() {
 	return (
 		<svg
@@ -41,7 +39,6 @@ function notificationIconClicked() {
 	});
 }
 
-
 function mobileNotificationIcon(e) {
 	const user = getAuth().currentUser;
 
@@ -64,14 +61,19 @@ function mobileNotificationIcon(e) {
 
 function notificationIcon(e) {
 	const user = getAuth().currentUser;
-
+	console.log(e.target);
 	if (user) {
 		if (
 			document.getElementById("notification-arrow-div").style.display === "flex" &&
 			(e.target.tagName === "svg" || e.target.tagName === "path")
 		) {
 			closeNotification();
-		} else {
+		} else if (
+			document.getElementById("notification-arrow-div").style.display === "flex" &&
+			window.location.href.includes("profile")
+		) {
+			closeNotification();
+		} else if (!window.location.href.includes("commentsM")) {
 			notificationIconClicked();
 			messageIconNotClicked();
 			homeIconNotClicked();
@@ -89,17 +91,17 @@ function notificationIcon(e) {
 }
 
 function closeNotification() {
-	if (
-		window.location.href === "http://localhost:3000/" ||
-		window.location.href === "http://localhost:3000/commentsM" ||
-		window.location.href === "http://localhost:3000/optionsM" ||
-		window.location.href === "http://localhost:3000/likesM" ||
-		window.location.href === "http://localhost:3000/shareM"
-	) {
-		homeIcon();
-	}
+	homeIcon();
+
 	document.getElementById("notification-div").style.display = "none";
 	document.getElementById("notification-arrow-div").style.display = "none";
 }
 
-export {NotificationIconSvg, notificationIconNotClicked, notificationIconClicked,  mobileNotificationIcon, notificationIcon, closeNotification}
+export {
+	NotificationIconSvg,
+	notificationIconNotClicked,
+	notificationIconClicked,
+	mobileNotificationIcon,
+	notificationIcon,
+	closeNotification,
+};
