@@ -14,7 +14,7 @@ import AddPostModal from "./Modals/AddPostModal";
 function Modals(props) {
 	return (
 		<>
-			<SearchModal />
+			<SearchModal yourUsername={props.username} />
 			<SignUpModal />
 			<SignInModal />
 			<OptionsModal
@@ -25,7 +25,7 @@ function Modals(props) {
 				removePost={props.removePost}
 				postIdOptionsModal={props.postIdOptionsModal}
 				commModalSetPostId={props.commModalSetPostId}
-        		setOptionsEdit={props.setOptionsEdit}
+				setOptionsEdit={props.setOptionsEdit}
 			/>
 			<LikesModal
 				users={props.users}
@@ -34,6 +34,8 @@ function Modals(props) {
 				following={props.following}
 				likes={props.likesForLikesModal}
 				dropDownSetUserData={props.dropDownSetUserData}
+				setLikesModalInfo={props.setLikesModalInfo}
+				likesModalInfo={props.likesModalInfo}
 			/>
 			<CommentsModal
 				users={props.users}
@@ -61,15 +63,22 @@ function Modals(props) {
 				follow={props.follow}
 				unFollow={props.unFollow}
 			/>
-			<AddPostModal setPosts={props.setPosts} posts={props.posts} postIdOptionsModal={props.postIdOptionsModal} setOptionsEdit={props.setOptionsEdit} optionsEdit={props.optionsEdit}  yourUsername={props.username} addPost={props.addPost} firestoreDocId={props.firestoreDocId} />
+			<AddPostModal
+				setPosts={props.setPosts}
+				posts={props.posts}
+				postIdOptionsModal={props.postIdOptionsModal}
+				setOptionsEdit={props.setOptionsEdit}
+				optionsEdit={props.optionsEdit}
+				yourUsername={props.username}
+				addPost={props.addPost}
+				firestoreDocId={props.firestoreDocId}
+			/>
 		</>
 	);
 }
 
 function closeModal(modal) {
-	return (
-		CloseModalIcon(modal)	
-	);
+	return CloseModalIcon(modal);
 }
 
 export default Modals;
