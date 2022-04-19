@@ -320,7 +320,8 @@ a:visited {
 .likes-modal-follow {
 	margin-top: 30px;
 	border-radius: 3px;
-	width: 80px;
+	min-width: 70px;
+	max-width: 70px;
 	height: 30px;
 	background-color: #0095f6;
 	color: white;
