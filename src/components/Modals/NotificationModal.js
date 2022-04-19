@@ -4,7 +4,8 @@ import uniqid from "uniqid";
 import ava from "../../img/ava.jpeg";
 import { useEffect } from "react";
 import { closeModal } from "../Modals";
-
+import { Link } from "react-router-dom";
+import { homeIcon } from "../Icons/HomeIcon";
 
 function NotificationModal(props) {
 	useEffect(() => {
@@ -35,18 +36,30 @@ function NotificationModal(props) {
 					.map((result) => {
 						return (
 							<div key={uniqid()} className="noti-modal-single-result-mobile">
-								<img src={ava} alt="" />
-								<div>
-									<span className="noti-mobile-user-span">{result.username + " "}</span>
-									{result.content + " "}
-									<span className="noti-date-mobile">
-										<ReactTimeAgo
-											timeStyle="mini-minute-now"
-											date={new Date(result.date)}
-											locale="en-US"
-										/>
-									</span>
-								</div>
+								<Link
+									className="link-like-modal"
+									onClick={() => {
+										window.history.pushState("/", "Title", "/");
+										document.getElementById("notification-modal-container").style.display = "none";
+										if(result.username !== props.username) {
+											homeIcon();
+										}
+									}}
+									to={`/profile/${result.username}`}
+								>
+									<img src={ava} alt="" />
+									<div>
+										<span className="noti-mobile-user-span">{result.username + " "}</span>
+										{result.content + " "}
+										<span className="noti-date-mobile">
+											<ReactTimeAgo
+												timeStyle="mini-minute-now"
+												date={new Date(result.date)}
+												locale="en-US"
+											/>
+										</span>
+									</div>
+								</Link>
 								{followButtonForNoti(
 									result.username,
 									props.following,
@@ -62,5 +75,4 @@ function NotificationModal(props) {
 	);
 }
 
-
-export default NotificationModal
+export default NotificationModal;
