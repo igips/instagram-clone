@@ -1,6 +1,5 @@
 import { getAuth } from "firebase/auth";
 import { useEffect } from "react";
-import { showAddPostModal } from "./AddPostModal";
 import { hideCommentsModal } from "./CommentsModal";
 import { showSignInModal } from "./SignInModal";
 
