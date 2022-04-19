@@ -3,17 +3,16 @@ import ReactDOM from "react-dom";
 import App from "./components/App.js";
 import "./styles/index.css";
 import { initializeApp } from "firebase/app";
-import { getAuth, onAuthStateChanged } from "firebase/auth";
+import { getAuth } from "firebase/auth";
 import { getFirestore, collection, getDocs } from "firebase/firestore";
 import TimeAgo from "javascript-time-ago";
 import en from "javascript-time-ago/locale/en.json";
 import { homeIcon } from "./components/Icons/HomeIcon.js";
-import { closeNotification } from "./components/Icons/NotificationIcon.js";
 
 TimeAgo.addDefaultLocale(en);
 
 window.addEventListener("load", () => {
-	if (window.location.href !== "http://localhost:3000/") {
+	if (window.location.href.charAt(window.location.href.length - 1) !== "/" && !window.location.href.includes("profile")) {
 		window.history.pushState("/", "Title", "/");
 		homeIcon();
 	}
@@ -101,7 +100,7 @@ window.addEventListener("popstate", (e) => {
 	}
 
 	
-	if (window.location.href === "http://localhost:3000/" || window.location.href === "http://localhost:3000/#/") {
+	if (window.location.href.charAt(window.location.href.length - 1) === "/") {
 		likesModal.style.display = "none";
 		shareModal.style.display = "none";
 		optionsModal.style.display = "none";
@@ -113,7 +112,7 @@ window.addEventListener("popstate", (e) => {
 		addPostModal.style.display = "none";
 		homeIcon();
 
-	}
+	} 
 
 });
 
