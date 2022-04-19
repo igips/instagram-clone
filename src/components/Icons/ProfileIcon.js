@@ -104,11 +104,11 @@ function avatarIcon(e) {
 
 function closeAvatar() {
 	if (
-		window.location.href === "http://localhost:3000/" ||
-		window.location.href === "http://localhost:3000/commentsM" ||
-		window.location.href === "http://localhost:3000/optionsM" ||
-		window.location.href === "http://localhost:3000/likesM" ||
-		window.location.href === "http://localhost:3000/shareM"
+		window.location.href.charAt(window.location.href.length - 1) === "/" ||
+		window.location.href.includes("commentsM") ||
+		window.location.href.includes("optionsM") ||
+		window.location.href.includes("likesM")  ||
+		window.location.href.includes("shareM")
 	) {
 		homeIcon();
 	}
