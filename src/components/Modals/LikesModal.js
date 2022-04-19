@@ -5,6 +5,7 @@ import { closeModal } from "../Modals";
 import { getUserDataFromUsersArray } from "../Home";
 import uniqid from "uniqid";
 import ava from "../../img/ava.jpeg";
+import { Link } from "react-router-dom";
 
 function LikesModal(props) {
 	const [signedIn, setSignedIn] = useState(false);
@@ -16,6 +17,8 @@ function LikesModal(props) {
 			setSignedIn(false);
 		}
 	});
+
+	
 
 	useEffect(() => {
 		const likesModal = document.getElementById("likes-modal");
@@ -64,13 +67,14 @@ function LikesModal(props) {
 		const modal = document.getElementById("likes-modal");
 		window.history.back();
 		modal.style.display = "none";
+		props.setLikesModalInfo("Likes")
 	}
 
 	return (
 		<div id="likes-modal" className="modal">
 			<div className="likes-modal-content">
 				<div id="likes-modal-header">
-					<span>Likes</span>
+					<span>{props.likesModalInfo}</span>
 					{closeModal(hideLikesModal)}
 				</div>
 				<div id="list-of-likes-div">
@@ -78,39 +82,51 @@ function LikesModal(props) {
 						{props.likes.map((user) => {
 							return (
 								<div key={uniqid()} className="right-sug-div-list">
-									<div
-										onMouseEnter={(e) => {
-											dropDown(
-												getUserDataFromUsersArray(props.users, user),
-												props.dropDownSetUserData,
-												e,
-												"avaPic"
-											);
-										}}
-										onMouseLeave={() => {
+									<Link
+									className="link-like-modal"
+										onClick={() => {
+											window.history.pushState("/", "Title", "/");
 											hideDropDown();
+											document.getElementById("likes-modal").style.display = "none";
+											document.getElementById("comments-modal").style.display = "none";
 										}}
-										className="right-sug-ava-div"
+										to={`/profile/${user}`}
 									>
-										<img className="ava-img-likes" src={ava} alt="" />
-									</div>
-									<span
-										onMouseEnter={(e) =>
-											dropDown(
-												getUserDataFromUsersArray(props.users, user),
-												props.dropDownSetUserData,
-												e,
-												"no",
-												"right"
-											)
-										}
-										onMouseLeave={() => {
-											hideDropDown();
-										}}
-										className="sug-login-right"
-									>
-										{user}
-									</span>
+										<div
+											onMouseEnter={(e) => {
+												dropDown(
+													getUserDataFromUsersArray(props.users, user),
+													props.dropDownSetUserData,
+													e,
+													"avaPic"
+												);
+											}}
+											onMouseLeave={() => {
+												hideDropDown();
+											}}
+											className="right-sug-ava-div"
+										>
+											<img className="ava-img-likes" src={ava} alt="" />
+										</div>
+
+										<span
+											onMouseEnter={(e) =>
+												dropDown(
+													getUserDataFromUsersArray(props.users, user),
+													props.dropDownSetUserData,
+													e,
+													"no",
+													"right"
+												)
+											}
+											onMouseLeave={() => {
+												hideDropDown();
+											}}
+											className="sug-login-right"
+										>
+											{user}
+										</span>
+									</Link>
 									{followButtonForLikes(user)}
 								</div>
 							);
@@ -122,13 +138,19 @@ function LikesModal(props) {
 	);
 }
 
-function showLikesModal(likes, likesModalSetLikes) {
+function showLikesModal(likes, likesModalSetLikes, info, info2) {
 	const modal = document.getElementById("likes-modal");
 	if (!window.location.href.includes("likesM")) {
 		window.history.pushState("likesM", "Title", "likesM");
 	}
 
-	likesModalSetLikes(likes.users);
+	if(!info) {
+		likesModalSetLikes(likes.users);
+
+	} else {
+		likesModalSetLikes(likes);
+		info(info2);
+	}
 
 	modal.style.display = "flex";
 }
