@@ -209,11 +209,12 @@ function Nav(props) {
 	function displayNotfications(data) {
 		if (data.postID) {
 			return (
-				<div  className="noti-modal-single-result">
-					<div className="noti-link"
+				<div className="noti-modal-single-result">
+					<div
+						className="noti-link"
 						onClick={() => {
 							showCommentsModal(data.postID, props.commModalSetPostId);
-							closeNotification()
+							closeNotification();
 						}}
 					>
 						<img src={ava} alt="" />
@@ -233,7 +234,7 @@ function Nav(props) {
 			return (
 				<>
 					<div className="noti-modal-single-result">
-						<Link  className="noti-link" to={`/profile/${data.username}`}>
+						<Link className="noti-link" to={`/profile/${data.username}`}>
 							<img src={ava} alt="" />
 							<span>{data.username}</span>
 							<span>&nbsp;</span>
@@ -296,10 +297,18 @@ function Nav(props) {
 								</div>
 								{searchResults.map((result) => {
 									return (
-										<div key={uniqid()} className="share-modal-single-result">
-											<img src={ava} alt="" />
-											<span>{result}</span>
-										</div>
+										<Link
+											key={uniqid()}
+											onClick={() => {
+												cancelSearch();
+											}}
+											to={`/profile/${result}`}
+										>
+											<div key={uniqid()} className="share-modal-single-result">
+												<img src={ava} alt="" />
+												<span>{result}</span>
+											</div>
+										</Link>
 									);
 								})}
 							</div>
@@ -333,7 +342,7 @@ function Nav(props) {
 										.slice(0)
 										.reverse()
 										.map((result) => {
-											return <div key={uniqid()}>{displayNotfications(result)}</div> 
+											return <div key={uniqid()}>{displayNotfications(result)}</div>;
 										})}
 								</div>
 								<div className="notification-svg svg-div">{NotificationIconSvg()}</div>
