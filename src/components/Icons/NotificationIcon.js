@@ -61,19 +61,20 @@ function mobileNotificationIcon(e) {
 
 function notificationIcon(e) {
 	const user = getAuth().currentUser;
-	console.log(e.target);
 	if (user) {
 		if (
 			document.getElementById("notification-arrow-div").style.display === "flex" &&
 			(e.target.tagName === "svg" || e.target.tagName === "path")
 		) {
 			closeNotification();
-		} else if (
-			document.getElementById("notification-arrow-div").style.display === "flex" &&
-			window.location.href.includes("profile")
-		) {
-			closeNotification();
-		} else if (!window.location.href.includes("commentsM")) {
+		} else if (document.getElementById("notification-arrow-div").style.display === "flex" && window.location.href.includes("profile")) {
+			closeNotification()
+
+		} 
+		
+		
+		
+		else if (!window.location.href.includes("commentsM")) {
 			notificationIconClicked();
 			messageIconNotClicked();
 			homeIconNotClicked();
