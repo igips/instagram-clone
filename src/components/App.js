@@ -33,6 +33,7 @@ function App() {
 
 	//LIKESMODAL//
 	const [likesForLikesModal, setLikesForLikesModal] = useState([]);
+	const [likesModalInfo, setLikesModalInfo] = useState("Likes");
 
 	function likesModalSetLikes(data) {
 		setLikesForLikesModal(data);
@@ -399,6 +400,8 @@ function App() {
 					optionsEdit={optionsEdit}
 					setOptionsEdit={setOptionsEdit}
 					setPosts={setPosts}
+					setLikesModalInfo={setLikesModalInfo}
+					likesModalInfo={likesModalInfo}
 				></Modals>
 				<Nav
 					clearNotifications={clearNotifications}
@@ -434,7 +437,21 @@ function App() {
 							/>
 						}
 					/>
-					<Route path="/profile/:username" element={<ProfilePage />} />
+					<Route
+						path="/profile/:username"
+						element={
+							<ProfilePage
+								follow={follow}
+								unFollow={unFollow}
+								yourUsername={username}
+								signedIn={signedIn}
+								following={following}
+								likesModalSetLikes={likesModalSetLikes}
+								setLikesModalInfo={setLikesModalInfo}
+								users={users}
+							/>
+						}
+					/>
 				</Routes>
 			</HashRouter>
 		</section>
