@@ -268,9 +268,9 @@ function PictureCardHeader(props) {
 				<header className="picture-card-header">
 					<div className="picture-card-avatar-div">
 						<div className="picture-card-avatar-div-inner">
-							<Link to={`/profile/${props.username}`}>
+							<Link onClick={() => window.history.pushState("/", "Title", "/")} to={`/profile/${props.username}`}>
 								<span
-									onClick={() => hideDropDown()}
+									onClick={() => {hideDropDown(); document.getElementById("comments-modal").style.display = "none"}}
 									onMouseEnter={(e) => {
 										dropDown(
 											getUserDataFromUsersArray(props.users, props.username),
@@ -298,9 +298,9 @@ function PictureCardHeader(props) {
 					</div>
 
 					<div className="picture-card-name-div">
-						<Link to={`/profile/${props.username}`}>
+						<Link onClick={() => window.history.pushState("/", "Title", "/")} to={`/profile/${props.username}`}>
 							<span
-								onClick={() => hideDropDown()}
+								onClick={() => {hideDropDown(); document.getElementById("comments-modal").style.display = "none"}}
 								onMouseEnter={(e) => {
 									dropDown(
 										getUserDataFromUsersArray(props.users, props.username),
