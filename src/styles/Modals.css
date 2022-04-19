@@ -225,6 +225,7 @@
 }
 
 #comments-div-img {
+	position: relative;
 	display: flex;
 	align-items: center;
 	justify-content: center;
@@ -838,6 +839,11 @@ input[type="file"] {
 #close-tag-drop-down-mobile {
 	display: none;
 	padding-top: 2px;
+}
+
+.link-like-modal {
+	display: flex;
+	align-items: center;
 }
 
 
