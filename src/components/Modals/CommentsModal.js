@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import { shareIcon } from "../Icons/ShareIcon";
 import { closeModal } from "../Modals";
-import testPic from "../../img/test-img.jpg";
 import { CloseIcon } from "../Icons/CloseIcon";
 import {
 	PictureCardHeader,
@@ -16,6 +15,9 @@ import ava from "../../img/ava.jpeg";
 import ReactTimeAgo from "react-time-ago";
 import { showLikesModal } from "./LikesModal";
 import { likeCommentIcon, likeCommentIconClicked } from "../Icons/LikeIcon";
+import { Link } from "react-router-dom";
+import { tagPosition } from "./AddPostModal";
+import { TagIcon } from "../Icons/TagIcon";
 
 function CommentsModal(props) {
 	const [postData, setPostData] = useState({
@@ -25,9 +27,18 @@ function CommentsModal(props) {
 		description: "",
 		id: "",
 		likes: { num: 0, users: [] },
-		pic: {src: ""},
+		pic: { src: "" , tags:[]},
 		date: new Date(),
 	});
+
+	useEffect(() => {
+		if (postData.pic.tags.length > 0) {
+			document.getElementById("tag-ico-modal").style.display = "flex";
+		} else {
+			document.getElementById("tag-ico-modal").style.display = "none";
+		}
+
+	},[postData])
 
 	useEffect(() => {
 		if (props.commModalPostId) {
@@ -51,6 +62,15 @@ function CommentsModal(props) {
 		});
 	}, []);
 
+	function showTags() {
+		const tagContainer = document.getElementById("tag-cont-modal");
+
+		if (tagContainer.style.display === "flex") {
+			tagContainer.style.display = "none";
+		} else {
+			tagContainer.style.display = "flex";
+		}
+	}
 
 	return (
 		<div id="comments-modal" className="modal">
@@ -60,6 +80,21 @@ function CommentsModal(props) {
 			<div id="comments-modal-content">
 				<div id="comments-div-img">
 					<img src={postData.pic.src} alt="" />
+					<div id={"tag-cont-modal"} className="tag-container-picture-card">
+						{postData.pic.tags.map((tag) => {
+							return (
+								<Link key={uniqid()} to={`/profile/${tag.username}`}>
+									<div style={tagPosition(tag)} className="tag-div-picture-card">
+										<span>{tag.username}</span>
+									</div>
+								</Link>
+							);
+						})}
+					</div>
+					
+					<div onClick={() => showTags()} id={"tag-ico-modal"} className="tag-icon-container">
+						{TagIcon()}
+					</div>
 				</div>
 				<div id="comments-div-modal">
 					<div id="comms-modal-header-mobile">
@@ -132,7 +167,9 @@ function CommentsModal(props) {
 
 function hideCommentsModal() {
 	const modal = document.getElementById("comments-modal");
+
 	window.history.back();
+
 	modal.style.display = "none";
 }
 
@@ -164,48 +201,66 @@ function Comments(props) {
 		if (props.description) {
 			return (
 				<div id="modal-first-comment">
-					<span
-						onMouseEnter={(e) => {
-							dropDown(
-								getUserDataFromUsersArray(props.users, props.username),
-								props.dropDownSetUserData,
-								e,
-								"avaPic"
-							);
-						}}
-						onMouseLeave={() => {
+					<Link
+						onClick={() => {
+							window.history.pushState("/", "Title", "/");
 							hideDropDown();
+							document.getElementById("comments-modal").style.display = "none";
 						}}
-						className="avatar-span-comments"
+						to={`/profile/${props.username}`}
 					>
-						<img
-							id="comments-modal-description-avatar"
-							alt=""
-							className="card-avatar-img"
-							data-testid="user-avatar"
-							draggable="false"
-							src={props.avatar}
-						/>
-					</span>
+						<span
+							onMouseEnter={(e) => {
+								dropDown(
+									getUserDataFromUsersArray(props.users, props.username),
+									props.dropDownSetUserData,
+									e,
+									"avaPic"
+								);
+							}}
+							onMouseLeave={() => {
+								hideDropDown();
+							}}
+							className="avatar-span-comments"
+						>
+							<img
+								id="comments-modal-description-avatar"
+								alt=""
+								className="card-avatar-img"
+								data-testid="user-avatar"
+								draggable="false"
+								src={props.avatar}
+							/>
+						</span>
+					</Link>
 					<div id="first-modal-comment-div" className="modal-comment-div">
 						<div id="first-modal-comment-div-inner">
 							<div className="name-span-modal" id="first-modal-comment-span">
-								<span
-									onMouseEnter={(e) => {
-										dropDown(
-											getUserDataFromUsersArray(props.users, props.username),
-											props.dropDownSetUserData,
-											e
-										);
-									}}
-									onMouseLeave={() => {
+								<Link
+									onClick={() => {
+										window.history.pushState("/", "Title", "/");
 										hideDropDown();
+										document.getElementById("comments-modal").style.display = "none";
 									}}
-									className="first-modal-comment-span"
-									id="description-comments-modal-username"
+									to={`/profile/${props.username}`}
 								>
-									{props.username}
-								</span>{" "}
+									<span
+										onMouseEnter={(e) => {
+											dropDown(
+												getUserDataFromUsersArray(props.users, props.username),
+												props.dropDownSetUserData,
+												e
+											);
+										}}
+										onMouseLeave={() => {
+											hideDropDown();
+										}}
+										className="first-modal-comment-span"
+										id="description-comments-modal-username"
+									>
+										{props.username}
+									</span>{" "}
+								</Link>
 								<span id="description-comments-modal-desc">{props.description}</span>
 							</div>
 							<div id="first-comment-when">
@@ -241,32 +296,52 @@ function Comments(props) {
 								}}
 								className="avatar-span-comments"
 							>
-								<img
-									alt=""
-									className="card-avatar-img"
-									data-testid="user-avatar"
-									draggable="false"
-									src={ava}
-								/>
+								{" "}
+								<Link
+									onClick={() => {
+										window.history.pushState("/", "Title", "/");
+										document.getElementById("comments-modal").style.display = "none";
+										hideDropDown();
+									}}
+									to={`/profile/${comment.username}`}
+								>
+									<img
+										alt=""
+										className="card-avatar-img"
+										data-testid="user-avatar"
+										draggable="false"
+										src={ava}
+									/>
+								</Link>
 							</span>
+
 							<div className="modal-comment-div">
 								<div className="modal-comment-div-inner">
 									<div className="name-span-modal">
-										<span
-											onMouseEnter={(e) => {
-												dropDown(
-													getUserDataFromUsersArray(props.users, comment.username),
-													props.dropDownSetUserData,
-													e
-												);
-											}}
-											onMouseLeave={() => {
-												hideDropDown();
-											}}
-											className="first-modal-comment-span"
+										<Link
+											onClick={() => window.history.pushState("/", "Title", "/")}
+											to={`/profile/${comment.username}`}
 										>
-											{comment.username}
-										</span>{" "}
+											<span
+												onClick={() => {
+													document.getElementById("comments-modal").style.display = "none";
+													hideDropDown();
+												}}
+												onMouseEnter={(e) => {
+													dropDown(
+														getUserDataFromUsersArray(props.users, comment.username),
+														props.dropDownSetUserData,
+														e
+													);
+												}}
+												onMouseLeave={() => {
+													hideDropDown();
+												}}
+												className="first-modal-comment-span"
+											>
+												{comment.username}
+											</span>{" "}
+										</Link>
 										{comment.comment}
 									</div>
 									<div className="like-and-when-added-div">
@@ -318,4 +393,4 @@ function showCommentsModal(postId, commModalSetPostId) {
 }
 
 export default CommentsModal;
-export {showCommentsModal, hideCommentsModal}
+export { showCommentsModal, hideCommentsModal };
