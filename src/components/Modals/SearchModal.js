@@ -6,8 +6,11 @@ import { closeModal } from "../Modals";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCircleXmark } from "@fortawesome/free-regular-svg-icons";
 import { faSpinner } from "@fortawesome/free-solid-svg-icons";
+import { Link } from "react-router-dom";
+import { homeIcon } from "../Icons/HomeIcon";
 
-function SearchModal() {
+
+function SearchModal(props) {
 	const [searchValue, setSearchValue] = useState("");
 	const [searchResults, setSearchResults] = useState([]);
 
@@ -96,10 +99,23 @@ function SearchModal() {
 				</div>
 				{searchResults.map((result) => {
 					return (
-						<div key={uniqid()} className="share-modal-single-result">
-							<img src={ava} alt="" />
-							<span>{result}</span>
-						</div>
+						<Link
+							key={uniqid()} 
+							onClick={() => {
+								window.history.pushState("/", "Title", "/");
+								document.getElementById("search-modal-container").style.display = "none";
+								cancelSearch();
+								if(result !== props.yourUsername) {
+									homeIcon();
+								}
+							}}
+							to={`/profile/${result}`}
+						>
+							<div className="share-modal-single-result">
+								<img src={ava} alt="" />
+								<span>{result}</span>
+							</div>
+						</Link>
 					);
 				})}
 			</div>
