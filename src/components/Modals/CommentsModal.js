@@ -22,7 +22,6 @@ import { TagIcon } from "../Icons/TagIcon";
 function CommentsModal(props) {
 	const [postData, setPostData] = useState({
 		username: "",
-		avatar: ava,
 		comments: [],
 		description: "",
 		id: "",
@@ -31,12 +30,20 @@ function CommentsModal(props) {
 		date: new Date(),
 	});
 
+	const [userData, setUserData] = useState({avatar: ""});
+
+
 	useEffect(() => {
 		if (postData.pic.tags.length > 0) {
 			document.getElementById("tag-ico-modal").style.display = "flex";
 		} else {
 			document.getElementById("tag-ico-modal").style.display = "none";
 		}
+
+		if(postData.username !== "") {
+			setUserData(getUserDataFromUsersArray(props.users, postData.username));
+		}
+		
 
 	},[postData])
 
@@ -109,7 +116,7 @@ function CommentsModal(props) {
 							unFollow={props.unFollow}
 							following={props.following}
 							username={postData.username}
-							avatar={postData.avatar}
+							avatar={userData.avatar ? userData.avatar : ava}
 							dropDownSetUserData={props.dropDownSetUserData}
 							optionsModalSetUserData={props.optionsModalSetUserData}
 							setpostIdOptionsModal={props.setpostIdOptionsModal}
@@ -125,7 +132,7 @@ function CommentsModal(props) {
 							users={props.users}
 							username={postData.username}
 							dropDownSetUserData={props.dropDownSetUserData}
-							avatar={postData.avatar}
+							avatar={userData.avatar ? userData.avatar : ava}
 							likesModalSetLikes={props.likesModalSetLikes}
 							postId={postData.id}
 							likeComment={props.likeComment}
@@ -280,6 +287,7 @@ function Comments(props) {
 			{description()}
 			<div id="container-for-comments-in-modal">
 				{props.comments.map((comment) => {
+					const userData = getUserDataFromUsersArray(props.users, comment.username);
 					return (
 						<div key={uniqid()} className="modal-comments">
 							<span
@@ -310,7 +318,7 @@ function Comments(props) {
 										className="card-avatar-img"
 										data-testid="user-avatar"
 										draggable="false"
-										src={ava}
+										src={userData.avatar ? userData.avatar : ava}
 									/>
 								</Link>
 							</span>
