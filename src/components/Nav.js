@@ -23,6 +23,7 @@ import { ThemeIcon } from "./Icons/ThemeIcon";
 import { SettingsIcon } from "./Icons/SettingsIcon";
 import { Link } from "react-router-dom";
 import { showCommentsModal } from "./Modals/CommentsModal";
+import { getUserDataFromUsersArray } from "./Home";
 
 function followButtonForNoti(user, following, username, follow, unFollow) {
 	if (!following.includes(user) && user !== username) {
@@ -188,7 +189,7 @@ function Nav(props) {
 		if (user) {
 			return (
 				<>
-					<div onClick={() => closeAvatar()} className="border-for-avatar">
+					<div onClick={(e) => avatarIcon(e)}   className="border-for-avatar">
 						{" "}
 					</div>
 					<span
@@ -197,7 +198,7 @@ function Nav(props) {
 						tabIndex="0"
 						style={{ width: "24px", height: "24px" }}
 					>
-						<img className="ava" alt="" crossOrigin="anonymous" draggable="false" src={ava} />
+						<img className="ava" alt="" draggable="false" src={props.avatar ? props.avatar : ava} />
 					</span>
 				</>
 			);
@@ -207,17 +208,24 @@ function Nav(props) {
 	}
 
 	function displayNotfications(data) {
+		const userData = getUserDataFromUsersArray(props.users, data.username);
+
 		if (data.postID) {
 			return (
 				<div className="noti-modal-single-result">
 					<div
 						className="noti-link"
 						onClick={() => {
-							showCommentsModal(data.postID, props.commModalSetPostId);
-							closeNotification();
+							for (let p of props.posts) {
+								if (p.id === data.postID) {
+									showCommentsModal(data.postID, props.commModalSetPostId);
+									closeNotification();
+									break;
+								}
+							}
 						}}
 					>
-						<img src={ava} alt="" />
+						<img src={userData.avatar ? userData.avatar : ava} alt="" />
 						<span>{data.username}</span>
 						<span>&nbsp;</span>
 						<span className="noti-content">{data.content}</span>
@@ -235,7 +243,7 @@ function Nav(props) {
 				<>
 					<div className="noti-modal-single-result">
 						<Link className="noti-link" to={`/profile/${data.username}`}>
-							<img src={ava} alt="" />
+							<img src={userData.avatar ? userData.avatar : ava} alt="" />
 							<span>{data.username}</span>
 							<span>&nbsp;</span>
 							<span className="noti-content">{data.content}</span>
@@ -296,6 +304,7 @@ function Nav(props) {
 									No results found
 								</div>
 								{searchResults.map((result) => {
+									const userData = getUserDataFromUsersArray(props.users, result);
 									return (
 										<Link
 											key={uniqid()}
@@ -305,7 +314,7 @@ function Nav(props) {
 											to={`/profile/${result}`}
 										>
 											<div key={uniqid()} className="share-modal-single-result">
-												<img src={ava} alt="" />
+												<img src={userData.avatar ? userData.avatar : ava} alt="" />
 												<span>{result}</span>
 											</div>
 										</Link>
@@ -383,9 +392,9 @@ function Nav(props) {
 			</nav>
 			<nav id="bottom-nav">
 				<div className="nav-container-bottom">
-					<div onClick={() => homeIcon()} className="icon-inner-div inner-bottom">
+					<Link to="/" onClick={() => homeIcon()} className="icon-inner-div inner-bottom">
 						{HomeIconSvg()}
-					</div>
+					</Link>
 					<div onClick={() => searchIcon()} id="search-icon-div" className="icon-inner-div inner-bottom">
 						{SearchIconSvg()}
 					</div>
@@ -404,7 +413,10 @@ function Nav(props) {
 						<div id="noti-amount-mobile"></div>
 						<div className="notification-svg svg-div">{NotificationIconSvg()}</div>
 					</div>
-					<div className="icon-inner-div inner-bottom">{profileIcon()}</div>
+
+					<Link to={`/profile/${props.username}`} className="icon-inner-div inner-bottom">
+						{profileIcon()}
+					</Link>
 				</div>
 			</nav>
 		</>
