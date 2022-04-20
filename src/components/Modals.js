@@ -72,6 +72,7 @@ function Modals(props) {
 				yourUsername={props.username}
 				addPost={props.addPost}
 				firestoreDocId={props.firestoreDocId}
+				avatar={props.avatar}
 			/>
 		</>
 	);
