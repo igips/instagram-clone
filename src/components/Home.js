@@ -98,7 +98,11 @@ function Home(props) {
 										return (
 											<div key={uniqid()} className="sug-box-left">
 												<Link to={`/profile/${user.username}`}>
-													<img className="sug-box-left-ava" src={ava} alt="" />
+													<img
+														className="sug-box-left-ava"
+														src={user.avatar ? user.avatar : ava}
+														alt=""
+													/>
 												</Link>
 												<Link to={`/profile/${user.username}`}>
 													<span style={{ marginBottom: "10px" }}>{user.username}</span>
@@ -154,7 +158,7 @@ function Home(props) {
 						<div className="not-visible" id="home-right-profile-inner">
 							<Link to={`/profile/${props.username}`}>
 								<div id="right-avatar-div">
-									<img className="right-ava" src={ava} alt="" />
+									<img className="right-ava" src={props.avatar ? props.avatar : ava} alt="" />
 								</div>
 							</Link>
 							<Link to={`/profile/${props.username}`}>
@@ -184,7 +188,12 @@ function Home(props) {
 													onMouseLeave={() => hideDropDown()}
 													className="right-sug-ava-div"
 												>
-													<img onClick={() => hideDropDown()} className="ava-img-sug" src={ava} alt="" />
+													<img
+														onClick={() => hideDropDown()}
+														className="ava-img-sug"
+														src={user.avatar ? user.avatar : ava}
+														alt=""
+													/>
 												</div>
 											</Link>
 											<Link to={`/profile/${user.username}`}>
