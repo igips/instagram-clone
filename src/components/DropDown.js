@@ -11,6 +11,7 @@ function DropDown(props) {
 	const [data, setData] = useState({ username: "", posts: [], followers: [], following: [] });
 	const user = getAuth().currentUser;
 	const [posts, setPosts] = useState([{ pic: { src: "" } }]);
+	let num = 0;
 
 	onAuthStateChanged(getAuth(), (user) => {
 		if (user) {
@@ -30,11 +31,9 @@ function DropDown(props) {
 		const miniPic = document.getElementById("mini-pic-div");
 		const noPost = document.getElementById("no-posts-drop-down");
 
-
 		if (posts[0].pic.src === "") {
 			miniPic.style.display = "none";
 			noPost.style.display = "flex";
-
 		} else {
 			noPost.style.display = "none";
 			miniPic.style.display = "flex";
@@ -95,11 +94,15 @@ function DropDown(props) {
 			className="drop-down"
 			id="drop-down"
 		>
-		
 			<div className="drop-down-inner-first">
-				<Link to={`/profile/${data.username}`}><img onClick={() => hideDropDown()} id="drop-down-ava" src={ava} alt="" /></Link>
-				<Link to={`/profile/${data.username}`}><span onClick={() => hideDropDown()} id="drop-down-username">{data.username}</span></Link>
-				
+				<Link to={`/profile/${data.username}`}>
+					<img onClick={() => hideDropDown()} id="drop-down-ava" src={ava} alt="" />
+				</Link>
+				<Link to={`/profile/${data.username}`}>
+					<span onClick={() => hideDropDown()} id="drop-down-username">
+						{data.username}
+					</span>
+				</Link>
 			</div>
 			<div className="drop-down-inner-second">
 				<div className="drop-down-inner-second-inner">
@@ -119,18 +122,21 @@ function DropDown(props) {
 				<div id="no-posts-drop-down">No posts yet</div>
 				<div id="mini-pic-div">
 					{posts.map((post) => {
-						return (
-							<img
-								key={uniqid()}
-								onClick={() => {
-									showCommentsModal(post.id, props.setPostId);
-									hideDropDown();
-								}}
-								src={post.pic.src}
-								alt=""
-								className="min-pic"
-							/>
-						);
+						if (num < 3) {
+							num++;
+							return (
+								<img
+									key={uniqid()}
+									onClick={() => {
+										showCommentsModal(post.id, props.setPostId);
+										hideDropDown();
+									}}
+									src={post.pic.src}
+									alt=""
+									className="min-pic"
+								/>
+							);
+						}
 					})}
 				</div>
 			</div>
