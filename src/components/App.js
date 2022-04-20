@@ -20,6 +20,7 @@ function App() {
 	const [notifications, setNotifications] = useState([]);
 	const [unReadNoti, setUnReadNoti] = useState(0);
 	const [posts, setPosts] = useState([]);
+	const [avatar, setAvatar] = useState();
 
 	let unsubscribe;
 
@@ -66,6 +67,7 @@ function App() {
 			setSignedIn(false);
 			setUsername("");
 			setUnReadNoti(0);
+			setAvatar();
 			if (unsubscribe) {
 				unsubscribe();
 			}
@@ -82,10 +84,16 @@ function App() {
 				setFollowing(user.data().following);
 				setNotifications(user.data().notifications);
 				setUnReadNoti(user.data().unReadNoti);
+				setAvatar(user.data().avatar);
 
 				//eslint-disable-next-line react-hooks/exhaustive-deps
 				unsubscribe = onSnapshot(doc(getFirestore(), "usernames", user.id), (docu) => {
 					setNotifications(docu.data().notifications);
+					if(docu.data().avatar !== avatar) {
+						setAvatar(docu.data().avatar);
+					}
+					
+
 					if (
 						document.getElementById("notification-div").style.display === "flex" ||
 						document.getElementById("notification-modal-container").style.display === "flex"
@@ -105,6 +113,18 @@ function App() {
 			initialSetPosts(users);
 		});
 	}, [signedIn]);
+
+	function updateUsers() {
+		getUsers().then((users) => {
+			shuffleArray(users);
+			setUsers(users);
+		});
+
+	}
+
+	useEffect(() => {
+		setTimeout(updateUsers(), 600);
+	}, [avatar]);
 
 	function initialSetPosts(data) {
 		const posts2 = [];
@@ -136,6 +156,7 @@ function App() {
 				break;
 			}
 		}
+		updateUsers();
 
 		setPosts((oldPosts) => {
 			const newPosts = oldPosts.filter((post) => post.id !== id);
@@ -150,7 +171,8 @@ function App() {
 					const newP = { ...post, comments: post.comments.filter((comment) => comment.id !== commentId) };
 					getDocId(post.username).then(async (id) => {
 						await updateDoc(doc(getFirestore(), "usernames", id), { posts: arrayRemove(post) });
-						updateDoc(doc(getFirestore(), "usernames", id), { posts: arrayUnion(newP) });
+						await updateDoc(doc(getFirestore(), "usernames", id), { posts: arrayUnion(newP) });
+						updateUsers();
 					});
 					return newP;
 				}
@@ -167,7 +189,7 @@ function App() {
 					const newP = { ...post, comments: [...post.comments, comment] };
 					getDocId(post.username).then(async (id) => {
 						await updateDoc(doc(getFirestore(), "usernames", id), { posts: arrayRemove(post) });
-						updateDoc(doc(getFirestore(), "usernames", id), { posts: arrayUnion(newP) });
+						await updateDoc(doc(getFirestore(), "usernames", id), { posts: arrayUnion(newP) });
 						if (post.username !== username) {
 							updateDoc(doc(getFirestore(), "usernames", id), {
 								notifications: arrayUnion({
@@ -179,6 +201,7 @@ function App() {
 								unReadNoti: increment(1),
 							});
 						}
+						updateUsers();
 					});
 					return newP;
 				}
@@ -225,7 +248,7 @@ function App() {
 
 					getDocId(post.username).then(async (id) => {
 						await updateDoc(doc(getFirestore(), "usernames", id), { posts: arrayRemove(post) });
-						updateDoc(doc(getFirestore(), "usernames", id), { posts: arrayUnion(newP) });
+						await updateDoc(doc(getFirestore(), "usernames", id), { posts: arrayUnion(newP) });
 						if (newLike && commentUsername !== username) {
 							updateDoc(doc(getFirestore(), "usernames", id), {
 								notifications: arrayUnion({
@@ -237,6 +260,8 @@ function App() {
 								unReadNoti: increment(1),
 							});
 						}
+						updateUsers();
+						
 					});
 
 					return newP;
@@ -267,7 +292,7 @@ function App() {
 					}
 					getDocId(post.username).then(async (id) => {
 						await updateDoc(doc(getFirestore(), "usernames", id), { posts: arrayRemove(post) });
-						updateDoc(doc(getFirestore(), "usernames", id), { posts: arrayUnion(newP) });
+						await updateDoc(doc(getFirestore(), "usernames", id), { posts: arrayUnion(newP) });
 						if (newLike && post.username !== username) {
 							updateDoc(doc(getFirestore(), "usernames", id), {
 								notifications: arrayUnion({
@@ -279,6 +304,8 @@ function App() {
 								unReadNoti: increment(1),
 							});
 						}
+						updateUsers();
+						
 					});
 					return newP;
 				}
@@ -402,6 +429,7 @@ function App() {
 					setPosts={setPosts}
 					setLikesModalInfo={setLikesModalInfo}
 					likesModalInfo={likesModalInfo}
+					avatar={avatar}
 				></Modals>
 				<Nav
 					clearNotifications={clearNotifications}
@@ -413,6 +441,8 @@ function App() {
 					follow={follow}
 					unFollow={unFollow}
 					commModalSetPostId={commModalSetPostId}
+					avatar={avatar}
+					posts={posts}
 				></Nav>
 				<Routes>
 					<Route
@@ -434,6 +464,7 @@ function App() {
 								addComment={addComment}
 								likeComment={likeComment}
 								commModalSetPostId={commModalSetPostId}
+								avatar={avatar}
 							/>
 						}
 					/>
@@ -449,6 +480,10 @@ function App() {
 								likesModalSetLikes={likesModalSetLikes}
 								setLikesModalInfo={setLikesModalInfo}
 								users={users}
+								commModalSetPostId={commModalSetPostId}
+								posts={posts}
+								firestoreDocId={firestoreDocId}
+								avatar={avatar}
 							/>
 						}
 					/>
