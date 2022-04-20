@@ -133,7 +133,6 @@ function AddPostModal(props) {
 				comments: [],
 				username: props.yourUsername,
 				description: captionValue,
-				avatar: ava,
 				pic: img,
 				date: Date.now(),
 			};
@@ -193,7 +192,6 @@ function AddPostModal(props) {
 			comments: post.comments,
 			username: props.yourUsername,
 			description: captionValue,
-			avatar: ava,
 			pic: img,
 			date: post.date,
 		};
