@@ -1,9 +1,10 @@
+import { getAuth } from "firebase/auth";
+import { getUserData } from "../..";
 import { showSignInModal } from "../Modals/SignInModal";
 import { homeIcon, homeIconNotClicked } from "./HomeIcon";
 import { messageIconNotClicked } from "./MessageIcon";
 import { notificationIconNotClicked } from "./NotificationIcon";
 import { searchIconNotClicked } from "./SearchIcon";
-
 
 function ProfileIconDrop() {
 	return (
@@ -86,7 +87,10 @@ function avatarIconClicked() {
 }
 
 function avatarIcon(e) {
-	if (document.getElementById("profile-arrow-div").style.display === "flex" && e.target.tagName === "IMG") {
+	if (
+		(document.getElementById("profile-arrow-div").style.display === "flex" && e.target.tagName === "IMG") ||
+		(e.target.tagName === "DIV" && document.getElementById("profile-arrow-div").style.display === "flex")
+	) {
 		closeAvatar();
 	} else {
 		avatarIconClicked();
@@ -103,19 +107,18 @@ function avatarIcon(e) {
 }
 
 function closeAvatar() {
-	if (
-		window.location.href.charAt(window.location.href.length - 1) === "/" ||
-		window.location.href.includes("commentsM") ||
-		window.location.href.includes("optionsM") ||
-		window.location.href.includes("likesM")  ||
-		window.location.href.includes("shareM")
-	) {
-		homeIcon();
-	}
+	const user = getAuth().currentUser;
+
+	getUserData(user.uid).then((user) => {
+		if (window.location.href.includes(user.data().username)) {
+			avatarIconClicked();
+		} else {
+			homeIcon();
+		}
+	});
+
 	document.getElementById("profile-arrow-div").style.display = "none";
 	document.getElementById("profile-div").style.display = "none";
 }
 
-
-
-export {ProfileIconDrop, ProfileIconSvg, avatarIconNotClicked, avatarIconClicked, avatarIcon, closeAvatar}
+export { ProfileIconDrop, ProfileIconSvg, avatarIconNotClicked, avatarIconClicked, avatarIcon, closeAvatar };
