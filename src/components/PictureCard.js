@@ -17,10 +17,13 @@ import { showCommentsModal } from "./Modals/CommentsModal";
 import { tagPosition } from "./Modals/AddPostModal";
 import { TagIcon } from "./Icons/TagIcon";
 import { Link } from "react-router-dom";
+import ava from "../img/ava.jpeg";
+
 
 function PictureCard(props) {
 	const [img, setImg] = useState(props.post.pic);
 	const [id, setId] = useState(uniqid());
+	const [userData, setUserData] = useState(getUserDataFromUsersArray(props.users, props.post.username));
 
 	useEffect(() => {
 		if (img.tags.length > 0) {
@@ -49,7 +52,7 @@ function PictureCard(props) {
 					unFollow={props.unFollow}
 					following={props.following}
 					username={props.post.username}
-					avatar={props.post.avatar}
+					avatar={userData.avatar ? userData.avatar : ava}
 					dropDownSetUserData={props.dropDownSetUserData}
 					optionsModalSetUserData={props.optionsModalSetUserData}
 					setpostIdOptionsModal={props.setpostIdOptionsModal}
@@ -105,6 +108,7 @@ function PictureCard(props) {
 						likeComment={props.likeComment}
 						postId={props.post.id}
 						commModalSetPostId={props.commModalSetPostId}
+						avatar={userData.avatar ? userData.avatar : ava}
 					/>
 					<div className="added-div">
 						<ReactTimeAgo date={props.post.date} locale="en-US" />
