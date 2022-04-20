@@ -127,6 +127,7 @@ a:visited {
 	border-radius: 50%;
 	flex: 0 0 auto;
 	overflow: hidden;
+	object-fit: cover;
 }
 
 #right-login-div {
@@ -213,6 +214,7 @@ a:visited {
 	width: 32px;
 	height: 32px;
 	cursor: pointer;
+	border-radius: 50%;
 }
 
 .sug-login-right {
