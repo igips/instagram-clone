@@ -1,8 +1,9 @@
 import { getAuth } from "firebase/auth";
+import { getUserData } from "../..";
 import { showSignInModal } from "../Modals/SignInModal";
 import { homeIcon, homeIconNotClicked } from "./HomeIcon";
 import { messageIconNotClicked } from "./MessageIcon";
-import { avatarIconNotClicked } from "./ProfileIcon";
+import { avatarIconClicked, avatarIconNotClicked } from "./ProfileIcon";
 import { searchIconNotClicked } from "./SearchIcon";
 
 function NotificationIconSvg() {
@@ -67,14 +68,12 @@ function notificationIcon(e) {
 			(e.target.tagName === "svg" || e.target.tagName === "path")
 		) {
 			closeNotification();
-		} else if (document.getElementById("notification-arrow-div").style.display === "flex" && window.location.href.includes("profile")) {
-			closeNotification()
-
-		} 
-		
-		
-		
-		else if (!window.location.href.includes("commentsM")) {
+		} else if (
+			document.getElementById("notification-arrow-div").style.display === "flex" &&
+			window.location.href.includes("profile")
+		) {
+			closeNotification();
+		} else if (!window.location.href.includes("commentsM")) {
 			notificationIconClicked();
 			messageIconNotClicked();
 			homeIconNotClicked();
@@ -92,7 +91,18 @@ function notificationIcon(e) {
 }
 
 function closeNotification() {
-	homeIcon();
+	const user = getAuth().currentUser;
+
+	getUserData(user.uid).then((user) => {
+		if (window.location.href.includes(user.data().username)) {
+			avatarIconClicked();
+			notificationIconNotClicked();
+		} else {
+			homeIcon();
+		}
+
+		
+	});
 
 	document.getElementById("notification-div").style.display = "none";
 	document.getElementById("notification-arrow-div").style.display = "none";
