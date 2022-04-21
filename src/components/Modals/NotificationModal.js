@@ -6,6 +6,8 @@ import { useEffect } from "react";
 import { closeModal } from "../Modals";
 import { Link } from "react-router-dom";
 import { homeIcon } from "../Icons/HomeIcon";
+import { notificationIconNotClicked } from "../Icons/NotificationIcon";
+import { getUserDataFromUsersArray } from "../Home";
 
 function NotificationModal(props) {
 	useEffect(() => {
@@ -19,6 +21,7 @@ function NotificationModal(props) {
 	function hideNotificationsModal() {
 		const modal = document.getElementById("notification-modal-container");
 		modal.style.display = "none";
+		notificationIconNotClicked();
 		window.history.back();
 	}
 
@@ -34,6 +37,7 @@ function NotificationModal(props) {
 					.slice(0)
 					.reverse()
 					.map((result) => {
+						const userData = getUserDataFromUsersArray(props.users, result.username);
 						return (
 							<div key={uniqid()} className="noti-modal-single-result-mobile">
 								<Link
@@ -47,7 +51,7 @@ function NotificationModal(props) {
 									}}
 									to={`/profile/${result.username}`}
 								>
-									<img src={ava} alt="" />
+									<img src={userData.avatar ? userData.avatar : ava} alt="" />
 									<div>
 										<span className="noti-mobile-user-span">{result.username + " "}</span>
 										{result.content + " "}
