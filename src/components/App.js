@@ -430,6 +430,7 @@ function App() {
 					setLikesModalInfo={setLikesModalInfo}
 					likesModalInfo={likesModalInfo}
 					avatar={avatar}
+					updateUsers={updateUsers}
 				></Modals>
 				<Nav
 					clearNotifications={clearNotifications}
