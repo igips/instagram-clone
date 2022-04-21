@@ -117,15 +117,7 @@ function ProfilePage(props) {
 		}
 
 		if (props.signedIn) {
-			if (props.yourUsername === username) {
-				return (
-					<>
-						<button className="likes-modal-follow sug-box-left-follow-active profile-button">
-							Edit Profile
-						</button>
-					</>
-				);
-			} else if (props.yourUsername !== "") {
+			 if (props.yourUsername !== "" && props.yourUsername !== username) {
 				return (
 					<>
 						<button className="likes-modal-follow sug-box-left-follow-active profile-button">
