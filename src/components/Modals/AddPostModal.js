@@ -155,6 +155,7 @@ function AddPostModal(props) {
 					}
 				});
 			});
+			props.updateUsers();
 		} else {
 			editPost();
 		}
@@ -214,6 +215,7 @@ function AddPostModal(props) {
 			}
 		});
 		props.setOptionsEdit(false);
+		props.updateUsers();
 	}
 
 	function handleImage(e) {
