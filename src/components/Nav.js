@@ -366,14 +366,6 @@ function Nav(props) {
 										</div>
 									</Link>
 
-									<div className="profile-drop-down-single-div">
-										<div className="profile-drop-icon">{SettingsIcon()}</div>
-										<div className="profile-drop-tex">Settings</div>
-									</div>
-									<div className="profile-drop-down-single-div">
-										<div className="profile-drop-icon">{ThemeIcon()}</div>
-										<div className="profile-drop-tex">Change Theme</div>
-									</div>
 									<div
 										onClick={() => {
 											signOutFromAccount();
