@@ -80,6 +80,7 @@ function LikesModal(props) {
 				<div id="list-of-likes-div">
 					<div id="list-of-likes-div-inner">
 						{props.likes.map((user) => {
+							const userData = getUserDataFromUsersArray(props.users, user);
 							return (
 								<div key={uniqid()} className="right-sug-div-list">
 									<Link
@@ -106,7 +107,7 @@ function LikesModal(props) {
 											}}
 											className="right-sug-ava-div"
 										>
-											<img className="ava-img-likes" src={ava} alt="" />
+											<img className="ava-img-likes" src={userData.avatar ? userData.avatar : ava} alt="" />
 										</div>
 
 										<span
