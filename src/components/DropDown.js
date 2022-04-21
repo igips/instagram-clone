@@ -62,15 +62,18 @@ function DropDown(props) {
 
 	function button() {
 		if (signedIn) {
-			if (props.userData && user && props.userData.uid === user.uid) {
-				return <button className="drop-down-button">Edit Profile</button>;
-			} else if (props.userData && !props.following.includes(props.userData.username) && user) {
+			if (
+				props.userData &&
+				!props.following.includes(props.userData.username) &&
+				user &&
+				props.userData.uid !== user.uid
+			) {
 				return (
 					<button onClick={() => props.follow(props.userData.username, props.right)} id="drop-down-button">
 						Follow
 					</button>
 				);
-			} else if (props.userData && user) {
+			} else if (props.userData && user && props.userData.uid !== user.uid) {
 				return (
 					<>
 						<button className="drop-down-button">Message</button>{" "}
@@ -96,7 +99,12 @@ function DropDown(props) {
 		>
 			<div className="drop-down-inner-first">
 				<Link to={`/profile/${data.username}`}>
-					<img onClick={() => hideDropDown()} id="drop-down-ava" src={data.avatar ? data.avatar : ava} alt="" />
+					<img
+						onClick={() => hideDropDown()}
+						id="drop-down-ava"
+						src={data.avatar ? data.avatar : ava}
+						alt=""
+					/>
 				</Link>
 				<Link to={`/profile/${data.username}`}>
 					<span onClick={() => hideDropDown()} id="drop-down-username">
@@ -159,7 +167,9 @@ function dropDown(userData, dropDownSetUserData, e, ele, right) {
 
 		dropDown.style.display = "flex";
 
-		if (user) {
+		
+
+		if (user &&  user.uid !== userData.uid) {
 			document.getElementById("drop-down-inner-fourth").style.display = "flex";
 		} else {
 			document.getElementById("drop-down-inner-fourth").style.display = "none";
