@@ -2,12 +2,11 @@ import "../styles/ProfilePage.css";
 import ava from "../img/ava.jpeg";
 import { useParams } from "react-router";
 import { useEffect, useState } from "react";
-import { getUserData } from "..";
 import { showLikesModal } from "./Modals/LikesModal";
 import { getUserDataFromUsersArray } from "./Home";
 import uniqid from "uniqid";
 import { LikeIconWhite } from "./Icons/LikeIcon";
-import { CommentIcon, CommentIconFilled } from "./Icons/CommentIcon";
+import { CommentIconFilled } from "./Icons/CommentIcon";
 import { showCommentsModal } from "./Modals/CommentsModal";
 import { homeIconClicked, homeIconNotClicked } from "./Icons/HomeIcon";
 import { avatarIconClicked, avatarIconNotClicked } from "./Icons/ProfileIcon";
@@ -21,6 +20,7 @@ function ProfilePage(props) {
 
 	const [userData, setUserData] = useState({ username: "", posts: [], followers: [], following: [] });
 	const [postsOrTagged, setPostsOrTagged] = useState("posts");
+	const [post, setPost] = useState();
 
 	useEffect(() => {
 		if (username === props.yourUsername) {
