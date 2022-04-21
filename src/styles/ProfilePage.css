@@ -171,4 +171,33 @@
     #profile-photo-div {
         grid-gap: 3px;
     }
-}
+
+	#profile-ava  {
+		width: 71px;
+		height: 71px;
+	}
+
+	#profile-avatar-div  {
+		min-width: 71px;
+    	max-width: 71px;
+		padding-left: 30px;
+	}
+
+	#profile-section {
+		padding-top: 10px;
+	}
+
+	.profile-num-info {
+		margin-right: 10px;
+	}
+
+	.profile-button {
+		margin-left: 10px;
+	}
+
+
+
+ 
+} 
+
+
