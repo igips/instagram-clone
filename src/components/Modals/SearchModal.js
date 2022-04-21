@@ -8,6 +8,8 @@ import { faCircleXmark } from "@fortawesome/free-regular-svg-icons";
 import { faSpinner } from "@fortawesome/free-solid-svg-icons";
 import { Link } from "react-router-dom";
 import { homeIcon } from "../Icons/HomeIcon";
+import {searchIconNotClicked} from "../Icons/SearchIcon";
+import { getUserDataFromUsersArray } from "../Home";
 
 
 function SearchModal(props) {
@@ -98,6 +100,7 @@ function SearchModal(props) {
 					No results found
 				</div>
 				{searchResults.map((result) => {
+					const userData = getUserDataFromUsersArray(props.users, result);
 					return (
 						<Link
 							key={uniqid()} 
@@ -107,12 +110,14 @@ function SearchModal(props) {
 								cancelSearch();
 								if(result !== props.yourUsername) {
 									homeIcon();
+								} else {
+									searchIconNotClicked();
 								}
 							}}
 							to={`/profile/${result}`}
 						>
 							<div className="share-modal-single-result">
-								<img src={ava} alt="" />
+								<img src={userData.avatar ? userData.avatar : ava} alt="" />
 								<span>{result}</span>
 							</div>
 						</Link>
