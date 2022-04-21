@@ -26,12 +26,11 @@ function CommentsModal(props) {
 		description: "",
 		id: "",
 		likes: { num: 0, users: [] },
-		pic: { src: "" , tags:[]},
+		pic: { src: "", tags: [] },
 		date: new Date(),
 	});
 
-	const [userData, setUserData] = useState({avatar: ""});
-
+	const [userData, setUserData] = useState({ avatar: "" });
 
 	useEffect(() => {
 		if (postData.pic.tags.length > 0) {
@@ -40,12 +39,10 @@ function CommentsModal(props) {
 			document.getElementById("tag-ico-modal").style.display = "none";
 		}
 
-		if(postData.username !== "") {
+		if (postData.username !== "") {
 			setUserData(getUserDataFromUsersArray(props.users, postData.username));
 		}
-		
-
-	},[postData])
+	}, [postData]);
 
 	useEffect(() => {
 		if (props.commModalPostId) {
@@ -64,6 +61,7 @@ function CommentsModal(props) {
 
 		commentsModal.addEventListener("click", (e) => {
 			if (e.target === commentsModal) {
+				props.commModalSetPostId("");
 				hideCommentsModal();
 			}
 		});
@@ -81,7 +79,13 @@ function CommentsModal(props) {
 
 	return (
 		<div id="comments-modal" className="modal">
-			<div onClick={() => hideCommentsModal()} id="comments-modal-close">
+			<div
+				onClick={() => {
+					hideCommentsModal();
+					props.commModalSetPostId();
+				}}
+				id="comments-modal-close"
+			>
 				{CloseIcon()}
 			</div>
 			<div id="comments-modal-content">
@@ -98,14 +102,15 @@ function CommentsModal(props) {
 							);
 						})}
 					</div>
-					
+
 					<div onClick={() => showTags()} id={"tag-ico-modal"} className="tag-icon-container">
 						{TagIcon()}
 					</div>
 				</div>
 				<div id="comments-div-modal">
 					<div id="comms-modal-header-mobile">
-						{closeModal(hideCommentsModal)}
+						<div onClick={() => props.commModalSetPostId("")}>{closeModal(hideCommentsModal)}</div>
+
 						<span>Comments</span>
 						{shareIcon()}
 					</div>
