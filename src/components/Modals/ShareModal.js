@@ -7,8 +7,9 @@ import { useEffect, useState } from "react";
 import { searchFunction } from "../..";
 import { closeModal } from "../Modals";
 import { DeleteIcon } from "../Icons/DeleteIcon";
+import { getUserDataFromUsersArray } from "../Home";
 
-function ShareModal() {
+function ShareModal(props) {
 	const [shareModalSearchUser, setShareModalSearchUser] = useState("");
 	const [searchResults, setSearchResults] = useState([]);
 	const [picked, setPicked] = useState([]);
@@ -154,13 +155,14 @@ function ShareModal() {
 						<FontAwesomeIcon icon={faSpinner} className="fa-spin" />
 					</div>
 					{searchResults.map((result) => {
+						const userData = getUserDataFromUsersArray(props.users, result);
 						return (
 							<div
 								onClick={(e) => checkBoxOnClick(e)}
 								key={uniqid()}
 								className="share-modal-single-result"
 							>
-								<img src={ava} alt="" />
+								<img src={userData.avatar ? userData.avatar : ava} alt="" />
 								<span>{result}</span>
 								<div className="div-for-checkbox-button">{CheckBoxIcon()}</div>
 							</div>
