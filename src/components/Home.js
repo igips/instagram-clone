@@ -72,6 +72,33 @@ function Home(props) {
 		}
 	});
 
+	useEffect(() => {
+		const sugDivLeft = document.getElementById("suggestions-left-div");
+		const sugDivLeftInner = document.getElementById("suggestions-left-inner-div");
+		const sugDivRight = document.getElementById("suggestions-div-right");
+
+		if (sugDivLeftInner.childElementCount < 1) {
+			sugDivLeft.style.display = "none";
+			sugDivRight.style.display = "none";
+		} else if(props.signedIn)  {
+			if (window.innerWidth < 1000) {
+				sugDivLeft.style.display = "flex";
+				sugDivRight.style.display = "none";
+			} else if(props.signedIn) {
+				sugDivRight.style.display = "flex";
+				sugDivLeft.style.display = "none";
+			} 
+
+		}   else if (!props.signedIn) {
+			sugDivLeft.style.display = "none";
+			sugDivRight.style.display = "none";
+		}
+
+		
+
+
+	});
+
 	return (
 		<main>
 			<section id="home-section">
@@ -92,7 +119,8 @@ function Home(props) {
 									if (
 										!props.following.includes(user.username) &&
 										num < 3 &&
-										user.username !== props.username
+										user.username !== props.username &&
+										user.posts.length > 0
 									) {
 										num++;
 										return (
@@ -175,7 +203,8 @@ function Home(props) {
 								if (
 									!props.following.includes(user.username) &&
 									num2 < 5 &&
-									user.username !== props.username
+									user.username !== props.username &&
+									user.posts.length > 0
 								) {
 									num2++;
 									return (
@@ -209,7 +238,7 @@ function Home(props) {
 												</span>
 											</Link>
 											<button
-												onClick={(e) => props.follow(user.username)}
+												onClick={(e) => {props.follow(user.username); hideDropDown()}}
 												className="sug-right-follow"
 											>
 												Follow
