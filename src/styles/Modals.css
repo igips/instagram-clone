@@ -204,6 +204,7 @@
 	height: 44px;
 	width: 44px;
 	cursor: pointer;
+	border-radius: 50%;
 }
 
 #list-of-likes-div,
@@ -864,7 +865,12 @@ input[type="file"] {
 	}
 
 	#comments-div-img {
-		display: none;
+		padding-top: 42px;
+		
+	}
+
+	#comments-div-img img  {
+		max-height: 300px;
 	}
 
 	#comments-modal {
@@ -876,15 +882,24 @@ input[type="file"] {
 	}
 
 	#comments-modal-content {
+		width: 100vw;
 		height: 100%;
-		width: 100%;
+		background-color: white;
+		flex-direction: column;
+	}
+
+	
+
+	#comments-modal-header-section {
+		display: none;
 	}
 
 	#comments-div-modal {
+		overflow-y: scroll;
+		min-width: 0px;
 		width: 100%;
 		border-top-right-radius: 0px;
-		border-bottom-right-radius: 0px;
-		max-width: 100%;
+    	border-bottom-right-radius: 0px;
 	}
 
 	#comments-div-modal .picture-card-header-div,
@@ -899,6 +914,7 @@ input[type="file"] {
 		position: absolute;
 		width: 100%;
 		top: 0;
+		background-color: white;
 	}
 
 	#comments-div-modal .add-comment-section {
@@ -913,15 +929,14 @@ input[type="file"] {
 		padding-bottom: 8px;
 		border-bottom: 1px solid #efefef;
 	}
+	
 
-	#modal-comments-section {
-		gap: 15px;
-		overflow-y: scroll;
-		height: 100%;
-		padding-bottom: 130px;
-		position: absolute;
-		top: 47px;
-	}
+	 #modal-comments-section {
+		border-bottom: none;
+		padding-bottom: 62px;
+	}  
+
+	
 
 	#send-button-div {
 		position: absolute;
