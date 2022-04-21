@@ -390,6 +390,7 @@ a:visited {
 	width: 56px;
 	height: 56px;
 	cursor: pointer;
+	border-radius: 50%;
 }
 
 .drop-down-inner-second {
