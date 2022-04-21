@@ -14,7 +14,7 @@ import AddPostModal from "./Modals/AddPostModal";
 function Modals(props) {
 	return (
 		<>
-			<SearchModal yourUsername={props.username} />
+			<SearchModal users={props.users} yourUsername={props.username} />
 			<SignUpModal />
 			<SignInModal />
 			<OptionsModal
@@ -54,14 +54,16 @@ function Modals(props) {
 				removeComment={props.removeComment}
 				likePicture={props.likePicture}
 				addComment={props.addComment}
+				commModalSetPostId={props.commModalSetPostId}
 			/>
-			<ShareModal />
+			<ShareModal users={props.users} />
 			<NotificationModal
 				notifications={props.notifications}
 				following={props.following}
 				username={props.username}
 				follow={props.follow}
 				unFollow={props.unFollow}
+				users={props.users}
 			/>
 			<AddPostModal
 				setPosts={props.setPosts}
@@ -73,6 +75,7 @@ function Modals(props) {
 				addPost={props.addPost}
 				firestoreDocId={props.firestoreDocId}
 				avatar={props.avatar}
+				updateUsers={props.updateUsers}
 			/>
 		</>
 	);
