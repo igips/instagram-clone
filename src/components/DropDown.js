@@ -96,7 +96,7 @@ function DropDown(props) {
 		>
 			<div className="drop-down-inner-first">
 				<Link to={`/profile/${data.username}`}>
-					<img onClick={() => hideDropDown()} id="drop-down-ava" src={ava} alt="" />
+					<img onClick={() => hideDropDown()} id="drop-down-ava" src={data.avatar ? data.avatar : ava} alt="" />
 				</Link>
 				<Link to={`/profile/${data.username}`}>
 					<span onClick={() => hideDropDown()} id="drop-down-username">
