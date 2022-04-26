@@ -32,4 +32,6 @@ function DeleteIcon() {
 	);
 }
 
-export {DeleteIcon};
+
+
+export { DeleteIcon};
