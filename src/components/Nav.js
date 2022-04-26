@@ -16,11 +16,9 @@ import {
 	NotificationIconSvg,
 } from "./Icons/NotificationIcon";
 import { homeIcon, HomeIconSvg } from "./Icons/HomeIcon";
-import { messageIcon, MessageIconSvg } from "./Icons/MessageIcon";
+import { messageIcon, messageIconNotClicked, MessageIconSvg } from "./Icons/MessageIcon";
 import { addPostIcon, AddPostIconSvg } from "./Icons/AddPostIcon";
 import { searchIcon, SearchIconSvg } from "./Icons/SearchIcon";
-import { ThemeIcon } from "./Icons/ThemeIcon";
-import { SettingsIcon } from "./Icons/SettingsIcon";
 import { Link } from "react-router-dom";
 import { showCommentsModal } from "./Modals/CommentsModal";
 import { getUserDataFromUsersArray } from "./Home";
@@ -189,7 +187,7 @@ function Nav(props) {
 		if (user) {
 			return (
 				<>
-					<div onClick={(e) => avatarIcon(e)}   className="border-for-avatar">
+					<div onClick={(e) => avatarIcon(e)} className="border-for-avatar">
 						{" "}
 					</div>
 					<span
@@ -310,6 +308,7 @@ function Nav(props) {
 											key={uniqid()}
 											onClick={() => {
 												cancelSearch();
+												messageIconNotClicked();
 											}}
 											to={`/profile/${result}`}
 										>
@@ -329,9 +328,14 @@ function Nav(props) {
 								</div>
 							</Link>
 
-							<div id="message-icon-div" onClick={() => messageIcon()} className="icon-inner-div">
+							<Link
+								id="message-icon-div"
+								onClick={() => messageIcon()}
+								className="icon-inner-div"
+								to="/inbox"
+							>
 								{MessageIconSvg()}
-							</div>
+							</Link>
 							<div onClick={() => addPostIcon()} className="icon-inner-div icon-to-hide">
 								{AddPostIconSvg()}
 							</div>
