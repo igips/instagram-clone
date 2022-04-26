@@ -2,7 +2,7 @@ import { getAuth } from "firebase/auth";
 import { getUserData } from "../..";
 import { showSignInModal } from "../Modals/SignInModal";
 import { homeIcon, homeIconNotClicked } from "./HomeIcon";
-import { messageIconNotClicked } from "./MessageIcon";
+import { messageIconNotClicked, messageIconClicked } from "./MessageIcon";
 import { avatarIconClicked, avatarIconNotClicked } from "./ProfileIcon";
 import { searchIconNotClicked } from "./SearchIcon";
 
@@ -69,8 +69,10 @@ function notificationIcon(e) {
 		) {
 			closeNotification();
 		} else if (
-			document.getElementById("notification-arrow-div").style.display === "flex" &&
-			window.location.href.includes("profile")
+			(document.getElementById("notification-arrow-div").style.display === "flex" &&
+				window.location.href.includes("profile")) ||
+			(document.getElementById("notification-arrow-div").style.display === "flex" &&
+				window.location.href.includes("inbox"))
 		) {
 			closeNotification();
 		} else if (!window.location.href.includes("commentsM")) {
@@ -97,11 +99,12 @@ function closeNotification() {
 		if (window.location.href.includes(user.data().username)) {
 			avatarIconClicked();
 			notificationIconNotClicked();
+		} else if (window.location.href.includes("inbox")) {
+			messageIconClicked();
+			notificationIconNotClicked();
 		} else {
 			homeIcon();
 		}
-
-		
 	});
 
 	document.getElementById("notification-div").style.display = "none";
