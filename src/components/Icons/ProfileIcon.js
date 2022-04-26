@@ -2,7 +2,7 @@ import { getAuth } from "firebase/auth";
 import { getUserData } from "../..";
 import { showSignInModal } from "../Modals/SignInModal";
 import { homeIcon, homeIconNotClicked } from "./HomeIcon";
-import { messageIconNotClicked } from "./MessageIcon";
+import { messageIconNotClicked, messageIconClicked } from "./MessageIcon";
 import { notificationIconNotClicked } from "./NotificationIcon";
 import { searchIconNotClicked } from "./SearchIcon";
 
@@ -112,6 +112,9 @@ function closeAvatar() {
 	getUserData(user.uid).then((user) => {
 		if (window.location.href.includes(user.data().username)) {
 			avatarIconClicked();
+		} else if (window.location.href.includes("inbox")) {
+			messageIconClicked();
+			avatarIconNotClicked();
 		} else {
 			homeIcon();
 		}
