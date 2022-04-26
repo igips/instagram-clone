@@ -10,6 +10,7 @@ import DropDown, { hideDropDown } from "./DropDown";
 import { deleteObject, getStorage, ref } from "firebase/storage";
 import { HashRouter, Routes, Route } from "react-router-dom";
 import ProfilePage from "./ProfilePage";
+import Inbox from "./Inbox";
 
 function App() {
 	const [signedIn, setSignedIn] = useState(false);
@@ -21,6 +22,7 @@ function App() {
 	const [unReadNoti, setUnReadNoti] = useState(0);
 	const [posts, setPosts] = useState([]);
 	const [avatar, setAvatar] = useState();
+	const [messages, setMessages] = useState([]);
 
 	let unsubscribe;
 
@@ -68,6 +70,7 @@ function App() {
 			setUsername("");
 			setUnReadNoti(0);
 			setAvatar();
+			// setMessages([]);
 			if (unsubscribe) {
 				unsubscribe();
 			}
@@ -85,14 +88,17 @@ function App() {
 				setNotifications(user.data().notifications);
 				setUnReadNoti(user.data().unReadNoti);
 				setAvatar(user.data().avatar);
+				setMessages(user.data().messages);
 
 				//eslint-disable-next-line react-hooks/exhaustive-deps
 				unsubscribe = onSnapshot(doc(getFirestore(), "usernames", user.id), (docu) => {
 					setNotifications(docu.data().notifications);
-					if(docu.data().avatar !== avatar) {
+					if (docu.data().avatar !== avatar) {
 						setAvatar(docu.data().avatar);
 					}
-					
+					if (docu.data().messages !== messages && docu.data().messages.length >= messages.length) {
+						setMessages(docu.data().messages);
+					}
 
 					if (
 						document.getElementById("notification-div").style.display === "flex" ||
@@ -119,7 +125,6 @@ function App() {
 			shuffleArray(users);
 			setUsers(users);
 		});
-
 	}
 
 	useEffect(() => {
@@ -261,7 +266,6 @@ function App() {
 							});
 						}
 						updateUsers();
-						
 					});
 
 					return newP;
@@ -305,7 +309,6 @@ function App() {
 							});
 						}
 						updateUsers();
-						
 					});
 					return newP;
 				}
@@ -485,6 +488,18 @@ function App() {
 								posts={posts}
 								firestoreDocId={firestoreDocId}
 								avatar={avatar}
+							/>
+						}
+					/>
+					<Route
+						path="/inbox"
+						element={
+							<Inbox
+								messages={messages}
+								setMessages={setMessages}
+								users={users}
+								yourUsername={username}
+								firestoreDocId={firestoreDocId}
 							/>
 						}
 					/>
