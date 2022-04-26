@@ -120,7 +120,7 @@ function Home(props) {
 										!props.following.includes(user.username) &&
 										num < 3 &&
 										user.username !== props.username &&
-										user.posts.length > 0
+										user.posts.length > 0 && props.username !== ""
 									) {
 										num++;
 										return (
@@ -204,7 +204,7 @@ function Home(props) {
 									!props.following.includes(user.username) &&
 									num2 < 5 &&
 									user.username !== props.username &&
-									user.posts.length > 0
+									user.posts.length > 0 && props.username !== ""
 								) {
 									num2++;
 									return (
