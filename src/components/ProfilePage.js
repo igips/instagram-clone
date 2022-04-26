@@ -14,6 +14,7 @@ import { deleteObject, getDownloadURL, getStorage, ref, uploadBytes } from "fire
 import { doc, getFirestore, updateDoc } from "firebase/firestore";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faSpinner } from "@fortawesome/free-solid-svg-icons";
+import { messageIconNotClicked } from "./Icons/MessageIcon";
 
 function ProfilePage(props) {
 	let { username } = useParams();
@@ -44,6 +45,7 @@ function ProfilePage(props) {
 
 	useEffect(() => {
 		homeIconNotClicked();
+		messageIconNotClicked();
 
 		if (props.users.length > 0 && username) {
 			const data = getUserDataFromUsersArray(props.users, username);
