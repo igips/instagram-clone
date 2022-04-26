@@ -5,7 +5,6 @@ import { notificationIconNotClicked } from "./NotificationIcon";
 import { avatarIconNotClicked } from "./ProfileIcon";
 import { searchIconNotClicked } from "./SearchIcon";
 
-
 function MessageIconSvg() {
 	return (
 		<svg
@@ -39,6 +38,48 @@ function MessageIconSvg() {
 	);
 }
 
+function NewMessageIcon() {
+	return (
+		<svg
+			aria-label="New Message"
+			color="#262626"
+			fill="#262626"
+			height="24"
+			role="img"
+			viewBox="0 0 24 24"
+			width="24"
+		>
+			<path
+				d="M12.202 3.203H5.25a3 3 0 00-3 3V18.75a3 3 0 003 3h12.547a3 3 0 003-3v-6.952"
+				fill="none"
+				stroke="currentColor"
+				strokeLinecap="round"
+				strokeLinejoin="round"
+				strokeWidth="2"
+			></path>
+			<path
+				d="M10.002 17.226H6.774v-3.228L18.607 2.165a1.417 1.417 0 012.004 0l1.224 1.225a1.417 1.417 0 010 2.004z"
+				fill="none"
+				stroke="currentColor"
+				strokeLinecap="round"
+				strokeLinejoin="round"
+				strokeWidth="2"
+			></path>
+			<line
+				fill="none"
+				stroke="currentColor"
+				strokeLinecap="round"
+				strokeLinejoin="round"
+				strokeWidth="2"
+				x1="16.848"
+				x2="20.076"
+				y1="3.924"
+				y2="7.153"
+			></line>
+		</svg>
+	);
+}
+
 function messageIconNotClicked() {
 	const svgDiv = document.getElementById("message-icon-svg");
 
@@ -67,7 +108,4 @@ function messageIcon() {
 	}
 }
 
-
-
-
-export {MessageIconSvg, messageIconNotClicked, messageIconClicked, messageIcon}
+export { MessageIconSvg, messageIconNotClicked, messageIconClicked, messageIcon, NewMessageIcon };
