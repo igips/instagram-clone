@@ -80,24 +80,71 @@ function Home(props) {
 		if (sugDivLeftInner.childElementCount < 1) {
 			sugDivLeft.style.display = "none";
 			sugDivRight.style.display = "none";
-		} else if(props.signedIn)  {
+		} else if (props.signedIn) {
 			if (window.innerWidth < 1000) {
 				sugDivLeft.style.display = "flex";
 				sugDivRight.style.display = "none";
-			} else if(props.signedIn) {
+			} else if (props.signedIn) {
 				sugDivRight.style.display = "flex";
 				sugDivLeft.style.display = "none";
-			} 
-
-		}   else if (!props.signedIn) {
+			}
+		} else if (!props.signedIn) {
 			sugDivLeft.style.display = "none";
 			sugDivRight.style.display = "none";
 		}
-
-		
-
-
 	});
+
+	function displayPosts() {
+		if (props.signedIn) {
+			return props.posts.map((post) => {
+				if (props.following.includes(post.username) || post.username === props.username) {
+					return (
+						<PictureCard
+							key={uniqid()}
+							dropDownSetUserData={props.dropDownSetUserData}
+							users={props.users}
+							follow={props.follow}
+							unFollow={props.unFollow}
+							following={props.following}
+							yourUsername={props.username}
+							likesModalSetLikes={props.likesModalSetLikes}
+							optionsModalSetUserData={props.optionsModalSetUserData}
+							setpostIdOptionsModal={props.setpostIdOptionsModal}
+							post={post}
+							likePicture={props.likePicture}
+							signedIn={props.signedIn}
+							addComment={props.addComment}
+							likeComment={props.likeComment}
+							commModalSetPostId={props.commModalSetPostId}
+						></PictureCard>
+					);
+				}
+			});
+		} else {
+			return props.posts.map((post) => {
+				return (
+					<PictureCard
+						key={uniqid()}
+						dropDownSetUserData={props.dropDownSetUserData}
+						users={props.users}
+						follow={props.follow}
+						unFollow={props.unFollow}
+						following={props.following}
+						yourUsername={props.username}
+						likesModalSetLikes={props.likesModalSetLikes}
+						optionsModalSetUserData={props.optionsModalSetUserData}
+						setpostIdOptionsModal={props.setpostIdOptionsModal}
+						post={post}
+						likePicture={props.likePicture}
+						signedIn={props.signedIn}
+						addComment={props.addComment}
+						likeComment={props.likeComment}
+						commModalSetPostId={props.commModalSetPostId}
+					></PictureCard>
+				);
+			});
+		}
+	}
 
 	return (
 		<main>
@@ -120,7 +167,8 @@ function Home(props) {
 										!props.following.includes(user.username) &&
 										num < 3 &&
 										user.username !== props.username &&
-										user.posts.length > 0 && props.username !== ""
+										user.posts.length > 0 &&
+										props.username !== ""
 									) {
 										num++;
 										return (
@@ -147,28 +195,7 @@ function Home(props) {
 								})}
 							</div>
 						</div>
-						{props.posts.map((post) => {
-							return (
-								<PictureCard
-									key={uniqid()}
-									dropDownSetUserData={props.dropDownSetUserData}
-									users={props.users}
-									follow={props.follow}
-									unFollow={props.unFollow}
-									following={props.following}
-									yourUsername={props.username}
-									likesModalSetLikes={props.likesModalSetLikes}
-									optionsModalSetUserData={props.optionsModalSetUserData}
-									setpostIdOptionsModal={props.setpostIdOptionsModal}
-									post={post}
-									likePicture={props.likePicture}
-									signedIn={props.signedIn}
-									addComment={props.addComment}
-									likeComment={props.likeComment}
-									commModalSetPostId={props.commModalSetPostId}
-								></PictureCard>
-							);
-						})}
+						{displayPosts()}
 					</div>
 				</div>
 
@@ -204,7 +231,8 @@ function Home(props) {
 									!props.following.includes(user.username) &&
 									num2 < 5 &&
 									user.username !== props.username &&
-									user.posts.length > 0 && props.username !== ""
+									user.posts.length > 0 &&
+									props.username !== ""
 								) {
 									num2++;
 									return (
@@ -238,7 +266,10 @@ function Home(props) {
 												</span>
 											</Link>
 											<button
-												onClick={(e) => {props.follow(user.username); hideDropDown()}}
+												onClick={(e) => {
+													props.follow(user.username);
+													hideDropDown();
+												}}
 												className="sug-right-follow"
 											>
 												Follow
