@@ -15,6 +15,7 @@ import { doc, getFirestore, updateDoc } from "firebase/firestore";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faSpinner } from "@fortawesome/free-solid-svg-icons";
 import { messageIconNotClicked } from "./Icons/MessageIcon";
+import { showShareModal } from "./Modals/ShareModal";
 
 function ProfilePage(props) {
 	let { username } = useParams();
@@ -122,7 +123,7 @@ function ProfilePage(props) {
 			 if (props.yourUsername !== "" && props.yourUsername !== username) {
 				return (
 					<>
-						<button className="likes-modal-follow sug-box-left-follow-active profile-button">
+						<button onClick={() => showShareModal()} className="likes-modal-follow sug-box-left-follow-active profile-button">
 							Message
 						</button>
 						{followUnfollow()}
