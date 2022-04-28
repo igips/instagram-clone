@@ -1041,7 +1041,7 @@ input[type="file"] {
 
 	#login-modal-content, #register-modal-content {
 		width: 100%;
-		height: 100%;
+		height: 100vh;
 	}
 
 	
