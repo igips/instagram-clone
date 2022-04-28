@@ -1,4 +1,4 @@
-* {
+/* * {
     -webkit-tap-highlight-color: transparent;
     -webkit-touch-callout: none;
     -webkit-user-select: none;
@@ -10,7 +10,7 @@
 
 *:focus {
     outline: none !important;
-}
+} */
 
 .picture-card-article {
 	margin-bottom: 24px;

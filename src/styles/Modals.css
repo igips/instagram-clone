@@ -1039,10 +1039,13 @@ input[type="file"] {
 		display: flex;
 	}
 
-	#login-modal-content, #register-modal-content {
+	#login-modal-content, #register-modal-content, #login-modal, #register-modal {
 		width: 100%;
 		height: 100vh;
+		overflow-y: scroll;
 	}
+
+	
 
 	
 }
