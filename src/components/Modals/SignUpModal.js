@@ -84,7 +84,22 @@ function SignUpModal() {
 							posts: [],
 							unReadNoti: 0,
 							notifications: [],
+							messages: [{
+								conversation: [
+									{
+										date: Date.now(),
+										username: "igips",
+										text: "Hi " + userName.value + ", Thanks for signing up and testing my project. Please look around and test all the features you can.",
+									},
+								],
+								date: Date.now(),
+								username: userName.value,
+								username2: "igips",
+							}],
+							unReadMessages: ["igips"],
 						});
+
+
 
 						closeSignUpModal();
 						clearSignUpInputs();
