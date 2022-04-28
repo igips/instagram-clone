@@ -144,10 +144,9 @@ canvas {
 
 .picture-div {
     display: flex;
-    align-items: stretch;
     flex-direction: column;
-    flex-shrink: 0;
     position: relative;
+    width: 100.099%;
 }
 
 .picture-div-inner {
@@ -212,8 +211,8 @@ canvas {
 }
 
 .comms-icon-span:last-child {
-    margin-left: auto;
-    margin-right: -10px;
+    margin-left: -10px;
+    margin-right: auto;
 }
 
 .number-of-likes-section {
