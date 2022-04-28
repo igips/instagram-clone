@@ -60,7 +60,7 @@ function SignInModal() {
 
 	return (
 		<div id="login-modal" className="modal">
-			<div className="modal-content">
+			<div id="login-modal-content" className="modal-content">
 				<span
 					onClick={() => {
 						closeSignInModal();

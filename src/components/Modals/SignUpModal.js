@@ -119,7 +119,7 @@ function SignUpModal() {
 
 	return (
 		<div id="register-modal" className="modal">
-			<div className="modal-content">
+			<div id="register-modal-content" className="modal-content">
 				<span
 					onClick={() => {
 						closeSignUpModal();
