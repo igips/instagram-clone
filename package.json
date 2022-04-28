@@ -2,6 +2,7 @@
   "name": "instagram-clone",
   "version": "0.1.0",
   "private": true,
+  "homepage": "https://igips.github.io/instagram-clone",
   "dependencies": {
     "@fortawesome/fontawesome-svg-core": "^6.1.1",
     "@fortawesome/free-regular-svg-icons": "^6.1.1",
@@ -12,6 +13,7 @@
     "@testing-library/user-event": "^13.5.0",
     "emoji-picker-react": "^3.5.1",
     "firebase": "^9.6.8",
+    "gh-pages": "^3.2.3",
     "javascript-time-ago": "^2.3.13",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
@@ -23,6 +25,8 @@
     "web-vitals": "^2.1.4"
   },
   "scripts": {
+    "predeploy": "npm run build",
+    "deploy": "gh-pages -d build",
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",

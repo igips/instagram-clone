@@ -254,6 +254,7 @@ function Inbox(props) {
 									props.users,
 									message.username === props.yourUsername ? message.username2 : message.username
 								);
+								const avatar = userData.avatar;
 
 								return (
 									<div
@@ -269,7 +270,7 @@ function Inbox(props) {
 										key={uniqid()}
 										className="conversation-div"
 									>
-										<img src={userData.avatar ? userData.avatar : ava} alt="" />
+										<img src={avatar ? avatar : ava} alt="" />
 										<div className="conversation-div-info">
 											<div className="conversation-div-username">
 												{message.username === props.yourUsername
