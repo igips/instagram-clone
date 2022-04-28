@@ -8,6 +8,7 @@ import { getFirestore, collection, getDocs } from "firebase/firestore";
 import TimeAgo from "javascript-time-ago";
 import en from "javascript-time-ago/locale/en.json";
 import { homeIcon } from "./components/Icons/HomeIcon.js";
+import { messageIconClicked } from "./components/Icons/MessageIcon.js";
 
 TimeAgo.addDefaultLocale(en);
 
@@ -112,7 +113,11 @@ window.addEventListener("popstate", (e) => {
 		addPostModal.style.display = "none";
 		homeIcon();
 
-	} 
+	}  
+
+	if(window.location.href.includes("inbox")) {
+		messageIconClicked();
+	}
 
 });
 
