@@ -4,10 +4,12 @@ import uniqid from "uniqid";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faSpinner } from "@fortawesome/free-solid-svg-icons";
 import { useEffect, useState } from "react";
-import { searchFunction } from "../..";
+import { getUsers, searchFunction } from "../..";
 import { closeModal } from "../Modals";
 import { DeleteIcon } from "../Icons/DeleteIcon";
 import { getUserDataFromUsersArray } from "../Home";
+import { arrayRemove, arrayUnion, doc, getFirestore, updateDoc } from "firebase/firestore";
+import { getDocId } from "../../index";
 
 function ShareModal(props) {
 	const [shareModalSearchUser, setShareModalSearchUser] = useState("");
@@ -71,10 +73,106 @@ function ShareModal(props) {
 		setShareModalSearchUser("");
 		setSearchResults([]);
 		setPicked([]);
+		setButtonDisabled(true);
 		document.getElementById("share-modal-text-input-message").value = "";
-		document.getElementById("send-share-button").disabled = "true";
 		document.getElementById("share-to-modal-search-results").classList.remove("results-active");
 		document.getElementById("share-modal-text-input-message").style.display = "none";
+	}
+
+	function sendMessage() {
+		const messageValue = document.getElementById("share-modal-text-input-message").value;
+
+		picked.forEach(async (pick) => {
+			const users = await getUsers();
+			const user = getUserDataFromUsersArray(users, pick);
+			let found = false;
+			const db = getFirestore();
+
+			for (let m of user.messages) {
+				if (m.username === pick || m.username2 === pick) {
+					// eslint-disable-next-line no-loop-func
+					await getDocId(pick).then(async (id) => {
+						await updateDoc(doc(db, "usernames", id), { messages: arrayRemove(m) });
+						await updateDoc(doc(db, "usernames", props.firestoreDocId), { messages: arrayRemove(m) });
+
+						m.conversation.push({
+							date: Date.now(),
+							username: props.yourUsername,
+							text: messageValue,
+						});
+						m.date = Date.now();
+
+						await updateDoc(doc(db, "usernames", id), {unReadMessages: arrayUnion(props.yourUsername), messages: arrayUnion(m) });
+						await updateDoc(doc(db, "usernames", props.firestoreDocId), {
+							messages: arrayUnion(m),
+						});
+					});
+					found = true;
+					break;
+				}
+			}
+
+			if (!found) {
+				const docID = await getDocId(pick);
+				const date = Date.now();
+
+				await updateDoc(doc(db, "usernames", docID), {
+					unReadMessages: arrayUnion(props.yourUsername),
+					messages: arrayUnion({
+						conversation: [
+							{
+								date: date,
+								username: props.yourUsername,
+								text: messageValue,
+							},
+						],
+						date: date,
+						username: pick,
+						username2: props.yourUsername,
+					}),
+				});
+
+				const user = getUserDataFromUsersArray(users, props.yourUsername);
+
+				let found2 = false;
+
+				for (let m of user.messages) {
+					if (m.username === pick || m.username2 === pick) {
+						await updateDoc(doc(db, "usernames", props.firestoreDocId), { messages: arrayRemove(m) });
+
+						m.conversation.push({
+							date: date,
+							username: props.yourUsername,
+							text: messageValue,
+						});
+						m.date = date;
+
+						await updateDoc(doc(db, "usernames", props.firestoreDocId), {
+							messages: arrayUnion(m),
+						});
+						found2 = true;
+						break;
+					}
+				}
+
+				if (!found2) {
+					await updateDoc(doc(db, "usernames", props.firestoreDocId), {
+						messages: arrayUnion({
+							conversation: [
+								{
+									date: date,
+									username: props.yourUsername,
+									text: messageValue,
+								},
+							],
+							date: date,
+							username: pick,
+							username2: props.yourUsername,
+						}),
+					});
+				}
+			}
+		});
 	}
 
 	function hideShareModal() {
@@ -119,7 +217,7 @@ function ShareModal(props) {
 		<div id="share-modal" className="modal">
 			<div id="share-modal-content">
 				<div id="share-modal-header">
-					<span>Share</span>
+					<span>New Message</span>
 					{closeModal(hideShareModal)}
 				</div>
 				<div id="share-to-modal">
@@ -177,7 +275,14 @@ function ShareModal(props) {
 						className="share-modal-text-input"
 						placeholder="Write a message..."
 					/>
-					<button onClick={() => hideShareModal()} id="send-share-button" disabled={buttonDisabled}>
+					<button
+						onClick={() => {
+							sendMessage();
+							hideShareModal();
+						}}
+						id="send-share-button"
+						disabled={buttonDisabled}
+					>
 						Send
 					</button>
 				</div>
