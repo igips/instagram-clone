@@ -278,7 +278,7 @@
 	color: #8e8e8e;
 }
 
-#noti-amount {
+#noti-amount, #mess-amount {
 	position: absolute;
 	justify-content: center;
 	align-items: center;

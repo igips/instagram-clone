@@ -322,15 +322,10 @@ canvas {
     padding-top: 6px;
     border-top: 1px solid rgba(219, 219, 219);
     color: rgba(142,142,142);
-    flex-shrink: 0;
     font-size: 14px;
     display: flex;
     justify-content: center;
-    line-height: 18px;
     flex-direction: column;
-    align-items: stretch;
-    vertical-align: baseline;
-    pointer-events: auto;
 
     
 }
@@ -341,8 +336,6 @@ canvas {
     flex-grow: 1;
     flex-shrink: 1;
     position: relative;
-    vertical-align: baseline;
-
 
 }
 
@@ -363,11 +356,8 @@ canvas {
     display: flex;
     align-items: stretch;
     flex-direction: column;
-    flex-shrink: 0;
     position: relative;
-    vertical-align: baseline;
-    pointer-events: auto;
-    flex-grow: 1;
+    flex: 1;
 
 }
 
