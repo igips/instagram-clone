@@ -19,10 +19,13 @@ function App() {
 	const [username, setUsername] = useState("");
 	const [firestoreDocId, setfirestoreDocId] = useState("");
 	const [notifications, setNotifications] = useState([]);
+	const [unReadMessages, setUnReadMessages] = useState([]);
 	const [unReadNoti, setUnReadNoti] = useState(0);
 	const [posts, setPosts] = useState([]);
 	const [avatar, setAvatar] = useState();
 	const [messages, setMessages] = useState([]);
+
+	const [messagesHelp, setMessagesHelp] = useState([]);
 
 	let unsubscribe;
 
@@ -78,6 +81,26 @@ function App() {
 	});
 
 	useEffect(() => {
+		if (messagesHelp.length >= messages.length) {
+			let mes = messagesHelp.sort((a, b) => {
+				return new Date(b.date) - new Date(a.date);
+			});
+
+			setMessages(mes);
+		}
+	}, [messagesHelp]);
+
+	useEffect(() => {
+		if(signedIn && following.length === 0) {
+			document.getElementById("discover-modal").style.display = "flex";
+
+		} else {
+			document.getElementById("discover-modal").style.display = "none";
+		}
+
+	},[following])
+
+	useEffect(() => {
 		const user = getAuth().currentUser;
 
 		if (signedIn) {
@@ -96,9 +119,9 @@ function App() {
 					if (docu.data().avatar !== avatar) {
 						setAvatar(docu.data().avatar);
 					}
-					if (docu.data().messages !== messages && docu.data().messages.length >= messages.length) {
-						setMessages(docu.data().messages);
-					}
+
+					setUnReadMessages(docu.data().unReadMessages);
+					setMessagesHelp(docu.data().messages);
 
 					if (
 						document.getElementById("notification-div").style.display === "flex" ||
@@ -447,6 +470,9 @@ function App() {
 					commModalSetPostId={commModalSetPostId}
 					avatar={avatar}
 					posts={posts}
+					signedIn={signedIn}
+					unReadMessages={unReadMessages}
+					setUnReadMessages={setUnReadMessages}
 				></Nav>
 				<Routes>
 					<Route
@@ -469,6 +495,7 @@ function App() {
 								likeComment={likeComment}
 								commModalSetPostId={commModalSetPostId}
 								avatar={avatar}
+
 							/>
 						}
 					/>
@@ -500,6 +527,9 @@ function App() {
 								users={users}
 								yourUsername={username}
 								firestoreDocId={firestoreDocId}
+								unReadMessages={unReadMessages}
+								setUnReadMessages={setUnReadMessages}
+								signedIn={signedIn}
 							/>
 						}
 					/>
