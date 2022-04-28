@@ -21,7 +21,7 @@ import { addPostIcon, AddPostIconSvg } from "./Icons/AddPostIcon";
 import { searchIcon, SearchIconSvg } from "./Icons/SearchIcon";
 import { Link } from "react-router-dom";
 import { showCommentsModal } from "./Modals/CommentsModal";
-import { getUserDataFromUsersArray } from "./Home";
+import Home, { getUserDataFromUsersArray } from "./Home";
 
 function followButtonForNoti(user, following, username, follow, unFollow) {
 	if (!following.includes(user) && user !== username) {
@@ -111,6 +111,16 @@ function Nav(props) {
 	}, [props.unReadNoti]);
 
 	useEffect(() => {
+		if(props.unReadMessages.length === 0 && props.signedIn) {
+			document.getElementById("mess-amount").style.display = "none";
+
+		} else if(props.signedIn) {
+			document.getElementById("mess-amount").style.display = "flex";
+		}
+
+	}, [props.unReadMessages]);
+
+	useEffect(() => {
 		if (props.notifications.length === 0) {
 			document.getElementById("no-notifications").style.display = "flex";
 		} else {
@@ -119,6 +129,10 @@ function Nav(props) {
 	}, [props.notifications]);
 
 	function signOutFromAccount() {
+		if(window.location.href.includes("inbox")) {
+			document.getElementById("logo").click();
+		}
+
 		signOut(getAuth())
 			.then(() => {
 				// homeIcon();
@@ -263,6 +277,26 @@ function Nav(props) {
 		}
 	}
 
+	function messageButton() {
+		if (props.signedIn) {
+			return (
+				<Link id="message-icon-div" onClick={() => messageIcon()} className="icon-inner-div icon-relative " to="/inbox">
+					<div id="mess-amount">{props.unReadMessages.length}</div>
+
+					{MessageIconSvg()}
+
+				</Link>
+			);
+		} else {
+			return (
+				<div id="message-icon-div" onClick={() => messageIcon()} className="icon-inner-div" to="/inbox">
+					{MessageIconSvg()}
+				</div>
+			);
+		}
+	}
+
+
 	return (
 		<>
 			<nav id="top-nav">
@@ -328,17 +362,14 @@ function Nav(props) {
 								</div>
 							</Link>
 
-							<Link
-								id="message-icon-div"
-								onClick={() => messageIcon()}
-								className="icon-inner-div"
-								to="/inbox"
-							>
-								{MessageIconSvg()}
-							</Link>
+							{messageButton()}
+
+
 							<div onClick={() => addPostIcon()} className="icon-inner-div icon-to-hide">
 								{AddPostIconSvg()}
 							</div>
+
+
 							<div
 								id="noti-icon"
 								onClick={(e) => {
