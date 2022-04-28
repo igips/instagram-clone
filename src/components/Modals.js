@@ -10,10 +10,20 @@ import SignUpModal from "./Modals/SignUpModal";
 import SignInModal from "./Modals/SignInModal";
 import { CloseModalIcon } from "./Icons/CloseIcon";
 import AddPostModal from "./Modals/AddPostModal";
+import DiscoverModal from "./Modals/DiscoverModal";
 
 function Modals(props) {
 	return (
 		<>
+			<DiscoverModal
+				signedIn={props.signedIn}
+				following={props.following}
+				users={props.users}
+				follow={props.follow}
+				unFollow={props.unFollow}
+				yourUsername={props.username}
+				dropDownSetUserData={props.dropDownSetUserData}
+			/>
 			<SearchModal users={props.users} yourUsername={props.username} />
 			<SignUpModal />
 			<SignInModal />
@@ -56,7 +66,7 @@ function Modals(props) {
 				addComment={props.addComment}
 				commModalSetPostId={props.commModalSetPostId}
 			/>
-			<ShareModal users={props.users} />
+			<ShareModal yourUsername={props.username} firestoreDocId={props.firestoreDocId} users={props.users} />
 			<NotificationModal
 				notifications={props.notifications}
 				following={props.following}
