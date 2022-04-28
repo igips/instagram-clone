@@ -13,18 +13,23 @@ import { getDocId } from "..";
 import { arrayRemove, arrayUnion, doc, getFirestore, updateDoc } from "firebase/firestore";
 import { Link } from "react-router-dom";
 import { showShareModal } from "./Modals/ShareModal";
+import { BackArrow } from "./Icons/ArrowIcons";
 
 function Inbox(props) {
 	const [messageValue, setMessageValue] = useState("");
 	const [activeMessage, setActiveMessage] = useState({ conversation: [] });
 	const [activeMessageUser, setActiveMessageUser] = useState({ avatar: "", username: "" });
-
 	const [messageSent, setMessageSent] = useState(false);
+
+
 
 	useEffect(() => {
 		if (messageSent) {
 			getDocId(activeMessageUser.username).then(async (id) => {
-				await updateDoc(doc(getFirestore(), "usernames", id), { messages: arrayUnion(activeMessage) });
+				await updateDoc(doc(getFirestore(), "usernames", id), {
+					unReadMessages: arrayUnion(props.yourUsername),
+					messages: arrayUnion(activeMessage),
+				});
 				await updateDoc(doc(getFirestore(), "usernames", props.firestoreDocId), {
 					messages: arrayUnion(activeMessage),
 				});
@@ -46,15 +51,17 @@ function Inbox(props) {
 		const div = document.getElementById("inbox-send-message-info");
 		const conversation = document.getElementById("inbox-right-conversation");
 
-		if (activeMessage.conversation.length > 0) {
-			div.style.display = "none";
-			conversation.style.display = "flex";
+		if (props.signedIn) {
+			if (activeMessage.conversation.length > 0) {
+				div.style.display = "none";
+				conversation.style.display = "flex";
 
-			const scroll = document.getElementById("inbox-right-conversation-area");
-			scroll.scrollTop = scroll.scrollHeight;
-		} else {
-			conversation.style.display = "none";
-			div.style.display = "flex";
+				const scroll = document.getElementById("inbox-right-conversation-area");
+				scroll.scrollTop = scroll.scrollHeight;
+			} else {
+				conversation.style.display = "none";
+				div.style.display = "flex";
+			}
 		}
 	}, [activeMessage]);
 
@@ -62,12 +69,24 @@ function Inbox(props) {
 		const conv = Array.from(document.querySelectorAll(".conversation-div"));
 
 		conv.forEach((c) => {
-			if (c.childNodes[1].childNodes[0].textContent === activeMessageUser.username) {
+			if (c.childNodes[1].childNodes[0].textContent === activeMessageUser.username && window.innerWidth > 650) {
 				c.style.background = "#efefef";
 			} else {
 				c.style.background = "none";
 			}
+
+			if (props.unReadMessages.includes(c.childNodes[1].childNodes[0].textContent)) {
+				c.style.fontWeight = 600;
+			} else {
+				c.style.fontWeight = 400;
+			}
 		});
+
+		if (props.unReadMessages.includes(activeMessageUser.username)) {
+			updateDoc(doc(getFirestore(), "usernames", props.firestoreDocId), {
+				unReadMessages: arrayRemove(activeMessageUser.username),
+			});
+		}
 	});
 
 	function deleteConversation() {
@@ -99,6 +118,7 @@ function Inbox(props) {
 					...activeMessage.conversation,
 					{ date: Date.now(), username: props.yourUsername, text: messageValue },
 				],
+				date: Date.now(),
 			});
 
 			setMessageSent(true);
@@ -172,7 +192,7 @@ function Inbox(props) {
 
 	function writeMessage() {
 		return (
-			<section className="add-comment-section">
+			<section id="add-message-section" className="add-comment-section">
 				<div className="add-comment-section-inner">
 					<form
 						onKeyDown={(e) => {
@@ -194,7 +214,7 @@ function Inbox(props) {
 							autoComplete="off"
 						></textarea>
 						<button id={"inbox-button"} className="post-div" disabled>
-							Post
+							Send
 						</button>
 					</form>
 				</div>
@@ -202,111 +222,141 @@ function Inbox(props) {
 		);
 	}
 
-	return (
-		<main>
-			<section id="inbox-section">
-				<div id="inbox-left">
-					<div id="inbox-left-header">
-						<span>{props.yourUsername}</span>
-						<span onClick={() => showShareModal()} id="new-message-icon-span">
-							{NewMessageIcon()}
-						</span>
-					</div>
-					<div id="inbox-message-list">
-						{props.messages.map((message) => {
-							const userData = getUserDataFromUsersArray(
-								props.users,
-								message.username === props.yourUsername ? message.username2 : message.username
-							);
+    function mobile() {
+        if (window.innerWidth < 650) {
+            document.getElementById("inbox-left").style.display = "none";
+            document.getElementById("inbox-right").style.display = "flex";
+        }
+    }
 
-							return (
-								<div
-									onClick={() => {
-										setActiveMessage(message);
-										setActiveMessageUser(userData);
-									}}
-									key={uniqid()}
-									className="conversation-div"
-								>
-									<img src={userData.avatar ? userData.avatar : ava} alt="" />
-									<div className="conversation-div-info">
-										<div className="conversation-div-username">
-											{message.username === props.yourUsername
-												? message.username2
-												: message.username}
-										</div>
-										<div className="conversation-div-message">
-											{message.conversation[message.conversation.length - 1].text}
-										</div>
-									</div>
-									<ReactTimeAgo
-										timeStyle="mini-minute"
-										date={message.conversation[message.conversation.length - 1].date}
-										locale="en-US"
-									/>
-								</div>
-							);
-						})}
-					</div>
-				</div>
-				<div id="inbox-right">
-					<div id="inbox-send-message-info">
-						<span>Your Messages</span>
-						<button>Send Message</button>
-					</div>
+    function mobileBack() {
+       
+        if (window.innerWidth < 650) {
+            document.getElementById("inbox-right").style.display = "none";
+            document.getElementById("inbox-left").style.display = "block";
+        }
+    }
 
-					<div id="inbox-right-conversation">
-						<div id="inbox-right-conversation-header">
-							<Link style={{ display: "flex" }} to={`/profile/${activeMessageUser.username}`}>
-								<img
-									id="conversation-header-avatar"
-									src={activeMessageUser.avatar ? activeMessageUser.avatar : ava}
-									alt=""
-								/>
-							</Link>
-							<Link to={`/profile/${activeMessageUser.username}`}>
-								<div id="conversation-header-username">{activeMessageUser.username}</div>
-							</Link>
-							<img
-								onClick={() => deleteConversation()}
-								id="conversation-header-delete"
-								src={trash}
-								alt=""
-							/>
+	if (props.signedIn) {
+		return (
+			<main>
+				<section id="inbox-section">
+					<div id="inbox-left">
+						<div id="inbox-left-header">
+							<span>{props.yourUsername}</span>
+							<span onClick={() => showShareModal()} id="new-message-icon-span">
+								{NewMessageIcon()}
+							</span>
 						</div>
-						<div id="inbox-right-conversation-area">
-							{activeMessage.conversation.map((conv) => {
-								if (conv.username === props.yourUsername) {
-									return (
-										<div key={uniqid()} className="conversation-row">
-											<div className="conversation-cloud-right">{conv.text}</div>
+						<div id="inbox-message-list">
+							{props.messages.map((message) => {
+								const userData = getUserDataFromUsersArray(
+									props.users,
+									message.username === props.yourUsername ? message.username2 : message.username
+								);
+
+								return (
+									<div
+										onClick={() => {
+											setActiveMessage(message);
+											setActiveMessageUser(userData);
+											updateDoc(doc(getFirestore(), "usernames", props.firestoreDocId), {
+												unReadMessages: arrayRemove(userData.username),
+											});
+                                            mobile();
+
+										}}
+										key={uniqid()}
+										className="conversation-div"
+									>
+										<img src={userData.avatar ? userData.avatar : ava} alt="" />
+										<div className="conversation-div-info">
+											<div className="conversation-div-username">
+												{message.username === props.yourUsername
+													? message.username2
+													: message.username}
+											</div>
+											<div className="conversation-div-message">
+												{message.conversation[message.conversation.length - 1].text}
+											</div>
 										</div>
-									);
-								} else {
-									return (
-										<div key={uniqid()} className="conversation-row">
-											<Link
-												style={{ display: "flex", cursor: "default" }}
-												to={`/profile/${activeMessageUser.username}`}
-											>
-												<img
-													src={activeMessageUser.avatar ? activeMessageUser.avatar : ava}
-													alt=""
-													className="messages-avatars"
-												/>
-											</Link>
-											<div className="conversation-cloud-left">{conv.text}</div>
-										</div>
-									);
-								}
+										<ReactTimeAgo
+											timeStyle="mini-minute"
+											date={message.conversation[message.conversation.length - 1].date}
+											locale="en-US"
+										/>
+									</div>
+								);
 							})}
 						</div>
-						<div id="inbox-right-add-message">{writeMessage()}</div>
 					</div>
-				</div>
-			</section>
-		</main>
-	);
+					<div id="inbox-right">
+						<div id="inbox-send-message-info">
+							<span>Your Messages</span>
+							<button onClick={() => showShareModal()}>Send Message</button>
+						</div>
+
+						<div id="inbox-right-conversation">
+							<div id="inbox-right-conversation-header">
+                                <div onClick={() => mobileBack()} id="go-back-inbox-mobile">{BackArrow()}</div>
+								<Link style={{ display: "flex" }} to={`/profile/${activeMessageUser.username}`}>
+									<img
+										id="conversation-header-avatar"
+										src={activeMessageUser.avatar ? activeMessageUser.avatar : ava}
+										alt=""
+									/>
+								</Link>
+								<Link to={`/profile/${activeMessageUser.username}`}>
+									<div id="conversation-header-username">{activeMessageUser.username}</div>
+								</Link>
+								<img
+									onClick={() => {deleteConversation(); mobileBack()}}
+									id="conversation-header-delete"
+									src={trash}
+									alt=""
+								/>
+							</div>
+							<div id="inbox-right-conversation-area">
+								{activeMessage.conversation.map((conv) => {
+									if (conv.username === props.yourUsername) {
+										return (
+											<div key={uniqid()} className="conversation-row">
+												<div className="conversation-cloud-right">{conv.text}</div>
+											</div>
+										);
+									} else {
+										return (
+											<div key={uniqid()} className="conversation-row">
+												<Link
+													style={{ display: "flex", cursor: "default" }}
+													to={`/profile/${activeMessageUser.username}`}
+												>
+													<img
+														src={activeMessageUser.avatar ? activeMessageUser.avatar : ava}
+														alt=""
+														className="messages-avatars"
+													/>
+												</Link>
+												<div className="conversation-cloud-left">{conv.text}</div>
+											</div>
+										);
+									}
+								})}
+                                
+							</div>
+                            <div id="inbox-right-add-message">{writeMessage()}</div>
+						</div>
+                        
+					</div>
+                    
+                    
+				</section>
+                
+			</main>
+		);
+	} else {
+		return <></>;
+	}
 }
 
 export default Inbox;
