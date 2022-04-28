@@ -442,7 +442,6 @@ function PictureCardIconsSection(props) {
 				{likeIconClicked(props.likes, props.yourUsername)}
 			</span>
 			{commentsIcon()}
-			{shareIcon()}
 		</>
 	);
 }
