@@ -18,6 +18,7 @@ function SearchModal(props) {
 
 	function hideSearchModal() {
 		const modal = document.getElementById("search-modal-container");
+		searchIconNotClicked();
 		modal.style.display = "none";
 		window.history.back();
 		cancelSearch();
