@@ -7,7 +7,6 @@ import { getAuth } from "firebase/auth";
 import { getFirestore, collection, getDocs } from "firebase/firestore";
 import TimeAgo from "javascript-time-ago";
 import en from "javascript-time-ago/locale/en.json";
-import { homeIcon } from "./components/Icons/HomeIcon.js";
 
 TimeAgo.addDefaultLocale(en);
 
