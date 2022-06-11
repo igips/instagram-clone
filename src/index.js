@@ -9,6 +9,8 @@ import TimeAgo from "javascript-time-ago";
 import en from "javascript-time-ago/locale/en.json";
 import { homeIcon } from "./components/Icons/HomeIcon.js";
 import { messageIconClicked } from "./components/Icons/MessageIcon.js";
+import { Provider } from "react-redux";
+import store from "./app/store.js";
 
 TimeAgo.addDefaultLocale(en);
 
@@ -191,9 +193,9 @@ async function searchFunction(value) {
 
 
 ReactDOM.render(
-	<React.StrictMode>
+	<Provider store={store}>
 		<App />
-	</React.StrictMode>,
+	</Provider>,
 	document.getElementById("root")
 );
 
