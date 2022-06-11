@@ -14,14 +14,14 @@ import { arrayRemove, arrayUnion, doc, getFirestore, updateDoc } from "firebase/
 import { Link } from "react-router-dom";
 import { showShareModal } from "./Modals/ShareModal";
 import { BackArrow } from "./Icons/ArrowIcons";
+import { useSelector } from "react-redux";
 
 function Inbox(props) {
 	const [messageValue, setMessageValue] = useState("");
 	const [activeMessage, setActiveMessage] = useState({ conversation: [] });
 	const [activeMessageUser, setActiveMessageUser] = useState({ avatar: "", username: "" });
 	const [messageSent, setMessageSent] = useState(false);
-
-
+	const signedIn = useSelector((state) => state.user.signedIn);
 
 	useEffect(() => {
 		if (messageSent) {
@@ -51,7 +51,7 @@ function Inbox(props) {
 		const div = document.getElementById("inbox-send-message-info");
 		const conversation = document.getElementById("inbox-right-conversation");
 
-		if (props.signedIn) {
+		if (signedIn) {
 			if (activeMessage.conversation.length > 0) {
 				div.style.display = "none";
 				conversation.style.display = "flex";
@@ -237,7 +237,7 @@ function Inbox(props) {
         }
     }
 
-	if (props.signedIn) {
+	if (signedIn) {
 		return (
 			<main>
 				<section id="inbox-section">

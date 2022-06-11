@@ -11,9 +11,12 @@ import { deleteObject, getStorage, ref } from "firebase/storage";
 import { HashRouter, Routes, Route } from "react-router-dom";
 import ProfilePage from "./ProfilePage";
 import Inbox from "./Inbox";
+import { useDispatch, useSelector } from "react-redux";
+import { setSignedIn } from "../features/userSlice";
 
 function App() {
-	const [signedIn, setSignedIn] = useState(false);
+	const dispatch = useDispatch();
+	const signedIn = useSelector((state) => state.user.signedIn);
 	const [following, setFollowing] = useState([]);
 	const [users, setUsers] = useState([]);
 	const [username, setUsername] = useState("");
@@ -24,7 +27,6 @@ function App() {
 	const [posts, setPosts] = useState([]);
 	const [avatar, setAvatar] = useState();
 	const [messages, setMessages] = useState([]);
-
 	const [messagesHelp, setMessagesHelp] = useState([]);
 
 	let unsubscribe;
@@ -67,13 +69,12 @@ function App() {
 
 	onAuthStateChanged(getAuth(), (user) => {
 		if (user) {
-			setSignedIn(true);
+			dispatch(setSignedIn(true));
 		} else {
-			setSignedIn(false);
+			dispatch(setSignedIn(false));
 			setUsername("");
 			setUnReadNoti(0);
 			setAvatar();
-			// setMessages([]);
 			if (unsubscribe) {
 				unsubscribe();
 			}
@@ -439,7 +440,6 @@ function App() {
 					setpostIdOptionsModal={setpostIdOptionsModal}
 					posts={posts}
 					commModalPostId={commModalPostId}
-					signedIn={signedIn}
 					likesModalSetLikes={likesModalSetLikes}
 					likeComment={likeComment}
 					removeComment={removeComment}
@@ -470,7 +470,6 @@ function App() {
 					commModalSetPostId={commModalSetPostId}
 					avatar={avatar}
 					posts={posts}
-					signedIn={signedIn}
 					unReadMessages={unReadMessages}
 					setUnReadMessages={setUnReadMessages}
 				></Nav>
@@ -490,7 +489,6 @@ function App() {
 								unFollow={unFollow}
 								posts={posts}
 								likePicture={likePicture}
-								signedIn={signedIn}
 								addComment={addComment}
 								likeComment={likeComment}
 								commModalSetPostId={commModalSetPostId}
@@ -506,7 +504,6 @@ function App() {
 								follow={follow}
 								unFollow={unFollow}
 								yourUsername={username}
-								signedIn={signedIn}
 								following={following}
 								likesModalSetLikes={likesModalSetLikes}
 								setLikesModalInfo={setLikesModalInfo}
@@ -529,7 +526,6 @@ function App() {
 								firestoreDocId={firestoreDocId}
 								unReadMessages={unReadMessages}
 								setUnReadMessages={setUnReadMessages}
-								signedIn={signedIn}
 							/>
 						}
 					/>

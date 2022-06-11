@@ -16,10 +16,11 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faSpinner } from "@fortawesome/free-solid-svg-icons";
 import { messageIconNotClicked } from "./Icons/MessageIcon";
 import { showShareModal } from "./Modals/ShareModal";
+import { useSelector } from "react-redux";
 
 function ProfilePage(props) {
 	let { username } = useParams();
-
+	const signedIn = useSelector((state) => state.user.signedIn);
 	const [userData, setUserData] = useState({ username: "", posts: [], followers: [], following: [] });
 	const [postsOrTagged, setPostsOrTagged] = useState("posts");
 	const [post, setPost] = useState();
@@ -119,7 +120,7 @@ function ProfilePage(props) {
 			}
 		}
 
-		if (props.signedIn) {
+		if (signedIn) {
 			 if (props.yourUsername !== "" && props.yourUsername !== username) {
 				return (
 					<>

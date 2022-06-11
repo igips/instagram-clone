@@ -6,7 +6,6 @@ import ReactTimeAgo from "react-time-ago";
 import Picker from "emoji-picker-react";
 import { dropDown, hideDropDown } from "./DropDown";
 import { likeCommentIcon, likeCommentIconClicked, likeIcon, likeIconClicked } from "./Icons/LikeIcon";
-import { shareIcon } from "./Icons/ShareIcon";
 import { showLikesModal } from "./Modals/LikesModal";
 import { EmojiiIcon } from "./Icons/EmojiiIcon";
 import { options } from "./Modals/OptionsModal";
@@ -18,6 +17,7 @@ import { tagPosition } from "./Modals/AddPostModal";
 import { TagIcon } from "./Icons/TagIcon";
 import { Link } from "react-router-dom";
 import ava from "../img/ava.jpeg";
+import { useSelector } from "react-redux";
 
 
 function PictureCard(props) {
@@ -116,7 +116,6 @@ function PictureCard(props) {
 					<AddCommentSection
 						yourUsername={props.yourUsername}
 						postId={props.post.id}
-						signedIn={props.signedIn}
 						addComment={props.addComment}
 					/>
 				</div>
@@ -148,6 +147,7 @@ function PictureCardNumOfLikesSection(props) {
 function AddCommentSection(props) {
 	const [id, setId] = useState(uniqid());
 	const [commentValue, setCommentValue] = useState("");
+	const signedIn = useSelector((state) => state.user.signedIn);
 
 	function submitComment(e) {
 		e.preventDefault();
@@ -230,7 +230,7 @@ function AddCommentSection(props) {
 		}
 	}
 
-	if (props.signedIn) {
+	if (signedIn) {
 		return (
 			<section className="add-comment-section">
 				<div className="add-comment-section-inner">

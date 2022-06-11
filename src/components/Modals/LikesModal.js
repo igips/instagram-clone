@@ -1,24 +1,15 @@
-import { getAuth, onAuthStateChanged } from "firebase/auth";
-import { useEffect, useState } from "react";
+import { getAuth } from "firebase/auth";
+import { useEffect } from "react";
 import { dropDown, hideDropDown } from "../DropDown";
 import { closeModal } from "../Modals";
 import { getUserDataFromUsersArray } from "../Home";
 import uniqid from "uniqid";
 import ava from "../../img/ava.jpeg";
 import { Link } from "react-router-dom";
+import { useSelector } from "react-redux";
 
 function LikesModal(props) {
-	const [signedIn, setSignedIn] = useState(false);
-
-	onAuthStateChanged(getAuth(), (user) => {
-		if (user) {
-			setSignedIn(true);
-		} else {
-			setSignedIn(false);
-		}
-	});
-
-	
+	const signedIn = useSelector((state) => state.user.signedIn);
 
 	useEffect(() => {
 		const likesModal = document.getElementById("likes-modal");

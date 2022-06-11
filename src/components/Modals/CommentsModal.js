@@ -18,6 +18,7 @@ import { likeCommentIcon, likeCommentIconClicked } from "../Icons/LikeIcon";
 import { Link } from "react-router-dom";
 import { tagPosition } from "./AddPostModal";
 import { TagIcon } from "../Icons/TagIcon";
+import { useSelector } from "react-redux";
 
 function CommentsModal(props) {
 	const [postData, setPostData] = useState({
@@ -131,7 +132,6 @@ function CommentsModal(props) {
 					<div id="modal-comments-section">
 						<Comments
 							comments={postData.comments}
-							signedIn={props.signedIn}
 							yourUsername={props.yourUsername}
 							description={postData.description}
 							users={props.users}
@@ -167,7 +167,6 @@ function CommentsModal(props) {
 						<AddCommentSection
 							yourUsername={props.yourUsername}
 							postId={postData.id}
-							signedIn={props.signedIn}
 							addComment={props.addComment}
 						/>
 					</div>
@@ -186,6 +185,8 @@ function hideCommentsModal() {
 }
 
 function Comments(props) {
+	const signedIn = useSelector((state) => state.user.signedIn);
+
 	useEffect(() => {
 		if (document.getElementById("comments-modal").style.display === "flex") {
 			const div = document.getElementById("modal-comments-section");
@@ -204,7 +205,7 @@ function Comments(props) {
 	}
 
 	function deleteComment(comment) {
-		if (props.signedIn && comment.username === props.yourUsername) {
+		if (signedIn && comment.username === props.yourUsername) {
 			return "Delete";
 		}
 	}

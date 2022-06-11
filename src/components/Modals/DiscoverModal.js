@@ -5,8 +5,12 @@ import { Link } from "react-router-dom";
 import { dropDown, hideDropDown } from "../DropDown";
 import { getAuth } from "firebase/auth";
 import ava from "../../img/ava.jpeg";
+import { useSelector } from "react-redux";
 
 function DiscoverModal(props) {
+	const signedIn = useSelector((state) => state.user.signedIn);
+
+
 	function hideDiscoverModal() {
 		document.getElementById("discover-modal").style.display = "none";
 	}
@@ -17,7 +21,7 @@ function DiscoverModal(props) {
 
 		if (
 			userR &&
-			props.signedIn &&
+			signedIn &&
 			!props.following.includes(user) &&
 			getUserDataFromUsersArray(props.users, user).uid !== userR.uid
 		) {
@@ -31,7 +35,7 @@ function DiscoverModal(props) {
 					Follow
 				</button>
 			);
-		} else if (userR && props.signedIn && props.following.includes(user)) {
+		} else if (userR && signedIn && props.following.includes(user)) {
 			return (
 				<button
 					onClick={() => {

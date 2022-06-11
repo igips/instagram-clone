@@ -21,7 +21,8 @@ import { addPostIcon, AddPostIconSvg } from "./Icons/AddPostIcon";
 import { searchIcon, SearchIconSvg } from "./Icons/SearchIcon";
 import { Link } from "react-router-dom";
 import { showCommentsModal } from "./Modals/CommentsModal";
-import Home, { getUserDataFromUsersArray } from "./Home";
+import { getUserDataFromUsersArray } from "./Home";
+import { useSelector } from "react-redux";
 
 function followButtonForNoti(user, following, username, follow, unFollow) {
 	if (!following.includes(user) && user !== username) {
@@ -50,15 +51,16 @@ function followButtonForNoti(user, following, username, follow, unFollow) {
 }
 
 function Nav(props) {
-	const [avatar, setAvatar] = useState(0);
+	const [flag, setFlag] = useState(0);
 	const [searchValue, setSearchValue] = useState("");
 	const [searchResults, setSearchResults] = useState([]);
+	const signedIn = useSelector((state) => state.user.signedIn);
 
 	onAuthStateChanged(getAuth(), (user) => {
 		if (user) {
-			setAvatar(1);
+			setFlag(1);
 		} else {
-			setAvatar(0);
+			setFlag(0);
 		}
 	});
 
@@ -67,7 +69,7 @@ function Nav(props) {
 			let found = false;
 
 			if (document.getElementById("search-results-div").style.display === "flex") {
-				e.path.forEach((ele) => {
+				e.composedPath().forEach((ele) => {
 					if (ele.id === "search-div") {
 						found = true;
 					}
@@ -77,7 +79,7 @@ function Nav(props) {
 					cancelSearch();
 				}
 			} else if (document.getElementById("notification-arrow-div").style.display === "flex") {
-				e.path.forEach((ele) => {
+				e.composedPath().forEach((ele) => {
 					if (ele.id === "noti-icon") {
 						found = true;
 					}
@@ -87,7 +89,7 @@ function Nav(props) {
 					closeNotification();
 				}
 			} else if (document.getElementById("profile-arrow-div").style.display === "flex") {
-				e.path.forEach((ele) => {
+				e.composedPath().forEach((ele) => {
 					if (ele.id === "profile-drop-div") {
 						found = true;
 					}
@@ -111,10 +113,10 @@ function Nav(props) {
 	}, [props.unReadNoti]);
 
 	useEffect(() => {
-		if(props.unReadMessages.length === 0 && props.signedIn) {
+		if(props.unReadMessages.length === 0 && signedIn) {
 			document.getElementById("mess-amount").style.display = "none";
 
-		} else if(props.signedIn) {
+		} else if(signedIn) {
 			document.getElementById("mess-amount").style.display = "flex";
 		}
 
@@ -278,7 +280,7 @@ function Nav(props) {
 	}
 
 	function messageButton() {
-		if (props.signedIn) {
+		if (signedIn) {
 			return (
 				<Link id="message-icon-div" onClick={() => messageIcon()} className="icon-inner-div icon-relative " to="/inbox">
 					<div id="mess-amount">{props.unReadMessages.length}</div>

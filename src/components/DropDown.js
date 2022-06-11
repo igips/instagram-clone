@@ -1,25 +1,18 @@
-import { getAuth, onAuthStateChanged } from "firebase/auth";
+import { getAuth } from "firebase/auth";
 import { useEffect, useState } from "react";
 import ava from "../img/ava.jpeg";
 import { getUserDataFromUsersArray } from "./Home";
 import { showCommentsModal } from "./Modals/CommentsModal";
 import uniqid from "uniqid";
 import { Link } from "react-router-dom";
+import { useSelector } from "react-redux";
 
 function DropDown(props) {
-	const [signedIn, setSignedIn] = useState(false);
+	const signedIn = useSelector((state) => state.user.signedIn);
 	const [data, setData] = useState({ username: "", posts: [], followers: [], following: [] });
 	const user = getAuth().currentUser;
 	const [posts, setPosts] = useState([{ pic: { src: "" } }]);
 	let num = 0;
-
-	onAuthStateChanged(getAuth(), (user) => {
-		if (user) {
-			setSignedIn(true);
-		} else {
-			setSignedIn(false);
-		}
-	});
 
 	useEffect(() => {
 		if (props.userData) {
@@ -167,9 +160,7 @@ function dropDown(userData, dropDownSetUserData, e, ele, right) {
 
 		dropDown.style.display = "flex";
 
-		
-
-		if (user &&  user.uid !== userData.uid) {
+		if (user && user.uid !== userData.uid) {
 			document.getElementById("drop-down-inner-fourth").style.display = "flex";
 		} else {
 			document.getElementById("drop-down-inner-fourth").style.display = "none";

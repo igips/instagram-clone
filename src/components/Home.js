@@ -7,6 +7,7 @@ import { showSignUpModal } from "./Modals/SignUpModal";
 import { showSignInModal } from "./Modals/SignInModal";
 import { useEffect } from "react";
 import { Link } from "react-router-dom";
+import { useSelector } from "react-redux";
 
 function followMobile(e) {
 	if (e.currentTarget.textContent === "Follow") {
@@ -46,6 +47,7 @@ function shuffleArray(array) {
 }
 
 function Home(props) {
+	const signedIn = useSelector((state) => state.user.signedIn);
 	let num = 0;
 	let num2 = 0;
 
@@ -56,7 +58,7 @@ function Home(props) {
 		const profileInfoRight = document.getElementById("home-right-profile-inner");
 		const suggestionsRight = document.getElementById("suggestions-div-right");
 
-		if (props.signedIn && props.username) {
+		if (signedIn && props.username) {
 			leftButtons.classList.add("mobile-not-vissible");
 			rightButtons.classList.add("buttons-not-vissible");
 			suggestionsLeft.classList.add("mobile");
@@ -80,22 +82,22 @@ function Home(props) {
 		if (sugDivLeftInner.childElementCount < 1) {
 			sugDivLeft.style.display = "none";
 			sugDivRight.style.display = "none";
-		} else if (props.signedIn) {
+		} else if (signedIn) {
 			if (window.innerWidth < 1000) {
 				sugDivLeft.style.display = "flex";
 				sugDivRight.style.display = "none";
-			} else if (props.signedIn) {
+			} else if (signedIn) {
 				sugDivRight.style.display = "flex";
 				sugDivLeft.style.display = "none";
 			}
-		} else if (!props.signedIn) {
+		} else if (!signedIn) {
 			sugDivLeft.style.display = "none";
 			sugDivRight.style.display = "none";
 		}
 	});
 
 	function displayPosts() {
-		if (props.signedIn) {
+		if (signedIn) {
 			return props.posts.map((post) => {
 				if (props.following.includes(post.username) || post.username === props.username) {
 					return (
@@ -112,7 +114,6 @@ function Home(props) {
 							setpostIdOptionsModal={props.setpostIdOptionsModal}
 							post={post}
 							likePicture={props.likePicture}
-							signedIn={props.signedIn}
 							addComment={props.addComment}
 							likeComment={props.likeComment}
 							commModalSetPostId={props.commModalSetPostId}
@@ -136,7 +137,6 @@ function Home(props) {
 						setpostIdOptionsModal={props.setpostIdOptionsModal}
 						post={post}
 						likePicture={props.likePicture}
-						signedIn={props.signedIn}
 						addComment={props.addComment}
 						likeComment={props.likeComment}
 						commModalSetPostId={props.commModalSetPostId}
