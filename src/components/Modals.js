@@ -16,7 +16,6 @@ function Modals(props) {
 	return (
 		<>
 			<DiscoverModal
-				signedIn={props.signedIn}
 				following={props.following}
 				users={props.users}
 				follow={props.follow}
@@ -57,7 +56,6 @@ function Modals(props) {
 				setpostIdOptionsModal={props.setpostIdOptionsModal}
 				posts={props.posts}
 				commModalPostId={props.commModalPostId}
-				signedIn={props.signedIn}
 				yourUsername={props.username}
 				likesModalSetLikes={props.likesModalSetLikes}
 				likeComment={props.likeComment}
