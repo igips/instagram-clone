@@ -19,6 +19,7 @@ Clone of instagram made with React and Firebase.
 ## Built with
 - [React](https://reactjs.org/)
 - [React Router DOM](https://www.npmjs.com/package/react-router-dom)
+- [Redux](https://redux.js.org/)
 - [Firebase](https://firebase.google.com/)
 
 ## Screenshots
