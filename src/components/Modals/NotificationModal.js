@@ -8,15 +8,24 @@ import { Link } from "react-router-dom";
 import { homeIcon } from "../Icons/HomeIcon";
 import { notificationIconNotClicked } from "../Icons/NotificationIcon";
 import { getUserDataFromUsersArray } from "../Home";
+import { useSelector } from "react-redux";
 
 function NotificationModal(props) {
+	const following = useSelector((state) => state.user.following);
+	const username = useSelector((state) => state.user.username);
+	const notifications = useSelector((state) => state.user.notifications);
+	const users = useSelector((state) => state.usersAndPosts.users);
+
+
+
+
 	useEffect(() => {
-		if (props.notifications.length === 0) {
+		if (notifications.length === 0) {
 			document.getElementById("no-notifications-modal").style.display = "flex";
 		} else {
 			document.getElementById("no-notifications-modal").style.display = "none";
 		}
-	}, [props.notifications]);
+	}, [notifications]);
 
 	function hideNotificationsModal() {
 		const modal = document.getElementById("notification-modal-container");
@@ -33,11 +42,11 @@ function NotificationModal(props) {
 			</div>
 			<div id="notifications-modal-noti">
 				<div id="no-notifications-modal">No notifications</div>
-				{props.notifications
+				{notifications
 					.slice(0)
 					.reverse()
 					.map((result) => {
-						const userData = getUserDataFromUsersArray(props.users, result.username);
+						const userData = getUserDataFromUsersArray(users, result.username);
 						return (
 							<div key={uniqid()} className="noti-modal-single-result-mobile">
 								<Link
@@ -45,7 +54,7 @@ function NotificationModal(props) {
 									onClick={() => {
 										window.history.pushState("/", "Title", "/");
 										document.getElementById("notification-modal-container").style.display = "none";
-										if(result.username !== props.username) {
+										if(result.username !== username) {
 											homeIcon();
 										}
 									}}
@@ -66,8 +75,8 @@ function NotificationModal(props) {
 								</Link>
 								{followButtonForNoti(
 									result.username,
-									props.following,
-									props.username,
+									following,
+									username,
 									props.follow,
 									props.unFollow
 								)}

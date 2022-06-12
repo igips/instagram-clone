@@ -18,9 +18,11 @@ import { likeCommentIcon, likeCommentIconClicked } from "../Icons/LikeIcon";
 import { Link } from "react-router-dom";
 import { tagPosition } from "./AddPostModal";
 import { TagIcon } from "../Icons/TagIcon";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import { setCommModalPostId } from "../../features/modalsSlice";
 
 function CommentsModal(props) {
+	const dispatch = useDispatch();
 	const [postData, setPostData] = useState({
 		username: "",
 		comments: [],
@@ -32,6 +34,9 @@ function CommentsModal(props) {
 	});
 
 	const [userData, setUserData] = useState({ avatar: "" });
+	const users = useSelector((state) => state.usersAndPosts.users);
+	const posts = useSelector((state) => state.usersAndPosts.posts);
+	const commModalPostId = useSelector((state) => state.modals.commModalPostId);
 
 	useEffect(() => {
 		if (postData.pic.tags.length > 0) {
@@ -41,28 +46,28 @@ function CommentsModal(props) {
 		}
 
 		if (postData.username !== "") {
-			setUserData(getUserDataFromUsersArray(props.users, postData.username));
+			setUserData(getUserDataFromUsersArray(users, postData.username));
 		}
 	}, [postData]);
 
 	useEffect(() => {
-		if (props.commModalPostId) {
-			setPostData(getPostDataFromPostsArray(props.posts, props.commModalPostId));
+		if (commModalPostId) {
+			setPostData(getPostDataFromPostsArray(posts, commModalPostId));
 		}
-	}, [props.commModalPostId]);
+	}, [commModalPostId]);
 
 	useEffect(() => {
-		if (props.commModalPostId) {
-			setPostData(getPostDataFromPostsArray(props.posts, props.commModalPostId));
+		if (commModalPostId) {
+			setPostData(getPostDataFromPostsArray(posts, commModalPostId));
 		}
-	}, [props.posts]);
+	}, [posts]);
 
 	useEffect(() => {
 		const commentsModal = document.getElementById("comments-modal");
 
 		commentsModal.addEventListener("click", (e) => {
 			if (e.target === commentsModal) {
-				props.commModalSetPostId("");
+				dispatch(setCommModalPostId(""));
 				hideCommentsModal();
 			}
 		});
@@ -83,7 +88,7 @@ function CommentsModal(props) {
 			<div
 				onClick={() => {
 					hideCommentsModal();
-					props.commModalSetPostId();
+					dispatch(setCommModalPostId(""));
 				}}
 				id="comments-modal-close"
 			>
@@ -110,35 +115,26 @@ function CommentsModal(props) {
 				</div>
 				<div id="comments-div-modal">
 					<div id="comms-modal-header-mobile">
-						<div onClick={() => props.commModalSetPostId("")}>{closeModal(hideCommentsModal)}</div>
+						<div onClick={() => dispatch(setCommModalPostId(""))}>{closeModal(hideCommentsModal)}</div>
 
 						<span>Comments</span>
 						{shareIcon()}
 					</div>
 					<div id="comments-modal-header-section">
 						<PictureCardHeader
-							users={props.users}
 							follow={props.follow}
 							unFollow={props.unFollow}
-							following={props.following}
 							username={postData.username}
-							avatar={userData.avatar ? userData.avatar : ava}
-							dropDownSetUserData={props.dropDownSetUserData}
-							optionsModalSetUserData={props.optionsModalSetUserData}
-							setpostIdOptionsModal={props.setpostIdOptionsModal}
+							avatar={userData.avatar ? userData.avatar : ava}														
 							postId={postData.id}
 						/>
 					</div>
 					<div id="modal-comments-section">
 						<Comments
 							comments={postData.comments}
-							yourUsername={props.yourUsername}
 							description={postData.description}
-							users={props.users}
 							username={postData.username}
-							dropDownSetUserData={props.dropDownSetUserData}
 							avatar={userData.avatar ? userData.avatar : ava}
-							likesModalSetLikes={props.likesModalSetLikes}
 							postId={postData.id}
 							likeComment={props.likeComment}
 							removeComment={props.removeComment}
@@ -147,7 +143,6 @@ function CommentsModal(props) {
 					</div>
 					<section id="icons-in-comments-section-modal" className="icons-in-comments-section">
 						<PictureCardIconsSection
-							yourUsername={props.yourUsername}
 							postId={postData.id}
 							likePicture={props.likePicture}
 							likes={postData.likes}
@@ -157,7 +152,6 @@ function CommentsModal(props) {
 					<section id="number-of-likes-section-modal" className="number-of-likes-section">
 						<PictureCardNumOfLikesSection
 							likes={postData.likes}
-							likesModalSetLikes={props.likesModalSetLikes}
 						/>
 					</section>
 					<div id="when-added-div-modal" className="added-div">
@@ -165,7 +159,6 @@ function CommentsModal(props) {
 					</div>
 					<div id="div-for-comment-section-in-comment-modal">
 						<AddCommentSection
-							yourUsername={props.yourUsername}
 							postId={postData.id}
 							addComment={props.addComment}
 						/>
@@ -185,7 +178,11 @@ function hideCommentsModal() {
 }
 
 function Comments(props) {
+	const dispatch = useDispatch();
 	const signedIn = useSelector((state) => state.user.signedIn);
+	const yourUsername = useSelector((state) => state.user.username);
+	const users = useSelector((state) => state.usersAndPosts.users);
+	
 
 	useEffect(() => {
 		if (document.getElementById("comments-modal").style.display === "flex") {
@@ -205,7 +202,7 @@ function Comments(props) {
 	}
 
 	function deleteComment(comment) {
-		if (signedIn && comment.username === props.yourUsername) {
+		if (signedIn && comment.username === yourUsername) {
 			return "Delete";
 		}
 	}
@@ -225,8 +222,8 @@ function Comments(props) {
 						<span
 							onMouseEnter={(e) => {
 								dropDown(
-									getUserDataFromUsersArray(props.users, props.username),
-									props.dropDownSetUserData,
+									getUserDataFromUsersArray(users, props.username),
+									dispatch,
 									e,
 									"avaPic"
 								);
@@ -260,8 +257,8 @@ function Comments(props) {
 									<span
 										onMouseEnter={(e) => {
 											dropDown(
-												getUserDataFromUsersArray(props.users, props.username),
-												props.dropDownSetUserData,
+												getUserDataFromUsersArray(users, props.username),
+												dispatch,
 												e
 											);
 										}}
@@ -293,14 +290,14 @@ function Comments(props) {
 			{description()}
 			<div id="container-for-comments-in-modal">
 				{props.comments.map((comment) => {
-					const userData = getUserDataFromUsersArray(props.users, comment.username);
+					const userData = getUserDataFromUsersArray(users, comment.username);
 					return (
 						<div key={uniqid()} className="modal-comments">
 							<span
 								onMouseEnter={(e) => {
 									dropDown(
-										getUserDataFromUsersArray(props.users, comment.username),
-										props.dropDownSetUserData,
+										getUserDataFromUsersArray(users, comment.username),
+										dispatch,
 										e,
 										"avaPic"
 									);
@@ -343,8 +340,8 @@ function Comments(props) {
 												}}
 												onMouseEnter={(e) => {
 													dropDown(
-														getUserDataFromUsersArray(props.users, comment.username),
-														props.dropDownSetUserData,
+														getUserDataFromUsersArray(users, comment.username),
+														dispatch,
 														e
 													);
 												}}
@@ -367,7 +364,7 @@ function Comments(props) {
 											/>
 										</div>
 										<div
-											onClick={() => showLikesModal(comment.likes, props.likesModalSetLikes)}
+											onClick={() => showLikesModal(comment.likes, dispatch)}
 											className="short-when-added-and-likes"
 										>
 											{showLikes(comment)}
@@ -385,7 +382,7 @@ function Comments(props) {
 								onClick={() => likeCommentIcon(props.likeComment, comment.id, props.postId)}
 								className="like-comment-div like-comment-div-modal"
 							>
-								{likeCommentIconClicked(comment.likes.users, props.yourUsername)}
+								{likeCommentIconClicked(comment.likes.users, yourUsername)}
 							</div>
 						</div>
 					);
@@ -401,7 +398,8 @@ function showCommentsModal(postId, commModalSetPostId) {
 		window.history.pushState("commentsM", "Title", "commentsM");
 	}
 
-	commModalSetPostId(postId);
+	
+	commModalSetPostId(setCommModalPostId(postId));
 
 	modal.style.display = "flex";
 }

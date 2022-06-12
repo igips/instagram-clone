@@ -14,23 +14,33 @@ import { arrayRemove, arrayUnion, doc, getFirestore, updateDoc } from "firebase/
 import { Link } from "react-router-dom";
 import { showShareModal } from "./Modals/ShareModal";
 import { BackArrow } from "./Icons/ArrowIcons";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import { setMessages } from "../features/userSlice";
 
-function Inbox(props) {
+function Inbox() {
+	const dispatch = useDispatch();
 	const [messageValue, setMessageValue] = useState("");
 	const [activeMessage, setActiveMessage] = useState({ conversation: [] });
 	const [activeMessageUser, setActiveMessageUser] = useState({ avatar: "", username: "" });
 	const [messageSent, setMessageSent] = useState(false);
+
 	const signedIn = useSelector((state) => state.user.signedIn);
+	const yourUsername = useSelector((state) => state.user.username);
+	const firestoreDocId = useSelector((state) => state.user.firestoreDocId);
+	const unReadMessages = useSelector((state) => state.user.unReadMessages);
+	const messages = useSelector((state) => state.user.messages);
+	const users = useSelector((state) => state.usersAndPosts.users);
+
+
 
 	useEffect(() => {
 		if (messageSent) {
 			getDocId(activeMessageUser.username).then(async (id) => {
 				await updateDoc(doc(getFirestore(), "usernames", id), {
-					unReadMessages: arrayUnion(props.yourUsername),
+					unReadMessages: arrayUnion(yourUsername),
 					messages: arrayUnion(activeMessage),
 				});
-				await updateDoc(doc(getFirestore(), "usernames", props.firestoreDocId), {
+				await updateDoc(doc(getFirestore(), "usernames", firestoreDocId), {
 					messages: arrayUnion(activeMessage),
 				});
 				setMessageSent(false);
@@ -39,13 +49,13 @@ function Inbox(props) {
 	}, [messageSent]);
 
 	useEffect(() => {
-		for (let m of props.messages) {
+		for (let m of messages) {
 			if (m.username === activeMessageUser.username || m.username2 === activeMessageUser.username) {
 				setActiveMessage(m);
 				break;
 			}
 		}
-	}, [props.messages]);
+	}, [messages]);
 
 	useEffect(() => {
 		const div = document.getElementById("inbox-send-message-info");
@@ -75,31 +85,30 @@ function Inbox(props) {
 				c.style.background = "none";
 			}
 
-			if (props.unReadMessages.includes(c.childNodes[1].childNodes[0].textContent)) {
+			if (unReadMessages.includes(c.childNodes[1].childNodes[0].textContent)) {
 				c.style.fontWeight = 600;
 			} else {
 				c.style.fontWeight = 400;
 			}
 		});
 
-		if (props.unReadMessages.includes(activeMessageUser.username)) {
-			updateDoc(doc(getFirestore(), "usernames", props.firestoreDocId), {
+		if (unReadMessages.includes(activeMessageUser.username)) {
+			updateDoc(doc(getFirestore(), "usernames", firestoreDocId), {
 				unReadMessages: arrayRemove(activeMessageUser.username),
 			});
 		}
 	});
 
 	function deleteConversation() {
-		updateDoc(doc(getFirestore(), "usernames", props.firestoreDocId), {
+		updateDoc(doc(getFirestore(), "usernames", firestoreDocId), {
 			messages: arrayRemove(activeMessage),
 		});
 		setActiveMessage({ conversation: [] });
-		props.setMessages((oldMessages) => {
-			const newMessages = oldMessages.filter(
-				(mes) => mes.username !== activeMessageUser.username && mes.username2 !== activeMessageUser.username
-			);
-			return newMessages;
-		});
+
+		const newMessages = messages.filter(
+			(mes) => mes.username !== activeMessageUser.username && mes.username2 !== activeMessageUser.username
+		);
+		dispatch(setMessages(newMessages));
 		setActiveMessageUser({ avatar: "", username: "" });
 	}
 
@@ -110,13 +119,13 @@ function Inbox(props) {
 		getDocId(activeMessageUser.username).then(async (id) => {
 			const db = getFirestore();
 			updateDoc(doc(db, "usernames", id), { messages: arrayRemove(activeMessage) });
-			updateDoc(doc(db, "usernames", props.firestoreDocId), { messages: arrayRemove(activeMessage) });
+			updateDoc(doc(db, "usernames", firestoreDocId), { messages: arrayRemove(activeMessage) });
 
 			setActiveMessage({
 				...activeMessage,
 				conversation: [
 					...activeMessage.conversation,
-					{ date: Date.now(), username: props.yourUsername, text: messageValue },
+					{ date: Date.now(), username: yourUsername, text: messageValue },
 				],
 				date: Date.now(),
 			});
@@ -243,16 +252,16 @@ function Inbox(props) {
 				<section id="inbox-section">
 					<div id="inbox-left">
 						<div id="inbox-left-header">
-							<span>{props.yourUsername}</span>
+							<span>{yourUsername}</span>
 							<span onClick={() => showShareModal()} id="new-message-icon-span">
 								{NewMessageIcon()}
 							</span>
 						</div>
 						<div id="inbox-message-list">
-							{props.messages.map((message) => {
+							{messages.map((message) => {
 								const userData = getUserDataFromUsersArray(
-									props.users,
-									message.username === props.yourUsername ? message.username2 : message.username
+									users,
+									message.username === yourUsername ? message.username2 : message.username
 								);
 								const avatar = userData.avatar;
 
@@ -261,7 +270,7 @@ function Inbox(props) {
 										onClick={() => {
 											setActiveMessage(message);
 											setActiveMessageUser(userData);
-											updateDoc(doc(getFirestore(), "usernames", props.firestoreDocId), {
+											updateDoc(doc(getFirestore(), "usernames", firestoreDocId), {
 												unReadMessages: arrayRemove(userData.username),
 											});
                                             mobile();
@@ -273,7 +282,7 @@ function Inbox(props) {
 										<img src={avatar ? avatar : ava} alt="" />
 										<div className="conversation-div-info">
 											<div className="conversation-div-username">
-												{message.username === props.yourUsername
+												{message.username === yourUsername
 													? message.username2
 													: message.username}
 											</div>
@@ -319,7 +328,7 @@ function Inbox(props) {
 							</div>
 							<div id="inbox-right-conversation-area">
 								{activeMessage.conversation.map((conv) => {
-									if (conv.username === props.yourUsername) {
+									if (conv.username === yourUsername) {
 										return (
 											<div key={uniqid()} className="conversation-row">
 												<div className="conversation-cloud-right">{conv.text}</div>

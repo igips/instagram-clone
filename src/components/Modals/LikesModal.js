@@ -6,10 +6,16 @@ import { getUserDataFromUsersArray } from "../Home";
 import uniqid from "uniqid";
 import ava from "../../img/ava.jpeg";
 import { Link } from "react-router-dom";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import { setLikesForLikesModal, setLikesModalInfo } from "../../features/modalsSlice";
 
 function LikesModal(props) {
+	const dispatch = useDispatch();
 	const signedIn = useSelector((state) => state.user.signedIn);
+	const following = useSelector((state) => state.user.following);
+	const users = useSelector((state) => state.usersAndPosts.users);
+	const likes = useSelector((state) => state.modals.likesForLikesModal);
+	const likesModalInfo = useSelector((state) => state.modals.likesModalInfo);
 
 	useEffect(() => {
 		const likesModal = document.getElementById("likes-modal");
@@ -27,8 +33,8 @@ function LikesModal(props) {
 		if (
 			userR &&
 			signedIn &&
-			!props.following.includes(user) &&
-			getUserDataFromUsersArray(props.users, user).uid !== userR.uid
+			!following.includes(user) &&
+			getUserDataFromUsersArray(users, user).uid !== userR.uid
 		) {
 			return (
 				<button
@@ -40,7 +46,7 @@ function LikesModal(props) {
 					Follow
 				</button>
 			);
-		} else if (userR && signedIn && props.following.includes(user)) {
+		} else if (userR && signedIn && following.includes(user)) {
 			return (
 				<button
 					onClick={() => {
@@ -58,20 +64,20 @@ function LikesModal(props) {
 		const modal = document.getElementById("likes-modal");
 		window.history.back();
 		modal.style.display = "none";
-		props.setLikesModalInfo("Likes")
+		dispatch(setLikesModalInfo("Likes"));
 	}
 
 	return (
 		<div id="likes-modal" className="modal">
 			<div className="likes-modal-content">
 				<div id="likes-modal-header">
-					<span>{props.likesModalInfo}</span>
+					<span>{likesModalInfo}</span>
 					{closeModal(hideLikesModal)}
 				</div>
 				<div id="list-of-likes-div">
 					<div id="list-of-likes-div-inner">
-						{props.likes.map((user) => {
-							const userData = getUserDataFromUsersArray(props.users, user);
+						{likes.map((user) => {
+							const userData = getUserDataFromUsersArray(users, user);
 							return (
 								<div key={uniqid()} className="right-sug-div-list">
 									<Link
@@ -87,8 +93,8 @@ function LikesModal(props) {
 										<div
 											onMouseEnter={(e) => {
 												dropDown(
-													getUserDataFromUsersArray(props.users, user),
-													props.dropDownSetUserData,
+													getUserDataFromUsersArray(users, user),
+													dispatch,
 													e,
 													"avaPic"
 												);
@@ -104,8 +110,8 @@ function LikesModal(props) {
 										<span
 											onMouseEnter={(e) =>
 												dropDown(
-													getUserDataFromUsersArray(props.users, user),
-													props.dropDownSetUserData,
+													getUserDataFromUsersArray(users, user),
+													dispatch,
 													e,
 													"no",
 													"right"
@@ -137,11 +143,12 @@ function showLikesModal(likes, likesModalSetLikes, info, info2) {
 	}
 
 	if(!info) {
-		likesModalSetLikes(likes.users);
+		
+		likesModalSetLikes(setLikesForLikesModal(likes.users));
 
 	} else {
-		likesModalSetLikes(likes);
-		info(info2);
+		likesModalSetLikes(setLikesForLikesModal(likes));
+		info(setLikesModalInfo(info2));
 	}
 
 	modal.style.display = "flex";

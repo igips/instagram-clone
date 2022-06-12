@@ -22,39 +22,25 @@ import { searchIcon, SearchIconSvg } from "./Icons/SearchIcon";
 import { Link } from "react-router-dom";
 import { showCommentsModal } from "./Modals/CommentsModal";
 import { getUserDataFromUsersArray } from "./Home";
-import { useSelector } from "react-redux";
-
-function followButtonForNoti(user, following, username, follow, unFollow) {
-	if (!following.includes(user) && user !== username) {
-		return (
-			<button
-				onClick={() => {
-					follow(user);
-				}}
-				className="likes-modal-follow"
-			>
-				Follow
-			</button>
-		);
-	} else if (following.includes(user)) {
-		return (
-			<button
-				onClick={() => {
-					unFollow(user);
-				}}
-				className="likes-modal-follow sug-box-left-follow-active"
-			>
-				Following
-			</button>
-		);
-	}
-}
+import { useDispatch, useSelector } from "react-redux";
 
 function Nav(props) {
+	const dispatch = useDispatch();
 	const [flag, setFlag] = useState(0);
 	const [searchValue, setSearchValue] = useState("");
 	const [searchResults, setSearchResults] = useState([]);
+
 	const signedIn = useSelector((state) => state.user.signedIn);
+	const following = useSelector((state) => state.user.following);
+	const username = useSelector((state) => state.user.username);
+	const notifications = useSelector((state) => state.user.notifications);
+	const unReadMessages = useSelector((state) => state.user.unReadMessages);
+	const unReadNoti = useSelector((state) => state.user.unReadNoti);
+	const avatar = useSelector((state) => state.user.avatar);
+	const users = useSelector((state) => state.usersAndPosts.users);
+	const posts = useSelector((state) => state.usersAndPosts.posts);
+
+
 
 	onAuthStateChanged(getAuth(), (user) => {
 		if (user) {
@@ -103,35 +89,33 @@ function Nav(props) {
 	}, []);
 
 	useEffect(() => {
-		if (props.unReadNoti === 0) {
+		if (unReadNoti === 0) {
 			document.getElementById("noti-amount").style.display = "none";
 			document.getElementById("noti-amount-mobile").style.display = "none";
 		} else {
 			document.getElementById("noti-amount").style.display = "flex";
 			document.getElementById("noti-amount-mobile").style.display = "flex";
 		}
-	}, [props.unReadNoti]);
+	}, [unReadNoti]);
 
 	useEffect(() => {
-		if(props.unReadMessages.length === 0 && signedIn) {
+		if (unReadMessages.length === 0 && signedIn) {
 			document.getElementById("mess-amount").style.display = "none";
-
-		} else if(signedIn) {
+		} else if (signedIn) {
 			document.getElementById("mess-amount").style.display = "flex";
 		}
-
-	}, [props.unReadMessages]);
+	}, [unReadMessages]);
 
 	useEffect(() => {
-		if (props.notifications.length === 0) {
+		if (notifications.length === 0) {
 			document.getElementById("no-notifications").style.display = "flex";
 		} else {
 			document.getElementById("no-notifications").style.display = "none";
 		}
-	}, [props.notifications]);
+	}, [notifications]);
 
 	function signOutFromAccount() {
-		if(window.location.href.includes("inbox")) {
+		if (window.location.href.includes("inbox")) {
 			document.getElementById("logo").click();
 		}
 
@@ -212,7 +196,7 @@ function Nav(props) {
 						tabIndex="0"
 						style={{ width: "24px", height: "24px" }}
 					>
-						<img className="ava" alt="" draggable="false" src={props.avatar ? props.avatar : ava} />
+						<img className="ava" alt="" draggable="false" src={avatar ? avatar : ava} />
 					</span>
 				</>
 			);
@@ -222,7 +206,7 @@ function Nav(props) {
 	}
 
 	function displayNotfications(data) {
-		const userData = getUserDataFromUsersArray(props.users, data.username);
+		const userData = getUserDataFromUsersArray(users, data.username);
 
 		if (data.postID) {
 			return (
@@ -230,9 +214,9 @@ function Nav(props) {
 					<div
 						className="noti-link"
 						onClick={() => {
-							for (let p of props.posts) {
+							for (let p of posts) {
 								if (p.id === data.postID) {
-									showCommentsModal(data.postID, props.commModalSetPostId);
+									showCommentsModal(data.postID, dispatch);
 									closeNotification();
 									break;
 								}
@@ -249,7 +233,7 @@ function Nav(props) {
 						</span>
 					</div>
 
-					{followButtonForNoti(data.username, props.following, props.username, props.follow, props.unFollow)}
+					{followButtonForNoti(data.username, following, username, props.follow, props.unFollow)}
 				</div>
 			);
 		} else {
@@ -268,8 +252,8 @@ function Nav(props) {
 						</Link>
 						{followButtonForNoti(
 							data.username,
-							props.following,
-							props.username,
+							following,
+							username,
 							props.follow,
 							props.unFollow
 						)}
@@ -282,11 +266,15 @@ function Nav(props) {
 	function messageButton() {
 		if (signedIn) {
 			return (
-				<Link id="message-icon-div" onClick={() => messageIcon()} className="icon-inner-div icon-relative " to="/inbox">
-					<div id="mess-amount">{props.unReadMessages.length}</div>
+				<Link
+					id="message-icon-div"
+					onClick={() => messageIcon()}
+					className="icon-inner-div icon-relative "
+					to="/inbox"
+				>
+					<div id="mess-amount">{unReadMessages.length}</div>
 
 					{MessageIconSvg()}
-
 				</Link>
 			);
 		} else {
@@ -297,7 +285,6 @@ function Nav(props) {
 			);
 		}
 	}
-
 
 	return (
 		<>
@@ -338,7 +325,7 @@ function Nav(props) {
 									No results found
 								</div>
 								{searchResults.map((result) => {
-									const userData = getUserDataFromUsersArray(props.users, result);
+									const userData = getUserDataFromUsersArray(users, result);
 									return (
 										<Link
 											key={uniqid()}
@@ -366,11 +353,9 @@ function Nav(props) {
 
 							{messageButton()}
 
-
 							<div onClick={() => addPostIcon()} className="icon-inner-div icon-to-hide">
 								{AddPostIconSvg()}
 							</div>
-
 
 							<div
 								id="noti-icon"
@@ -380,11 +365,11 @@ function Nav(props) {
 								}}
 								className="icon-inner-div icon-to-hide icon-relative"
 							>
-								<div id="noti-amount">{props.unReadNoti}</div>
+								<div id="noti-amount">{unReadNoti}</div>
 								<div id="notification-arrow-div"></div>
 								<div id="notification-div">
 									<div id="no-notifications">No notifications</div>
-									{props.notifications
+									{notifications
 										.slice(0)
 										.reverse()
 										.map((result) => {
@@ -396,7 +381,7 @@ function Nav(props) {
 							<div id="profile-drop-div" className="icon-inner-div icon-to-hide">
 								<div id="profile-arrow-div"></div>
 								<div id="profile-div">
-									<Link to={`/profile/${props.username}`}>
+									<Link to={`/profile/${username}`}>
 										<div onClick={() => closeAvatar()} className="profile-drop-down-single-div">
 											<div className="profile-drop-icon">{ProfileIconDrop()}</div>
 											<div className="profile-drop-tex">Profile</div>
@@ -443,13 +428,39 @@ function Nav(props) {
 						<div className="notification-svg svg-div">{NotificationIconSvg()}</div>
 					</div>
 
-					<Link to={`/profile/${props.username}`} className="icon-inner-div inner-bottom">
+					<Link to={`/profile/${username}`} className="icon-inner-div inner-bottom">
 						{profileIcon()}
 					</Link>
 				</div>
 			</nav>
 		</>
 	);
+}
+
+function followButtonForNoti(user, following, username, follow, unFollow) {
+	if (!following.includes(user) && user !== username) {
+		return (
+			<button
+				onClick={() => {
+					follow(user);
+				}}
+				className="likes-modal-follow"
+			>
+				Follow
+			</button>
+		);
+	} else if (following.includes(user)) {
+		return (
+			<button
+				onClick={() => {
+					unFollow(user);
+				}}
+				className="likes-modal-follow sug-box-left-follow-active"
+			>
+				Following
+			</button>
+		);
+	}
 }
 
 export default Nav;

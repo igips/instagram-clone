@@ -17,14 +17,17 @@ import { tagPosition } from "./Modals/AddPostModal";
 import { TagIcon } from "./Icons/TagIcon";
 import { Link } from "react-router-dom";
 import ava from "../img/ava.jpeg";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import { setPostIdOptionsModal } from "../features/modalsSlice";
 
 
 function PictureCard(props) {
 	const [img, setImg] = useState(props.post.pic);
 	const [id, setId] = useState(uniqid());
-	const [userData, setUserData] = useState(getUserDataFromUsersArray(props.users, props.post.username));
+	const users = useSelector((state) => state.usersAndPosts.users);
+	const [userData, setUserData] = useState(getUserDataFromUsersArray(users, props.post.username));
 
+	
 	useEffect(() => {
 		if (img.tags.length > 0) {
 			document.getElementById("tag-ico" + id).style.display = "flex";
@@ -47,15 +50,10 @@ function PictureCard(props) {
 		<div className="picture-card-article">
 			<div className="picture-card-div">
 				<PictureCardHeader
-					users={props.users}
 					follow={props.follow}
 					unFollow={props.unFollow}
-					following={props.following}
 					username={props.post.username}
 					avatar={userData.avatar ? userData.avatar : ava}
-					dropDownSetUserData={props.dropDownSetUserData}
-					optionsModalSetUserData={props.optionsModalSetUserData}
-					setpostIdOptionsModal={props.setpostIdOptionsModal}
 					postId={props.post.id}
 				/>
 			</div>
@@ -86,15 +84,12 @@ function PictureCard(props) {
 							likes={props.post.likes}
 							likePicture={props.likePicture}
 							postId={props.post.id}
-							yourUsername={props.yourUsername}
-							commModalSetPostId={props.commModalSetPostId}
 						/>
 					</section>
 
 					<section className="number-of-likes-section">
 						<PictureCardNumOfLikesSection
 							likes={props.post.likes}
-							likesModalSetLikes={props.likesModalSetLikes}
 						/>
 					</section>
 
@@ -102,19 +97,14 @@ function PictureCard(props) {
 						comments={props.post.comments}
 						username={props.post.username}
 						description={props.post.description}
-						yourUsername={props.yourUsername}
-						users={props.users}
-						dropDownSetUserData={props.dropDownSetUserData}
 						likeComment={props.likeComment}
 						postId={props.post.id}
-						commModalSetPostId={props.commModalSetPostId}
 						avatar={userData.avatar ? userData.avatar : ava}
 					/>
 					<div className="added-div">
 						<ReactTimeAgo date={props.post.date} locale="en-US" />
 					</div>
 					<AddCommentSection
-						yourUsername={props.yourUsername}
 						postId={props.post.id}
 						addComment={props.addComment}
 					/>
@@ -125,6 +115,8 @@ function PictureCard(props) {
 }
 
 function PictureCardNumOfLikesSection(props) {
+	const dispatch = useDispatch();
+
 	function showLikes(likes) {
 		if (likes.num === 0) {
 			return "";
@@ -137,7 +129,7 @@ function PictureCardNumOfLikesSection(props) {
 
 	return (
 		<div className="number-of-likes-div">
-			<span onClick={() => showLikesModal(props.likes, props.likesModalSetLikes)} className="likes-span">
+			<span onClick={() => showLikesModal(props.likes, dispatch)} className="likes-span">
 				{showLikes(props.likes)}
 			</span>
 		</div>
@@ -148,6 +140,8 @@ function AddCommentSection(props) {
 	const [id, setId] = useState(uniqid());
 	const [commentValue, setCommentValue] = useState("");
 	const signedIn = useSelector((state) => state.user.signedIn);
+	const yourUsername = useSelector((state) => state.user.username);
+
 
 	function submitComment(e) {
 		e.preventDefault();
@@ -156,7 +150,7 @@ function AddCommentSection(props) {
 		if (button.classList.contains("post-div-active")) {
 			props.addComment(
 				{
-					username: props.yourUsername,
+					username: yourUsername,
 					comment: commentValue,
 					id: uniqid(),
 					likes: { num: 0, users: [] },
@@ -266,6 +260,9 @@ function AddCommentSection(props) {
 }
 
 function PictureCardHeader(props) {
+	const dispatch = useDispatch();
+	const users = useSelector((state) => state.usersAndPosts.users);
+
 	return (
 		<div className="picture-card-header-div">
 			<div className="picture-card-header-inner">
@@ -277,8 +274,8 @@ function PictureCardHeader(props) {
 									onClick={() => {hideDropDown(); document.getElementById("comments-modal").style.display = "none"}}
 									onMouseEnter={(e) => {
 										dropDown(
-											getUserDataFromUsersArray(props.users, props.username),
-											props.dropDownSetUserData,
+											getUserDataFromUsersArray(users, props.username),
+											dispatch,
 											e,
 											"avaPic"
 										);
@@ -307,8 +304,8 @@ function PictureCardHeader(props) {
 								onClick={() => {hideDropDown(); document.getElementById("comments-modal").style.display = "none"}}
 								onMouseEnter={(e) => {
 									dropDown(
-										getUserDataFromUsersArray(props.users, props.username),
-										props.dropDownSetUserData,
+										getUserDataFromUsersArray(users, props.username),
+										dispatch,
 										e
 									);
 								}}
@@ -325,8 +322,8 @@ function PictureCardHeader(props) {
 				</header>
 				<div
 					onClick={() => {
-						options(getUserDataFromUsersArray(props.users, props.username), props.optionsModalSetUserData);
-						props.setpostIdOptionsModal(props.postId);
+						options(getUserDataFromUsersArray(users, props.username), dispatch);
+						dispatch(setPostIdOptionsModal(props.postId));
 					}}
 					className="picture-card-header-options"
 				>
@@ -338,12 +335,16 @@ function PictureCardHeader(props) {
 }
 
 function PictureCardCommentsSection(props) {
+	const dispatch = useDispatch();
+	const yourUsername = useSelector((state) => state.user.username);
+	const users = useSelector((state) => state.usersAndPosts.users);
+
 	function viewAllComments() {
 		if (props.comments.length > 2) {
 			return (
 				<div className="comment-line-div">
 					<span
-						onClick={() => showCommentsModal(props.postId, props.commModalSetPostId)}
+						onClick={() => showCommentsModal(props.postId, dispatch)}
 						className="view-all-coms-span"
 					>
 						View all {props.comments.length} comments
@@ -363,8 +364,8 @@ function PictureCardCommentsSection(props) {
 								onClick={() => hideDropDown()}
 								onMouseEnter={(e) =>
 									dropDown(
-										getUserDataFromUsersArray(props.users, props.username),
-										props.dropDownSetUserData,
+										getUserDataFromUsersArray(users, props.username),
+										dispatch,
 										e
 									)
 								}
@@ -395,8 +396,8 @@ function PictureCardCommentsSection(props) {
 										onClick={() => hideDropDown()}
 										onMouseEnter={(e) =>
 											dropDown(
-												getUserDataFromUsersArray(props.users, comment.username),
-												props.dropDownSetUserData,
+												getUserDataFromUsersArray(users, comment.username),
+												dispatch,
 												e
 											)
 										}
@@ -412,7 +413,7 @@ function PictureCardCommentsSection(props) {
 								onClick={() => likeCommentIcon(props.likeComment, comment.id, props.postId)}
 								className="like-comment-div"
 							>
-								{likeCommentIconClicked(comment.likes.users, props.yourUsername)}
+								{likeCommentIconClicked(comment.likes.users, yourUsername)}
 							</div>
 						</div>
 					);
@@ -423,11 +424,14 @@ function PictureCardCommentsSection(props) {
 }
 
 function PictureCardIconsSection(props) {
+	const dispatch = useDispatch();
+	const yourUsername = useSelector((state) => state.user.username);
+
 	function commentsIcon() {
 		if (!props.modal) {
 			return (
 				<span
-					onClick={() => showCommentsModal(props.postId, props.commModalSetPostId)}
+					onClick={() => showCommentsModal(props.postId, dispatch)}
 					className="comms-icon-span"
 				>
 					{CommentIcon()}
@@ -439,7 +443,7 @@ function PictureCardIconsSection(props) {
 	return (
 		<>
 			<span onClick={() => likeIcon(props.likePicture, props.postId)} className="comms-icon-span">
-				{likeIconClicked(props.likes, props.yourUsername)}
+				{likeIconClicked(props.likes, yourUsername)}
 			</span>
 			{commentsIcon()}
 		</>

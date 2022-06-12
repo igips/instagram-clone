@@ -10,6 +10,7 @@ import { DeleteIcon } from "../Icons/DeleteIcon";
 import { getUserDataFromUsersArray } from "../Home";
 import { arrayRemove, arrayUnion, doc, getFirestore, updateDoc } from "firebase/firestore";
 import { getDocId } from "../../index";
+import { useSelector } from "react-redux";
 
 function ShareModal(props) {
 	const [shareModalSearchUser, setShareModalSearchUser] = useState("");
@@ -17,6 +18,11 @@ function ShareModal(props) {
 	const [picked, setPicked] = useState([]);
 	const [buttonDisabled, setButtonDisabled] = useState(true);
 
+	const yourUsername = useSelector((state) => state.user.username);
+	const firestoreDocId = useSelector((state) => state.user.firestoreDocId);
+	const users = useSelector((state) => state.usersAndPosts.users);
+
+	
 	useEffect(() => {
 		const shareModal = document.getElementById("share-modal");
 
@@ -93,17 +99,17 @@ function ShareModal(props) {
 					// eslint-disable-next-line no-loop-func
 					await getDocId(pick).then(async (id) => {
 						await updateDoc(doc(db, "usernames", id), { messages: arrayRemove(m) });
-						await updateDoc(doc(db, "usernames", props.firestoreDocId), { messages: arrayRemove(m) });
+						await updateDoc(doc(db, "usernames", firestoreDocId), { messages: arrayRemove(m) });
 
 						m.conversation.push({
 							date: Date.now(),
-							username: props.yourUsername,
+							username: yourUsername,
 							text: messageValue,
 						});
 						m.date = Date.now();
 
-						await updateDoc(doc(db, "usernames", id), {unReadMessages: arrayUnion(props.yourUsername), messages: arrayUnion(m) });
-						await updateDoc(doc(db, "usernames", props.firestoreDocId), {
+						await updateDoc(doc(db, "usernames", id), {unReadMessages: arrayUnion(yourUsername), messages: arrayUnion(m) });
+						await updateDoc(doc(db, "usernames", firestoreDocId), {
 							messages: arrayUnion(m),
 						});
 					});
@@ -117,37 +123,37 @@ function ShareModal(props) {
 				const date = Date.now();
 
 				await updateDoc(doc(db, "usernames", docID), {
-					unReadMessages: arrayUnion(props.yourUsername),
+					unReadMessages: arrayUnion(yourUsername),
 					messages: arrayUnion({
 						conversation: [
 							{
 								date: date,
-								username: props.yourUsername,
+								username: yourUsername,
 								text: messageValue,
 							},
 						],
 						date: date,
 						username: pick,
-						username2: props.yourUsername,
+						username2: yourUsername,
 					}),
 				});
 
-				const user = getUserDataFromUsersArray(users, props.yourUsername);
+				const user = getUserDataFromUsersArray(users, yourUsername);
 
 				let found2 = false;
 
 				for (let m of user.messages) {
 					if (m.username === pick || m.username2 === pick) {
-						await updateDoc(doc(db, "usernames", props.firestoreDocId), { messages: arrayRemove(m) });
+						await updateDoc(doc(db, "usernames", firestoreDocId), { messages: arrayRemove(m) });
 
 						m.conversation.push({
 							date: date,
-							username: props.yourUsername,
+							username: yourUsername,
 							text: messageValue,
 						});
 						m.date = date;
 
-						await updateDoc(doc(db, "usernames", props.firestoreDocId), {
+						await updateDoc(doc(db, "usernames", firestoreDocId), {
 							messages: arrayUnion(m),
 						});
 						found2 = true;
@@ -156,18 +162,18 @@ function ShareModal(props) {
 				}
 
 				if (!found2) {
-					await updateDoc(doc(db, "usernames", props.firestoreDocId), {
+					await updateDoc(doc(db, "usernames", firestoreDocId), {
 						messages: arrayUnion({
 							conversation: [
 								{
 									date: date,
-									username: props.yourUsername,
+									username: yourUsername,
 									text: messageValue,
 								},
 							],
 							date: date,
 							username: pick,
-							username2: props.yourUsername,
+							username2: yourUsername,
 						}),
 					});
 				}
@@ -253,7 +259,7 @@ function ShareModal(props) {
 						<FontAwesomeIcon icon={faSpinner} className="fa-spin" />
 					</div>
 					{searchResults.map((result) => {
-						const userData = getUserDataFromUsersArray(props.users, result);
+						const userData = getUserDataFromUsersArray(users, result);
 						return (
 							<div
 								onClick={(e) => checkBoxOnClick(e)}

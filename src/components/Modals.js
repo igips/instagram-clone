@@ -16,73 +16,36 @@ function Modals(props) {
 	return (
 		<>
 			<DiscoverModal
-				following={props.following}
-				users={props.users}
 				follow={props.follow}
 				unFollow={props.unFollow}
-				yourUsername={props.username}
-				dropDownSetUserData={props.dropDownSetUserData}
 			/>
-			<SearchModal users={props.users} yourUsername={props.username} />
+			<SearchModal />
 			<SignUpModal />
 			<SignInModal />
 			<OptionsModal
 				follow={props.follow}
 				unFollow={props.unFollow}
-				following={props.following}
-				userData={props.userDataOptionsModal}
 				removePost={props.removePost}
-				postIdOptionsModal={props.postIdOptionsModal}
-				commModalSetPostId={props.commModalSetPostId}
-				setOptionsEdit={props.setOptionsEdit}
 			/>
 			<LikesModal
-				users={props.users}
 				follow={props.follow}
-				unFollow={props.unFollow}
-				following={props.following}
-				likes={props.likesForLikesModal}
-				dropDownSetUserData={props.dropDownSetUserData}
-				setLikesModalInfo={props.setLikesModalInfo}
-				likesModalInfo={props.likesModalInfo}
+				unFollow={props.unFollow}												
 			/>
 			<CommentsModal
-				users={props.users}
 				follow={props.follow}
-				unFollow={props.unFollow}
-				following={props.following}
-				dropDownSetUserData={props.dropDownSetUserData}
-				optionsModalSetUserData={props.optionsModalSetUserData}
-				setpostIdOptionsModal={props.setpostIdOptionsModal}
-				posts={props.posts}
-				commModalPostId={props.commModalPostId}
-				yourUsername={props.username}
-				likesModalSetLikes={props.likesModalSetLikes}
+				unFollow={props.unFollow}												
 				likeComment={props.likeComment}
 				removeComment={props.removeComment}
 				likePicture={props.likePicture}
 				addComment={props.addComment}
-				commModalSetPostId={props.commModalSetPostId}
 			/>
-			<ShareModal yourUsername={props.username} firestoreDocId={props.firestoreDocId} users={props.users} />
+			<ShareModal />
 			<NotificationModal
-				notifications={props.notifications}
-				following={props.following}
-				username={props.username}
 				follow={props.follow}
 				unFollow={props.unFollow}
-				users={props.users}
 			/>
-			<AddPostModal
-				setPosts={props.setPosts}
-				posts={props.posts}
-				postIdOptionsModal={props.postIdOptionsModal}
-				setOptionsEdit={props.setOptionsEdit}
-				optionsEdit={props.optionsEdit}
-				yourUsername={props.username}
+			<AddPostModal												
 				addPost={props.addPost}
-				firestoreDocId={props.firestoreDocId}
-				avatar={props.avatar}
 				updateUsers={props.updateUsers}
 			/>
 		</>

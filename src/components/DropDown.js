@@ -5,20 +5,28 @@ import { getUserDataFromUsersArray } from "./Home";
 import { showCommentsModal } from "./Modals/CommentsModal";
 import uniqid from "uniqid";
 import { Link } from "react-router-dom";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import { setUserDataDropDown } from "../features/modalsSlice";
 
 function DropDown(props) {
-	const signedIn = useSelector((state) => state.user.signedIn);
+	const dispatch = useDispatch();
 	const [data, setData] = useState({ username: "", posts: [], followers: [], following: [] });
 	const user = getAuth().currentUser;
 	const [posts, setPosts] = useState([{ pic: { src: "" } }]);
+
+	const signedIn = useSelector((state) => state.user.signedIn);
+	const following = useSelector((state) => state.user.following);
+	const users = useSelector((state) => state.usersAndPosts.users);
+	const allPosts = useSelector((state) => state.usersAndPosts.posts);
+	const userData = useSelector((state) => state.modals.userDataDropDown);
+
 	let num = 0;
 
 	useEffect(() => {
-		if (props.userData) {
-			setData(getUserDataFromUsersArray(props.users, props.userData.username));
+		if (userData) {
+			setData(userData);
 		}
-	}, [props.userData]);
+	}, [userData]);
 
 	useEffect(() => {
 		const miniPic = document.getElementById("mini-pic-div");
@@ -36,7 +44,7 @@ function DropDown(props) {
 	useEffect(() => {
 		if (data.username !== "") {
 			setPosts(() => {
-				const newPosts = props.posts.filter((post) => post.username === data.username);
+				const newPosts = allPosts.filter((post) => post.username === data.username);
 
 				if (newPosts.length < 1) {
 					return [{ pic: { src: "" } }];
@@ -49,29 +57,24 @@ function DropDown(props) {
 
 	useEffect(() => {
 		if (document.getElementById("drop-down").style.display === "flex") {
-			setData(getUserDataFromUsersArray(props.users, props.userData.username));
+			setData(getUserDataFromUsersArray(users, userData.username));
 		}
-	}, [props.users]);
+	}, [users]);
 
 	function button() {
 		if (signedIn) {
-			if (
-				props.userData &&
-				!props.following.includes(props.userData.username) &&
-				user &&
-				props.userData.uid !== user.uid
-			) {
+			if (userData && !following.includes(userData.username) && user && userData.uid !== user.uid) {
 				return (
-					<button onClick={() => props.follow(props.userData.username, props.right)} id="drop-down-button">
+					<button onClick={() => props.follow(userData.username, props.right)} id="drop-down-button">
 						Follow
 					</button>
 				);
-			} else if (props.userData && user && props.userData.uid !== user.uid) {
+			} else if (userData && user && userData.uid !== user.uid) {
 				return (
 					<>
 						<button className="drop-down-button">Message</button>{" "}
 						<button
-							onClick={() => props.unFollow(props.userData.username)}
+							onClick={() => props.unFollow(userData.username)}
 							id="drop-down-following-button"
 							className="drop-down-button"
 						>
@@ -129,7 +132,7 @@ function DropDown(props) {
 								<img
 									key={uniqid()}
 									onClick={() => {
-										showCommentsModal(post.id, props.setPostId);
+										showCommentsModal(post.id, dispatch);
 										hideDropDown();
 									}}
 									src={post.pic.src}
@@ -152,7 +155,7 @@ function dropDown(userData, dropDownSetUserData, e, ele, right) {
 		const dropDown = document.getElementById("drop-down");
 		const rect = e.target.getBoundingClientRect();
 
-		dropDownSetUserData(userData);
+		dropDownSetUserData(setUserDataDropDown(userData));
 
 		dropDown.style.left = rect.left + "px";
 		dropDown.style.top = (right ? rect.top : window.scrollY + rect.top) + (ele === "avaPic" ? 25 : 18) + "px";

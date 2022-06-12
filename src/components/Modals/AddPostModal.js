@@ -14,6 +14,9 @@ import { getDocId, searchFunction } from "../..";
 import { arrayUnion, doc, getFirestore, updateDoc, increment, arrayRemove } from "firebase/firestore";
 import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { getPostDataFromPostsArray } from "../Home";
+import { useDispatch, useSelector } from "react-redux";
+import { setPosts } from "../../features/usersAndPostsSlice";
+import { setOptionsEdit } from "../../features/modalsSlice";
 
 function AddPostModal(props) {
 	const [img, setImg] = useState({ src: "", tags: [] });
@@ -22,6 +25,13 @@ function AddPostModal(props) {
 	const [captionValue, setCaptionValue] = useState("");
 	const [locX, setLocX] = useState();
 	const [locY, setLocY] = useState();
+
+	const dispatch = useDispatch();
+	const yourUsername = useSelector((state) => state.user.username);
+	const firestoreDocId = useSelector((state) => state.user.firestoreDocId);
+	const posts = useSelector((state) => state.usersAndPosts.posts);
+	const postIdOptionsModal = useSelector((state) => state.modals.postIdOptionsModal);
+	const optionsEdit = useSelector((state) => state.modals.optionsEdit);
 
 	let nextButton;
 	let submitButton;
@@ -62,7 +72,7 @@ function AddPostModal(props) {
 	useEffect(() => {
 		addPostModal.addEventListener("click", (e) => {
 			if (e.target === addPostModal) {
-				props.setOptionsEdit(false);
+				dispatch(setOptionsEdit(false));
 				closeAddPostModal();
 			}
 		});
@@ -85,7 +95,7 @@ function AddPostModal(props) {
 			imgDiv.style.display = "flex";
 		}
 
-		if (props.optionsEdit) {
+		if (optionsEdit) {
 			goToCaptionAndTag();
 			captionAndTags.style.display = "none";
 			editSpan.style.display = "flex";
@@ -93,13 +103,13 @@ function AddPostModal(props) {
 	}, [img]);
 
 	useEffect(() => {
-		if (props.optionsEdit) {
-			const post = getPostDataFromPostsArray(props.posts, props.postIdOptionsModal);
+		if (optionsEdit) {
+			const post = getPostDataFromPostsArray(posts, postIdOptionsModal);
 			setImg({ src: post.pic.src, tags: post.pic.tags });
 			setCaptionValue(post.description);
 			setTimeout(showAddPostModal, 50);
 		}
-	}, [props.optionsEdit]);
+	}, [optionsEdit]);
 
 	function dataURLtoBlob(dataurl) {
 		let arr = dataurl.split(","),
@@ -117,7 +127,7 @@ function AddPostModal(props) {
 		imgDiv.style.display = "none";
 		spinner.style.display = "flex";
 
-		if (!props.optionsEdit) {
+		if (!optionsEdit) {
 			const id = uniqid();
 			const storage = getStorage();
 
@@ -131,21 +141,21 @@ function AddPostModal(props) {
 				id: id,
 				likes: { num: 0, users: [] },
 				comments: [],
-				username: props.yourUsername,
+				username: yourUsername,
 				description: captionValue,
 				pic: img,
 				date: Date.now(),
 			};
 
 			props.addPost(post);
-			updateDoc(doc(getFirestore(), "usernames", props.firestoreDocId), { posts: arrayUnion(post) });
+			updateDoc(doc(getFirestore(), "usernames", firestoreDocId), { posts: arrayUnion(post) });
 
 			img.tags.forEach((t) => {
 				getDocId(t.username).then((id) => {
-					if (t.username !== props.yourUsername) {
+					if (t.username !== yourUsername) {
 						updateDoc(doc(getFirestore(), "usernames", id), {
 							notifications: arrayUnion({
-								username: props.yourUsername,
+								username: yourUsername,
 								content: "tagged you in a post.",
 								postID: post.id,
 								date: Date.now(),
@@ -166,18 +176,16 @@ function AddPostModal(props) {
 
 	function editPost() {
 		editSpan.style.display = "none";
-		const post = getPostDataFromPostsArray(props.posts, props.postIdOptionsModal);
+		const post = getPostDataFromPostsArray(posts, postIdOptionsModal);
 
-		props.setPosts((oldPosts) => {
-			const newPosts = oldPosts.map((post) => {
-				if (post.id === props.postIdOptionsModal) {
-					return { ...post, pic: img, description: captionValue };
-				}
-				return post;
-			});
-
-			return newPosts;
+		const newPosts = posts.map((post) => {
+			if (post.id === postIdOptionsModal) {
+				return { ...post, pic: img, description: captionValue };
+			}
+			return post;
 		});
+
+		dispatch(setPosts(newPosts));
 
 		const oldTags = [];
 
@@ -185,26 +193,26 @@ function AddPostModal(props) {
 			oldTags.push(tag.username);
 		});
 
-		updateDoc(doc(getFirestore(), "usernames", props.firestoreDocId), { posts: arrayRemove(post) });
+		updateDoc(doc(getFirestore(), "usernames", firestoreDocId), { posts: arrayRemove(post) });
 
 		const newPost = {
 			id: post.id,
 			likes: post.likes,
 			comments: post.comments,
-			username: props.yourUsername,
+			username: yourUsername,
 			description: captionValue,
 			pic: img,
 			date: post.date,
 		};
 
-		updateDoc(doc(getFirestore(), "usernames", props.firestoreDocId), { posts: arrayUnion(newPost) });
+		updateDoc(doc(getFirestore(), "usernames", firestoreDocId), { posts: arrayUnion(newPost) });
 
 		img.tags.forEach((tag) => {
-			if (!oldTags.includes(tag.username) && tag.username !== props.yourUsername) {
+			if (!oldTags.includes(tag.username) && tag.username !== yourUsername) {
 				getDocId(tag.username).then((id) => {
 					updateDoc(doc(getFirestore(), "usernames", id), {
 						notifications: arrayUnion({
-							username: props.yourUsername,
+							username: yourUsername,
 							content: "tagged you in a post.",
 							postID: post.id,
 							date: Date.now(),
@@ -214,7 +222,7 @@ function AddPostModal(props) {
 				});
 			}
 		});
-		props.setOptionsEdit(false);
+		dispatch(setOptionsEdit(false));
 		props.updateUsers();
 	}
 
@@ -267,7 +275,7 @@ function AddPostModal(props) {
 		captionArea.style.display = "flex";
 		newPostHeader.style.display = "none";
 		captionAndTags.style.display = "flex";
-		if (!props.optionsEdit) {
+		if (!optionsEdit) {
 			goBackArrow.style.display = "flex";
 		}
 		tagDiv.style.display = "flex";
@@ -357,7 +365,7 @@ function AddPostModal(props) {
 				<div id="add-post-header">
 					<span
 						onClick={() => {
-							props.setOptionsEdit(false);
+							dispatch(setOptionsEdit(false));
 							closeAddPostModal();
 						}}
 						id="add-post-close-mobile"

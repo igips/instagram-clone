@@ -16,17 +16,27 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faSpinner } from "@fortawesome/free-solid-svg-icons";
 import { messageIconNotClicked } from "./Icons/MessageIcon";
 import { showShareModal } from "./Modals/ShareModal";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 
 function ProfilePage(props) {
 	let { username } = useParams();
-	const signedIn = useSelector((state) => state.user.signedIn);
+	const dispatch = useDispatch();
 	const [userData, setUserData] = useState({ username: "", posts: [], followers: [], following: [] });
 	const [postsOrTagged, setPostsOrTagged] = useState("posts");
-	const [post, setPost] = useState();
+
+	const signedIn = useSelector((state) => state.user.signedIn);
+	const following = useSelector((state) => state.user.following);
+	const yourUsername = useSelector((state) => state.user.username);
+	const firestoreDocId = useSelector((state) => state.user.firestoreDocId);
+	const yourAvatar = useSelector((state) => state.user.avatar);
+	const users = useSelector((state) => state.usersAndPosts.users);
+	const posts = useSelector((state) => state.usersAndPosts.posts);
+
+
+	
 
 	useEffect(() => {
-		if (username === props.yourUsername) {
+		if (username === yourUsername) {
 			avatarIconClicked();
 		} else {
 			homeIconClicked();
@@ -49,31 +59,34 @@ function ProfilePage(props) {
 		homeIconNotClicked();
 		messageIconNotClicked();
 
-		if (props.users.length > 0 && username) {
-			const data = getUserDataFromUsersArray(props.users, username);
-			data.posts.sort((a, b) => {
+		if (users.length > 0 && username) {
+			const data = getUserDataFromUsersArray(users, username);
+			
+			const newData = JSON.parse(JSON.stringify(data));	
+
+			newData.posts.sort((a, b) => {
 				return new Date(b.date) - new Date(a.date);
 			});
 
-			setUserData(data);
+			setUserData(newData);
 		}
 
 		const avatar = document.getElementById("profile-ava");
 
-		if (username === props.yourUsername) {
+		if (username === yourUsername) {
 			avatar.style.cursor = "pointer";
 			avatarIconClicked();
 		} else {
 			avatar.style.cursor = "default";
 			avatarIconNotClicked();
 		}
-	}, [username, props.users]);
+	}, [username, users]);
 
 	useEffect(() => {
-		if (props.yourUsername === username && userData.username !== "" && userData.avatar !== props.avatar) {
-			setUserData({ ...userData, avatar: props.avatar });
+		if (yourUsername === username && userData.username !== "" && userData.avatar !== yourAvatar) {
+			setUserData({ ...userData, avatar: yourAvatar });
 		}
-	}, [props.avatar]);
+	}, [yourAvatar]);
 
 	async function changeAvatar(e) {
 		const avatarSpinner = document.getElementById("avatar-spinner");
@@ -94,7 +107,7 @@ function ProfilePage(props) {
 			const snapshot = await uploadBytes(picImagesRef, avatar);
 
 			const url = await getDownloadURL(snapshot.ref);
-			await updateDoc(doc(getFirestore(), "usernames", props.firestoreDocId), { avatar: url });
+			await updateDoc(doc(getFirestore(), "usernames", firestoreDocId), { avatar: url });
 			avatarSpinner.style.display = "none";
 			e.target.value = "";
 		}
@@ -102,7 +115,7 @@ function ProfilePage(props) {
 
 	function buttons() {
 		function followUnfollow() {
-			if (props.following.includes(username)) {
+			if (following.includes(username)) {
 				return (
 					<button
 						onClick={() => props.unFollow(username)}
@@ -121,7 +134,7 @@ function ProfilePage(props) {
 		}
 
 		if (signedIn) {
-			 if (props.yourUsername !== "" && props.yourUsername !== username) {
+			 if (yourUsername !== "" && yourUsername !== username) {
 				return (
 					<>
 						<button onClick={() => showShareModal()} className="likes-modal-follow sug-box-left-follow-active profile-button">
@@ -138,7 +151,7 @@ function ProfilePage(props) {
 		if (postsOrTagged === "posts") {
 			return userData.posts.map((post) => {
 				return (
-					<div onClick={() => showCommentsModal(post.id, props.commModalSetPostId)} key={uniqid()}>
+					<div onClick={() => showCommentsModal(post.id, dispatch)} key={uniqid()}>
 						<img style={{ aspectRatio: "1/1" }} src={post.pic.src} alt="" />
 						<div className="likes-and-comments-profile">
 							<span>
@@ -152,7 +165,7 @@ function ProfilePage(props) {
 				);
 			});
 		} else {
-			return props.posts.map((post) => {
+			return posts.map((post) => {
 				let found = false;
 				for (let t of post.pic.tags) {
 					if (t.username === username) {
@@ -162,7 +175,7 @@ function ProfilePage(props) {
 				}
 				if (found) {
 					return (
-						<div onClick={() => showCommentsModal(post.id, props.commModalSetPostId)} key={uniqid()}>
+						<div onClick={() => showCommentsModal(post.id, dispatch)} key={uniqid()}>
 							<img style={{ aspectRatio: "1/1" }} src={post.pic.src} alt="" />
 							<div className="likes-and-comments-profile">
 								<span>
@@ -180,7 +193,7 @@ function ProfilePage(props) {
 	}
 
 	function avatarInput() {
-		if (username === props.yourUsername) {
+		if (username === yourUsername) {
 			return <input onChange={(e) => changeAvatar(e)} id="avatar-input" type="file" accept="image/*" />;
 		}
 	}
@@ -216,8 +229,8 @@ function ProfilePage(props) {
 								onClick={() =>
 									showLikesModal(
 										userData.followers,
-										props.likesModalSetLikes,
-										props.setLikesModalInfo,
+										dispatch,
+										dispatch,
 										"Followers"
 									)
 								}
@@ -230,8 +243,8 @@ function ProfilePage(props) {
 								onClick={() =>
 									showLikesModal(
 										userData.following,
-										props.likesModalSetLikes,
-										props.setLikesModalInfo,
+										dispatch,
+										dispatch,
 										"Following"
 									)
 								}

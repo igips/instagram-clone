@@ -1,10 +1,19 @@
 import { getAuth } from "firebase/auth";
 import { useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { setCommModalPostId, setOptionsEdit, setUserDataOptionsModal } from "../../features/modalsSlice";
 import { hideCommentsModal } from "./CommentsModal";
 import { showSignInModal } from "./SignInModal";
 
 
 function OptionsModal(props) {
+	const dispatch = useDispatch();
+	const following = useSelector((state) => state.user.following);
+	const userData = useSelector((state) => state.modals.userDataOptionsModal);
+	const postIdOptionsModal = useSelector((state) => state.modals.postIdOptionsModal); 
+
+
+
 	useEffect(() => {
 		const optionsModal = document.getElementById("unfollow-modal");
 
@@ -16,8 +25,8 @@ function OptionsModal(props) {
 	}, []);
 
 	function deletePost() {
-		props.commModalSetPostId(); 
-		props.removePost(props.postIdOptionsModal); 
+		dispatch(setCommModalPostId(""))
+		props.removePost(postIdOptionsModal); 
 		hideOptionsModal(); 
 
 		if(document.getElementById("comments-modal").style.display === "flex") {
@@ -27,7 +36,7 @@ function OptionsModal(props) {
 	}
 
 	function editPost() {
-		props.setOptionsEdit(true);
+		dispatch(setOptionsEdit(true));
 		hideOptionsModal();
 
 		if(document.getElementById("comments-modal").style.display === "flex") {
@@ -39,19 +48,19 @@ function OptionsModal(props) {
 	function buttons() {
 		const user = getAuth().currentUser;
 
-		if (props.userData &&  user && user.uid === props.userData.uid) {
+		if (userData &&  user && user.uid === userData.uid) {
 			return (
 				<>
 					<span onClick={() => deletePost()}>Delete</span>
 					<span onClick={() => editPost()}>Edit</span>
 				</>
 			);
-		} else if (props.userData && props.following.includes(props.userData.username)) {
+		} else if (userData && following.includes(userData.username)) {
 			return (
 				<>
 					<span
 						onClick={() => {
-							props.unFollow(props.userData.username);
+							props.unFollow(userData.username);
 							hideOptionsModal();
 						}}
 					>
@@ -59,12 +68,12 @@ function OptionsModal(props) {
 					</span>
 				</>
 			);
-		} else if (props.userData && !props.following.includes(props.userData.username)) {
+		} else if (userData && !following.includes(userData.username)) {
 			return (
 				<>
 					<span
 						onClick={() => {
-							props.follow(props.userData.username);
+							props.follow(userData.username);
 							hideOptionsModal();
 						}}
 					>
@@ -94,8 +103,8 @@ function options(userData, optionsModalSetUserData) {
 		if (!window.location.href.includes("optionsM")) {
 			window.history.pushState("optionsM", "Title", "optionsM");
 		}
-
-		optionsModalSetUserData(userData);
+		
+		optionsModalSetUserData(setUserDataOptionsModal(userData));
 		modal.style.display = "flex";
 	} else {
 		showSignInModal();

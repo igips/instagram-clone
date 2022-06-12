@@ -10,11 +10,16 @@ import { Link } from "react-router-dom";
 import { homeIcon } from "../Icons/HomeIcon";
 import {searchIconNotClicked} from "../Icons/SearchIcon";
 import { getUserDataFromUsersArray } from "../Home";
+import { useSelector } from "react-redux";
 
 
 function SearchModal(props) {
 	const [searchValue, setSearchValue] = useState("");
 	const [searchResults, setSearchResults] = useState([]);
+
+	const yourUsername = useSelector((state) => state.user.username);
+	const users = useSelector((state) => state.usersAndPosts.users);
+
 
 	function hideSearchModal() {
 		const modal = document.getElementById("search-modal-container");
@@ -101,7 +106,7 @@ function SearchModal(props) {
 					No results found
 				</div>
 				{searchResults.map((result) => {
-					const userData = getUserDataFromUsersArray(props.users, result);
+					const userData = getUserDataFromUsersArray(users, result);
 					return (
 						<Link
 							key={uniqid()} 
@@ -109,7 +114,7 @@ function SearchModal(props) {
 								window.history.pushState("/", "Title", "/");
 								document.getElementById("search-modal-container").style.display = "none";
 								cancelSearch();
-								if(result !== props.yourUsername) {
+								if(result !== yourUsername) {
 									homeIcon();
 								} else {
 									searchIconNotClicked();

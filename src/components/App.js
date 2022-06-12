@@ -12,69 +12,43 @@ import { HashRouter, Routes, Route } from "react-router-dom";
 import ProfilePage from "./ProfilePage";
 import Inbox from "./Inbox";
 import { useDispatch, useSelector } from "react-redux";
-import { setSignedIn } from "../features/userSlice";
+import {
+	setSignedIn,
+	setFollowing,
+	setUsername,
+	setFirestoreDocId,
+	setNotifications,
+	setUnReadMessages,
+	setUnReadNoti,
+	setAvatar,
+	setMessages,
+} from "../features/userSlice";
+import { setPosts, setUsers } from "../features/usersAndPostsSlice";
 
 function App() {
 	const dispatch = useDispatch();
 	const signedIn = useSelector((state) => state.user.signedIn);
-	const [following, setFollowing] = useState([]);
-	const [users, setUsers] = useState([]);
-	const [username, setUsername] = useState("");
-	const [firestoreDocId, setfirestoreDocId] = useState("");
-	const [notifications, setNotifications] = useState([]);
-	const [unReadMessages, setUnReadMessages] = useState([]);
-	const [unReadNoti, setUnReadNoti] = useState(0);
-	const [posts, setPosts] = useState([]);
-	const [avatar, setAvatar] = useState();
-	const [messages, setMessages] = useState([]);
+	const following = useSelector((state) => state.user.following);
+	const username = useSelector((state) => state.user.username);
+	const firestoreDocId = useSelector((state) => state.user.firestoreDocId);
+	const unReadNoti = useSelector((state) => state.user.unReadNoti);
+	const avatar = useSelector((state) => state.user.avatar);
+	const messages = useSelector((state) => state.user.messages);
+	const users = useSelector((state) => state.usersAndPosts.users);
+	const posts = useSelector((state) => state.usersAndPosts.posts);
+
 	const [messagesHelp, setMessagesHelp] = useState([]);
 
 	let unsubscribe;
-
-	//DROPDOWN//
-	const [userDataDropDown, setUserDataDropDown] = useState();
-
-	function dropDownSetUserData(data) {
-		setUserDataDropDown(data);
-	}
-	//DROPDWON//
-
-	//LIKESMODAL//
-	const [likesForLikesModal, setLikesForLikesModal] = useState([]);
-	const [likesModalInfo, setLikesModalInfo] = useState("Likes");
-
-	function likesModalSetLikes(data) {
-		setLikesForLikesModal(data);
-	}
-	//LIKESMODAL//
-
-	//OPTIONSMODAL//
-	const [userDataOptionsModal, setUserDataOptionsModal] = useState();
-	const [postIdOptionsModal, setpostIdOptionsModal] = useState();
-	const [optionsEdit, setOptionsEdit] = useState(false);
-
-	function optionsModalSetUserData(data) {
-		setUserDataOptionsModal(data);
-	}
-
-	//OPTIONSMODAL//
-
-	//COMMENTSMODAL//
-	const [commModalPostId, setCommModalPostId] = useState();
-
-	function commModalSetPostId(data) {
-		setCommModalPostId(data);
-	}
-	//COMMENTSMODAL//
 
 	onAuthStateChanged(getAuth(), (user) => {
 		if (user) {
 			dispatch(setSignedIn(true));
 		} else {
 			dispatch(setSignedIn(false));
-			setUsername("");
-			setUnReadNoti(0);
-			setAvatar();
+			dispatch(setUsername(""));
+			dispatch(setUnReadNoti(0));
+			dispatch(setAvatar(""));
 			if (unsubscribe) {
 				unsubscribe();
 			}
@@ -87,41 +61,40 @@ function App() {
 				return new Date(b.date) - new Date(a.date);
 			});
 
-			setMessages(mes);
+			dispatch(setMessages(mes));
 		}
 	}, [messagesHelp]);
 
 	useEffect(() => {
-		if(signedIn && following.length === 0) {
+		if (signedIn && following.length === 0) {
 			document.getElementById("discover-modal").style.display = "flex";
-
 		} else {
 			document.getElementById("discover-modal").style.display = "none";
 		}
-
-	},[following])
+	}, [following]);
 
 	useEffect(() => {
 		const user = getAuth().currentUser;
 
 		if (signedIn) {
 			getUserData(user.uid).then((user) => {
-				setfirestoreDocId(user.id);
-				setUsername(user.data().username);
-				setFollowing(user.data().following);
-				setNotifications(user.data().notifications);
-				setUnReadNoti(user.data().unReadNoti);
-				setAvatar(user.data().avatar);
-				setMessages(user.data().messages);
+				dispatch(setFirestoreDocId(user.id));
+				dispatch(setUsername(user.data().username));
+				dispatch(setFollowing(user.data().following));
+				dispatch(setNotifications(user.data().notifications));
+				dispatch(setUnReadNoti(user.data().unReadNoti));
+				dispatch(setAvatar(user.data().avatar));
+				dispatch(setMessages(user.data().messages));
 
 				//eslint-disable-next-line react-hooks/exhaustive-deps
 				unsubscribe = onSnapshot(doc(getFirestore(), "usernames", user.id), (docu) => {
-					setNotifications(docu.data().notifications);
+					dispatch(setNotifications(user.data().notifications));
 					if (docu.data().avatar !== avatar) {
-						setAvatar(docu.data().avatar);
+						dispatch(setAvatar(user.data().avatar));
 					}
 
-					setUnReadMessages(docu.data().unReadMessages);
+					dispatch(setUnReadMessages(docu.data().unReadMessages));
+
 					setMessagesHelp(docu.data().messages);
 
 					if (
@@ -130,16 +103,16 @@ function App() {
 					) {
 						updateDoc(doc(getFirestore(), "usernames", user.id), { unReadNoti: 0 });
 					} else {
-						setUnReadNoti(docu.data().unReadNoti);
+						dispatch(setUnReadNoti(docu.data().unReadNoti));
 					}
 				});
 			});
 		} else {
-			setfirestoreDocId("");
+			dispatch(setFirestoreDocId(""));
 		}
 		getUsers().then((users) => {
 			shuffleArray(users);
-			setUsers(users);
+			dispatch(setUsers(users));
 			initialSetPosts(users);
 		});
 	}, [signedIn]);
@@ -147,7 +120,7 @@ function App() {
 	function updateUsers() {
 		getUsers().then((users) => {
 			shuffleArray(users);
-			setUsers(users);
+			dispatch(setUsers(users));
 		});
 	}
 
@@ -168,11 +141,11 @@ function App() {
 			return new Date(b.date) - new Date(a.date);
 		});
 
-		setPosts(posts2);
+		dispatch(setPosts(posts2));
 	}
 
 	function addPost(post) {
-		setPosts([post, ...posts]);
+		dispatch(setPosts([post, ...posts]));
 	}
 
 	function removePost(id) {
@@ -187,189 +160,182 @@ function App() {
 		}
 		updateUsers();
 
-		setPosts((oldPosts) => {
-			const newPosts = oldPosts.filter((post) => post.id !== id);
-			return newPosts;
-		});
+		const newPosts = posts.filter((post) => post.id !== id);
+		dispatch(setPosts(newPosts));
+
 	}
 
 	function removeComment(postId, commentId) {
-		setPosts((prevPosts) => {
-			const newPosts = prevPosts.map((post) => {
-				if (post.id === postId) {
-					const newP = { ...post, comments: post.comments.filter((comment) => comment.id !== commentId) };
-					getDocId(post.username).then(async (id) => {
-						await updateDoc(doc(getFirestore(), "usernames", id), { posts: arrayRemove(post) });
-						await updateDoc(doc(getFirestore(), "usernames", id), { posts: arrayUnion(newP) });
-						updateUsers();
-					});
-					return newP;
-				}
-				return post;
-			});
-			return newPosts;
+		const newPosts = posts.map((post) => {
+			if (post.id === postId) {
+				const newP = { ...post, comments: post.comments.filter((comment) => comment.id !== commentId) };
+				getDocId(post.username).then(async (id) => {
+					await updateDoc(doc(getFirestore(), "usernames", id), { posts: arrayRemove(post) });
+					await updateDoc(doc(getFirestore(), "usernames", id), { posts: arrayUnion(newP) });
+					updateUsers();
+				});
+				return newP;
+			}
+			return post;
 		});
+		dispatch(setPosts(newPosts));
 	}
 
 	function addComment(comment, id) {
-		setPosts((prevPosts) => {
-			const newPosts = prevPosts.map((post) => {
-				if (post.id === id) {
-					const newP = { ...post, comments: [...post.comments, comment] };
-					getDocId(post.username).then(async (id) => {
-						await updateDoc(doc(getFirestore(), "usernames", id), { posts: arrayRemove(post) });
-						await updateDoc(doc(getFirestore(), "usernames", id), { posts: arrayUnion(newP) });
-						if (post.username !== username) {
-							updateDoc(doc(getFirestore(), "usernames", id), {
-								notifications: arrayUnion({
-									username: username,
-									content: "commented your post.",
-									postID: post.id,
-									date: Date.now(),
-								}),
-								unReadNoti: increment(1),
-							});
-						}
-						updateUsers();
-					});
-					return newP;
-				}
-				return post;
-			});
-
-			return newPosts;
+		const newPosts = posts.map((post) => {
+			if (post.id === id) {
+				const newP = { ...post, comments: [...post.comments, comment] };
+				getDocId(post.username).then(async (id) => {
+					await updateDoc(doc(getFirestore(), "usernames", id), { posts: arrayRemove(post) });
+					await updateDoc(doc(getFirestore(), "usernames", id), { posts: arrayUnion(newP) });
+					if (post.username !== username) {
+						updateDoc(doc(getFirestore(), "usernames", id), {
+							notifications: arrayUnion({
+								username: username,
+								content: "commented your post.",
+								postID: post.id,
+								date: Date.now(),
+							}),
+							unReadNoti: increment(1),
+						});
+					}
+					updateUsers();
+				});
+				return newP;
+			}
+			return post;
 		});
+		dispatch(setPosts(newPosts))
 	}
 
 	function likeComment(postId, commentId) {
-		setPosts((prevPosts) => {
-			const newPosts = prevPosts.map((post) => {
-				if (post.id === postId) {
-					let newLike = false;
-					let commentUsername;
-					const newP = {
-						...post,
-						comments: post.comments.map((comment) => {
-							if (comment.id === commentId) {
-								if (!comment.likes.users.includes(username)) {
-									commentUsername = comment.username;
-									newLike = true;
-									return {
-										...comment,
-										likes: {
-											num: comment.likes.num + 1,
-											users: [...comment.likes.users, username],
-										},
-									};
-								} else {
-									return {
-										...comment,
-										likes: {
-											num: comment.likes.num - 1,
-											users: comment.likes.users.filter((user) => user !== username),
-										},
-									};
-								}
+		const newPosts = posts.map((post) => {
+			if (post.id === postId) {
+				let newLike = false;
+				let commentUsername;
+				const newP = {
+					...post,
+					comments: post.comments.map((comment) => {
+						if (comment.id === commentId) {
+							if (!comment.likes.users.includes(username)) {
+								commentUsername = comment.username;
+								newLike = true;
+								return {
+									...comment,
+									likes: {
+										num: comment.likes.num + 1,
+										users: [...comment.likes.users, username],
+									},
+								};
+							} else {
+								return {
+									...comment,
+									likes: {
+										num: comment.likes.num - 1,
+										users: comment.likes.users.filter((user) => user !== username),
+									},
+								};
 							}
-							return comment;
-						}),
-					};
-
-					getDocId(post.username).then(async (id) => {
-						await updateDoc(doc(getFirestore(), "usernames", id), { posts: arrayRemove(post) });
-						await updateDoc(doc(getFirestore(), "usernames", id), { posts: arrayUnion(newP) });
-						if (newLike && commentUsername !== username) {
-							updateDoc(doc(getFirestore(), "usernames", id), {
-								notifications: arrayUnion({
-									username: username,
-									content: "liked your comment.",
-									postID: post.id,
-									date: Date.now(),
-								}),
-								unReadNoti: increment(1),
-							});
 						}
-						updateUsers();
-					});
+						return comment;
+					}),
+				};
 
-					return newP;
-				}
-				return post;
-			});
-			return newPosts;
+				getDocId(post.username).then(async (id) => {
+					await updateDoc(doc(getFirestore(), "usernames", id), { posts: arrayRemove(post) });
+					await updateDoc(doc(getFirestore(), "usernames", id), { posts: arrayUnion(newP) });
+					if (newLike && commentUsername !== username) {
+						updateDoc(doc(getFirestore(), "usernames", id), {
+							notifications: arrayUnion({
+								username: username,
+								content: "liked your comment.",
+								postID: post.id,
+								date: Date.now(),
+							}),
+							unReadNoti: increment(1),
+						});
+					}
+					updateUsers();
+				});
+
+				return newP;
+			}
+			return post;
 		});
+		dispatch(setPosts(newPosts));
+
 	}
 
 	function likePicture(id) {
-		setPosts((prevPosts) => {
-			const newPosts = prevPosts.map((post) => {
-				if (post.id === id) {
-					let newP;
-					let newLike = false;
-					if (!post.likes.users.includes(username)) {
-						newP = { ...post, likes: { num: post.likes.num + 1, users: [...post.likes.users, username] } };
-						newLike = true;
-					} else {
-						newP = {
-							...post,
-							likes: {
-								num: post.likes.num - 1,
-								users: post.likes.users.filter((user) => user !== username),
-							},
-						};
-					}
-					getDocId(post.username).then(async (id) => {
-						await updateDoc(doc(getFirestore(), "usernames", id), { posts: arrayRemove(post) });
-						await updateDoc(doc(getFirestore(), "usernames", id), { posts: arrayUnion(newP) });
-						if (newLike && post.username !== username) {
-							updateDoc(doc(getFirestore(), "usernames", id), {
-								notifications: arrayUnion({
-									username: username,
-									content: "liked your post.",
-									postID: post.id,
-									date: Date.now(),
-								}),
-								unReadNoti: increment(1),
-							});
-						}
-						updateUsers();
-					});
-					return newP;
+		const newPosts = posts.map((post) => {
+			if (post.id === id) {
+				let newP;
+				let newLike = false;
+				if (!post.likes.users.includes(username)) {
+					newP = { ...post, likes: { num: post.likes.num + 1, users: [...post.likes.users, username] } };
+					newLike = true;
+				} else {
+					newP = {
+						...post,
+						likes: {
+							num: post.likes.num - 1,
+							users: post.likes.users.filter((user) => user !== username),
+						},
+					};
 				}
+				getDocId(post.username).then(async (id) => {
+					await updateDoc(doc(getFirestore(), "usernames", id), { posts: arrayRemove(post) });
+					await updateDoc(doc(getFirestore(), "usernames", id), { posts: arrayUnion(newP) });
+					if (newLike && post.username !== username) {
+						updateDoc(doc(getFirestore(), "usernames", id), {
+							notifications: arrayUnion({
+								username: username,
+								content: "liked your post.",
+								postID: post.id,
+								date: Date.now(),
+							}),
+							unReadNoti: increment(1),
+						});
+					}
+					updateUsers();
+				});
+				return newP;
+			}
 
-				return post;
-			});
-			return newPosts;
+			return post;
 		});
+		dispatch(setPosts(newPosts));
+
+	
 	}
 
 	function clearNotifications() {
 		if (unReadNoti !== 0) {
 			updateDoc(doc(getFirestore(), "usernames", firestoreDocId), { unReadNoti: 0 });
-			setUnReadNoti(0);
+			dispatch(setUnReadNoti(0));
 		}
 	}
 
 	function follow(who, right) {
-		setFollowing([...following, who]);
-		setUsers((oldUsers) => {
-			const newUsers = oldUsers.map((user) => {
-				if (user.username === who) {
-					return {
-						...user,
-						followers: [...user.followers, username],
-					};
-				} else if (user.username === username) {
-					return {
-						...user,
-						following: [...user.following, who],
-					};
-				} else {
-					return user;
-				}
-			});
-			return newUsers;
+		dispatch(setFollowing([...following, who]));
+
+		const newUsers = users.map((user) => {
+			if (user.username === who) {
+				return {
+					...user,
+					followers: [...user.followers, username],
+				};
+			} else if (user.username === username) {
+				return {
+					...user,
+					following: [...user.following, who],
+				};
+			} else {
+				return user;
+			}
 		});
+
+		dispatch(setUsers(newUsers));
 
 		getDocId(who).then((id) =>
 			updateDoc(doc(getFirestore(), "usernames", id), {
@@ -386,28 +352,27 @@ function App() {
 	}
 
 	function unFollow(who) {
-		setFollowing((oldFollowing) => {
-			const newFollowing = oldFollowing.filter((name) => name !== who);
-			return newFollowing;
+		const newFollowing = following.filter((name) => name !== who);
+		dispatch(setFollowing(newFollowing));
+
+		const newUsers = users.map((user) => {
+			if (user.username === who) {
+				return {
+					...user,
+					followers: user.followers.filter((name) => name !== username),
+				};
+			} else if (user.username === username) {
+				return {
+					...user,
+					following: user.following.filter((name) => name !== who),
+				};
+			} else {
+				return user;
+			}
 		});
-		setUsers((oldUsers) => {
-			const newUsers = oldUsers.map((user) => {
-				if (user.username === who) {
-					return {
-						...user,
-						followers: user.followers.filter((name) => name !== username),
-					};
-				} else if (user.username === username) {
-					return {
-						...user,
-						following: user.following.filter((name) => name !== who),
-					};
-				} else {
-					return user;
-				}
-			});
-			return newUsers;
-		});
+
+		dispatch(setUsers(newUsers));
+
 		getDocId(who).then((id) =>
 			updateDoc(doc(getFirestore(), "usernames", id), { followers: arrayRemove(username) })
 		);
@@ -418,82 +383,35 @@ function App() {
 		<section id="top-section">
 			<HashRouter>
 				<DropDown
-					following={following}
 					follow={follow}
-					unFollow={unFollow}
-					userData={userDataDropDown}
-					users={users}
-					posts={posts}
-					setPostId={commModalSetPostId}
+					unFollow={unFollow}					
 				/>
 				<Modals
-					notifications={notifications}
-					following={following}
-					username={username}
 					follow={follow}
-					unFollow={unFollow}
-					users={users}
-					dropDownSetUserData={dropDownSetUserData}
-					likesForLikesModal={likesForLikesModal}
-					userDataOptionsModal={userDataOptionsModal}
-					optionsModalSetUserData={optionsModalSetUserData}
-					setpostIdOptionsModal={setpostIdOptionsModal}
-					posts={posts}
-					commModalPostId={commModalPostId}
-					likesModalSetLikes={likesModalSetLikes}
+					unFollow={unFollow}															
 					likeComment={likeComment}
 					removeComment={removeComment}
 					likePicture={likePicture}
 					addComment={addComment}
 					addPost={addPost}
-					firestoreDocId={firestoreDocId}
-					removePost={removePost}
-					postIdOptionsModal={postIdOptionsModal}
-					commModalSetPostId={commModalSetPostId}
-					optionsEdit={optionsEdit}
-					setOptionsEdit={setOptionsEdit}
-					setPosts={setPosts}
-					setLikesModalInfo={setLikesModalInfo}
-					likesModalInfo={likesModalInfo}
-					avatar={avatar}
+					removePost={removePost}	
 					updateUsers={updateUsers}
 				></Modals>
 				<Nav
 					clearNotifications={clearNotifications}
-					unReadNoti={unReadNoti}
-					notifications={notifications}
-					users={users}
-					following={following}
-					username={username}
 					follow={follow}
 					unFollow={unFollow}
-					commModalSetPostId={commModalSetPostId}
-					avatar={avatar}
-					posts={posts}
-					unReadMessages={unReadMessages}
-					setUnReadMessages={setUnReadMessages}
 				></Nav>
 				<Routes>
 					<Route
 						path="/"
 						element={
-							<Home
-								setpostIdOptionsModal={setpostIdOptionsModal}
-								optionsModalSetUserData={optionsModalSetUserData}
-								likesModalSetLikes={likesModalSetLikes}
-								dropDownSetUserData={dropDownSetUserData}
-								users={users}
-								following={following}
-								username={username}
+							<Home								
 								follow={follow}
 								unFollow={unFollow}
-								posts={posts}
 								likePicture={likePicture}
 								addComment={addComment}
 								likeComment={likeComment}
-								commModalSetPostId={commModalSetPostId}
-								avatar={avatar}
-
 							/>
 						}
 					/>
@@ -502,33 +420,11 @@ function App() {
 						element={
 							<ProfilePage
 								follow={follow}
-								unFollow={unFollow}
-								yourUsername={username}
-								following={following}
-								likesModalSetLikes={likesModalSetLikes}
-								setLikesModalInfo={setLikesModalInfo}
-								users={users}
-								commModalSetPostId={commModalSetPostId}
-								posts={posts}
-								firestoreDocId={firestoreDocId}
-								avatar={avatar}
+								unFollow={unFollow}								
 							/>
 						}
 					/>
-					<Route
-						path="/inbox"
-						element={
-							<Inbox
-								messages={messages}
-								setMessages={setMessages}
-								users={users}
-								yourUsername={username}
-								firestoreDocId={firestoreDocId}
-								unReadMessages={unReadMessages}
-								setUnReadMessages={setUnReadMessages}
-							/>
-						}
-					/>
+					<Route path="/inbox" element={<Inbox />} />
 				</Routes>
 			</HashRouter>
 		</section>

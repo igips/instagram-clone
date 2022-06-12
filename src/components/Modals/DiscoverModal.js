@@ -5,25 +5,27 @@ import { Link } from "react-router-dom";
 import { dropDown, hideDropDown } from "../DropDown";
 import { getAuth } from "firebase/auth";
 import ava from "../../img/ava.jpeg";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 
 function DiscoverModal(props) {
+	const dispatch = useDispatch();
 	const signedIn = useSelector((state) => state.user.signedIn);
-
+	const following = useSelector((state) => state.user.following);
+	const yourUsername = useSelector((state) => state.user.username);
+	const users = useSelector((state) => state.usersAndPosts.users);
 
 	function hideDiscoverModal() {
 		document.getElementById("discover-modal").style.display = "none";
 	}
-    
 
-    function followButtonForLikes(user) {
+	function followButtonForLikes(user) {
 		const userR = getAuth().currentUser;
 
 		if (
 			userR &&
 			signedIn &&
-			!props.following.includes(user) &&
-			getUserDataFromUsersArray(props.users, user).uid !== userR.uid
+			!following.includes(user) &&
+			getUserDataFromUsersArray(users, user).uid !== userR.uid
 		) {
 			return (
 				<button
@@ -35,7 +37,7 @@ function DiscoverModal(props) {
 					Follow
 				</button>
 			);
-		} else if (userR && signedIn && props.following.includes(user)) {
+		} else if (userR && signedIn && following.includes(user)) {
 			return (
 				<button
 					onClick={() => {
@@ -54,13 +56,13 @@ function DiscoverModal(props) {
 			<div className="discover-modal-content">
 				<div id="discover-modal-header">
 					<span>{"Discover"}</span>
-                    <div id="close-discover-modal">{closeModal(hideDiscoverModal)}</div>
+					<div id="close-discover-modal">{closeModal(hideDiscoverModal)}</div>
 				</div>
 				<div id="list-of-discover-div">
 					<div id="list-of-discover-div-inner">
-						{props.users.map((user) => {
-							if (user.username !== props.yourUsername && user.posts.length > 0) {
-								const userData = getUserDataFromUsersArray(props.users, user.username);
+						{users.map((user) => {
+							if (user.username !== yourUsername && user.posts.length > 0) {
+								const userData = getUserDataFromUsersArray(users, user.username);
 								return (
 									<div key={uniqid()} className="right-sug-div-list">
 										<Link
@@ -76,8 +78,8 @@ function DiscoverModal(props) {
 											<div
 												onMouseEnter={(e) => {
 													dropDown(
-														getUserDataFromUsersArray(props.users, user.username),
-														props.dropDownSetUserData,
+														getUserDataFromUsersArray(users, user.username),
+														dispatch,
 														e,
 														"avaPic"
 													);
@@ -97,8 +99,8 @@ function DiscoverModal(props) {
 											<span
 												onMouseEnter={(e) =>
 													dropDown(
-														getUserDataFromUsersArray(props.users, user.username),
-														props.dropDownSetUserData,
+														getUserDataFromUsersArray(users, user.username),
+														dispatch,
 														e,
 														"no",
 														"right"
